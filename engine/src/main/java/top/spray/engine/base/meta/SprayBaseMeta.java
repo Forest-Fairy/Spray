@@ -23,9 +23,10 @@ public interface SprayBaseMeta<T extends SprayBaseMeta<?>> extends Cloneable {
 
     Logger logger();
 
-    /**
-     * 列出节点需要的jar文件
-     */
+    /** the jars for running */
     String listJarFiles();
+
+    /** run this step async */
+    boolean isAsync();
 
 }

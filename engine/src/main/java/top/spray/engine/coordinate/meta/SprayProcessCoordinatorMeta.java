@@ -17,6 +17,8 @@ public interface SprayProcessCoordinatorMeta extends SprayBaseMeta<SprayProcessC
     /** the startNodes for the coordinator */
     List<? extends SprayProcessStepMeta> getStartNodes();
 
+    int minThreadCount();
+
     @Override
     default String listJarFiles() {
         return this.getStartNodes().stream()

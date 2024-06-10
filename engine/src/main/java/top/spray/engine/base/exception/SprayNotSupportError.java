@@ -35,5 +35,10 @@ public class SprayNotSupportError extends SprayMetaError {
         public String listJarFiles() {
             return "";
         }
+
+        @Override
+        public boolean isAsync() {
+            return false;
+        }
     }
 }

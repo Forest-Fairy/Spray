@@ -1,7 +1,12 @@
 package top.spray.engine.step.meta;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import top.spray.engine.base.meta.SprayBaseMeta;
 import top.spray.engine.coordinate.meta.SprayProcessCoordinatorMeta;
+import top.spray.engine.step.executor.SprayProcessStepExecutor;
+
+import java.util.List;
 
 /**
  * 节点引擎
@@ -10,26 +15,15 @@ public interface SprayProcessStepMeta extends SprayBaseMeta<SprayProcessStepMeta
     String getId();
     String getName();
 
-    SprayProcessCoordinatorMeta getProcessEngine();
-    default String transactionId() {
-        return this.getProcessEngine().transactionId();
-    }
+    List<SprayProcessStepMeta> nextNodes();
 
-    /**
-     * 是否事务操作
-     */
     boolean isTransactional();
 
-    /**
-     * 回滚操作
-     */
-    void rollback();
-
-    /**
-     * 出错时是否回滚
-     */
     boolean rollbackIfError();
 
+    boolean ignoreError();
+
+    Class<? extends SprayProcessStepExecutor> executorClass();
 
 
 }
