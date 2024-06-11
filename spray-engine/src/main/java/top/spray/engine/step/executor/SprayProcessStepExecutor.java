@@ -13,13 +13,16 @@ import java.util.Map;
  * Define the executor of a process node
  */
 public interface SprayProcessStepExecutor extends SprayMetaDrive<SprayProcessStepMeta>, Runnable {
+    static String getExecutorId(SprayProcessCoordinator coordinator, SprayProcessStepMeta stepMeta) {
+        return coordinator.getMeta().transactionId() + "_" + stepMeta.getId();
+    }
     static <T extends SprayProcessStepMeta> SprayProcessStepExecutor create(
             SprayProcessCoordinator coordinator, SprayProcessStepMeta stepMeta) {
-        String executorId = coordinator.getMeta().transactionId() + "_" + stepMeta.getId();
-        SprayProcessStepExecutor stepExecutor = coordinator.getExecutor(executorId);
+        String executorId = getExecutorId(coordinator, stepMeta);
+        SprayProcessStepExecutor stepExecutor = coordinator.getThreadExecutor(executorId);
         if (stepExecutor == null) {
             synchronized (coordinator) {
-                if ((stepExecutor = coordinator.getExecutor(stepMeta.getId())) == null) {
+                if ((stepExecutor = coordinator.getThreadExecutor(stepMeta.getId())) == null) {
                     try {
                         stepExecutor = stepMeta.executorClass().getConstructor().newInstance();
                         stepExecutor.setMeta(stepMeta);
@@ -35,9 +38,6 @@ public interface SprayProcessStepExecutor extends SprayMetaDrive<SprayProcessSte
         return stepExecutor;
     }
     void init();
-    String executorId();
-    String executorType();
-
     @Override
     SprayProcessStepMeta getMeta();
     SprayProcessCoordinator getCoordinator();

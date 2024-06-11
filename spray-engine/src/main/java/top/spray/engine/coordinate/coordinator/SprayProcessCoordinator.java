@@ -2,11 +2,12 @@ package top.spray.engine.coordinate.coordinator;
 
 import top.spray.core.engine.execute.SprayMetaDrive;
 import top.spray.core.engine.props.SprayData;
-import top.spray.core.engine.result.SprayCoordinateResult;
+import top.spray.core.engine.result.SprayCoordinateStatus;
 import top.spray.engine.coordinate.meta.SprayProcessCoordinatorMeta;
 import top.spray.engine.step.executor.SprayProcessStepExecutor;
 import top.spray.engine.step.meta.SprayProcessStepMeta;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.function.Supplier;
@@ -14,21 +15,21 @@ import java.util.function.Supplier;
 /**
  * Define the coordinator of a process
  */
-public interface SprayProcessCoordinator extends SprayMetaDrive<SprayProcessCoordinatorMeta>, Supplier<SprayCoordinateResult> {
+public interface SprayProcessCoordinator extends SprayMetaDrive<SprayProcessCoordinatorMeta>, Supplier<SprayCoordinateStatus> {
     @Override
     SprayProcessCoordinatorMeta getMeta();
 
     @Override
-    default SprayCoordinateResult get() {
+    default SprayCoordinateStatus get() {
         return execute();
     }
 
-    SprayCoordinateResult execute();
+    SprayCoordinateStatus execute();
 
-    Executor getExecutor();
+    Executor getThreadExecutor();
 
     void registerExecutor(String executorId, SprayProcessStepExecutor executor);
-    SprayProcessStepExecutor getExecutor(String executorId);
+    SprayProcessStepExecutor getThreadExecutor(String executorId);
 
 
 
@@ -44,8 +45,8 @@ public interface SprayProcessCoordinator extends SprayMetaDrive<SprayProcessCoor
                 nextExecutor.dataInput(fromExecutor, data, still);
                 continue;
             }
-            if (nextNode.isAsync() && getExecutor() != null) {
-                getExecutor().execute(nextExecutor.dataInput(fromExecutor, data, still));
+            if (nextNode.isAsync() && getThreadExecutor() != null) {
+                getThreadExecutor().execute(nextExecutor.dataInput(fromExecutor, data, still));
             } else {
                 nextExecutor.dataInput(fromExecutor, data, still).run();
             }

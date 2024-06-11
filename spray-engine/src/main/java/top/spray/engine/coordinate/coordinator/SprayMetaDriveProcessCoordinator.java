@@ -1,9 +1,8 @@
 package top.spray.engine.coordinate.coordinator;
 
 import top.spray.core.engine.execute.SprayListenable;
-import top.spray.core.engine.result.SprayStepResult;
-import top.spray.core.engine.props.SprayData;
-import top.spray.core.engine.result.SprayCoordinateResult;
+import top.spray.core.engine.result.SprayStepStatus;
+import top.spray.core.engine.result.SprayCoordinateStatus;
 import top.spray.engine.step.executor.SprayExecutorListener;
 import top.spray.engine.coordinate.meta.SprayProcessCoordinatorMeta;
 import top.spray.engine.step.executor.SprayProcessStepExecutor;
@@ -12,7 +11,6 @@ import top.spray.engine.step.meta.SprayProcessStepMeta;
 
 import java.util.*;
 import java.util.concurrent.*;
-import java.util.stream.Stream;
 
 public class SprayMetaDriveProcessCoordinator implements
         SprayProcessCoordinator,
@@ -76,7 +74,7 @@ public class SprayMetaDriveProcessCoordinator implements
 
 
     @Override
-    public SprayCoordinateResult execute() {
+    public SprayCoordinateStatus execute() {
         ExecutorService executorService = null;
         if (this.coordinatorMeta.minThreadCount() > 1) {
             executorService = new ThreadPoolExecutor(
@@ -84,26 +82,30 @@ public class SprayMetaDriveProcessCoordinator implements
                     Integer.MAX_VALUE, 3, TimeUnit.SECONDS, new LinkedBlockingQueue<>(this.coordinatorMeta.minThreadCount())
             );
         }
-        SprayCoordinateResult coordinateResult = SprayCoordinateResult.SUCCESS;
+        SprayCoordinateStatus coordinateResult = SprayCoordinateStatus.SUCCESS;
         List<CompletableFuture<SprayStepResultInstance<?>>> futureResults = new ArrayList<>();
+        Map<String, SprayStepResultInstance<?>> executorResultMap = new HashMap<>();
         for (SprayProcessStepMeta startNode : this.coordinatorMeta.getStartNodes()) {
             if (startNode.isAsync() && executorService != null) {
                 futureResults.add(CompletableFuture.supplyAsync(
+                        // this will create a new thread to run the step fully
                         () -> this.execute(startNode),
                         executorService));
             } else {
-                SprayStepResult resultStatus = this.execute(startNode).getStatus();
-                if (!SprayStepResult.DONE.equals(resultStatus)) {
-                    return
-                }
+                String executorId = SprayProcessStepExecutor.getExecutorId(this, startNode);
+                executorResultMap.put(executorId, this.execute(startNode));
             }
         }
-        return null;
+        for (CompletableFuture<SprayStepResultInstance<?>> futureResult : futureResults) {
+            SprayStepResultInstance<?> sprayStepResultInstance = futureResult.get();
+
+        }
+        return SprayCoordinateStatus.FAILED;
     }
 
 
     @Override
-    public Executor getExecutor() {
+    public Executor getThreadExecutor() {
         return this.executor;
     }
 
@@ -115,7 +117,14 @@ public class SprayMetaDriveProcessCoordinator implements
 
     protected SprayStepResultInstance<?> execute(SprayProcessStepMeta stepMeta) {
         SprayProcessStepExecutor executor = SprayProcessStepExecutor.create(this, stepMeta);
-        executor.run();
+        try {
+            executor.run();
+        } catch (Throwable e) {
+            if (!executor.getMeta().ignoreError()) {
+                executor.getStepResult().setStatus(SprayStepStatus.FAILED);
+                executor.getStepResult().setError(e);
+            }
+        }
         return executor.getStepResult();
     }
 

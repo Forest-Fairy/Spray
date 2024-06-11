@@ -1,7 +1,7 @@
 package top.spray.engine.step.instance;
 
 import top.spray.engine.step.executor.SprayProcessStepExecutor;
-import top.spray.core.engine.result.SprayStepResult;
+import top.spray.core.engine.result.SprayStepStatus;
 
 import java.util.Map;
 
@@ -14,6 +14,10 @@ public interface SprayStepResultInstance<Executor extends SprayProcessStepExecut
     String id();
     String transactionId();
 
+    void setStatus(SprayStepStatus status);
+
+    void setError(Throwable throwable);
+
     Executor getExecutor();
 
     long getStartTime();
@@ -22,7 +26,5 @@ public interface SprayStepResultInstance<Executor extends SprayProcessStepExecut
     Map<String, Long> inputInfos();
 
     Map<String, Long> outputInfos();
-
-    void setStatus(SprayStepResult status);
-    SprayStepResult getStatus();
+    SprayStepStatus getStatus();
 }
