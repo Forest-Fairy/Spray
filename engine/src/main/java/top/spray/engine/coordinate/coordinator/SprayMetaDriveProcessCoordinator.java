@@ -71,6 +71,7 @@ public class SprayMetaDriveProcessCoordinator implements
         return null;
     }
 
+
     protected SprayStepResultInstance<?> executeOneByOne(SprayProcessStepMeta stepMeta) {
         boolean gotoNext = true;
         try {
@@ -92,7 +93,7 @@ public class SprayMetaDriveProcessCoordinator implements
     }
 
     protected SprayStepResultInstance<?> executeOne(SprayProcessStepMeta stepMeta) {
-        SprayProcessStepExecutor executor = SprayProcessStepExecutor.create(stepMeta);
+        SprayProcessStepExecutor executor = SprayProcessStepExecutor.create(this, stepMeta);
         // TODO make it a publish model
         SprayStepResultInstance<? extends SprayProcessStepExecutor> stepResult = null;
         executor.execute(this, stepMeta,
