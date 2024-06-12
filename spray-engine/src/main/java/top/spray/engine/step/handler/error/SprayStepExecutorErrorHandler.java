@@ -1,12 +1,22 @@
 package top.spray.engine.step.handler.error;
 
+import top.spray.core.engine.factory.SprayErrorHandlerFactory;
 import top.spray.core.engine.handler.error.SprayErrorHandler;
 import top.spray.engine.step.executor.SprayProcessStepExecutor;
 
-public interface SprayStepExecutorErrorHandler extends SprayErrorHandler<SprayProcessStepExecutor> {
-    @Override
-    boolean canHandle(SprayProcessStepExecutor sprayProcessStepExecutor, Throwable throwable, Object args);
+public abstract class SprayStepExecutorErrorHandler implements SprayErrorHandler<SprayProcessStepExecutor> {
+    protected SprayStepExecutorErrorHandler() {
+        SprayErrorHandlerFactory.register(this);
+    }
 
     @Override
-    void handle(SprayProcessStepExecutor executor, Throwable error, Object... args);
+    public abstract boolean canHandle(SprayProcessStepExecutor sprayProcessStepExecutor, Throwable throwable, Object args);
+    @Override
+    public void handle(SprayProcessStepExecutor executor, Throwable error, Object... args) {
+        if (this.canHandle(executor, error, args)) {
+            this.handle0(executor, error, args);
+        }
+    }
+    protected abstract void handle0(SprayProcessStepExecutor executor, Throwable error, Object[] args);
+
 }
