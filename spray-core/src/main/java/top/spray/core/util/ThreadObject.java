@@ -25,7 +25,7 @@ public class ThreadObject {
     public ThreadObject() {
     }
 
-    public void init() {
+    private void init() {
         Timestamp timestamp = new Timestamp(new Date().getTime());
         this.tid = String.valueOf(Thread.currentThread().getId());
         this.transactionId = String.valueOf(timestamp.getTime()).substring(0, 10) + timestamp.getNanos();
