@@ -6,6 +6,8 @@ import top.spray.core.engine.result.SprayCoordinateStatus;
 import top.spray.engine.step.executor.SprayExecutorListener;
 import top.spray.engine.coordinate.meta.SprayProcessCoordinatorMeta;
 import top.spray.engine.step.executor.SprayProcessStepExecutor;
+import top.spray.engine.step.executor.closeable.SprayCloseableExecutor;
+import top.spray.engine.step.executor.transaction.SprayTransactionSupportExecutor;
 import top.spray.engine.step.instance.SprayStepResultInstance;
 import top.spray.engine.step.meta.SprayProcessStepMeta;
 
@@ -120,6 +122,21 @@ public class SprayMetaDriveProcessCoordinator implements
             if (!executor.getMeta().ignoreError()) {
                 executor.getStepResult().setStatus(SprayStepStatus.FAILED);
                 executor.getStepResult().setError(e);
+            }
+        }
+        if (executor instanceof SprayTransactionSupportExecutor transactionSupportExecutor) {
+            if (SprayStepStatus.DONE.equals(executor.getStepResult().getStatus())) {
+                transactionSupportExecutor.commit();
+            } else if (SprayStepStatus.FAILED.equals(executor.getStepResult().getStatus()) ||
+                    SprayStepStatus.STOP.equals(executor.getStepResult().getStatus())) {
+                transactionSupportExecutor.rollback();
+            }
+        }
+        if (executor instanceof SprayCloseableExecutor closeableExecutor) {
+            try {
+                closeableExecutor.close();
+            } catch (Throwable closeException) {
+                closeableExecutor.closeFailed(closeException);
             }
         }
         return executor.getStepResult();

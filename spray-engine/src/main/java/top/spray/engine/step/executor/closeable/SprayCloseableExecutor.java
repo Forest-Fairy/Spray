@@ -5,4 +5,6 @@ import top.spray.engine.step.executor.SprayProcessStepExecutor;
 
 public interface SprayCloseableExecutor extends SprayProcessStepExecutor {
     void close();
+
+    void closeFailed(Throwable throwable);
 }
