@@ -37,6 +37,7 @@ public interface SprayProcessStepExecutor extends SprayMetaDrive<SprayProcessSte
         }
         return stepExecutor;
     }
+
     void init();
     @Override
     SprayProcessStepMeta getMeta();
@@ -46,8 +47,9 @@ public interface SprayProcessStepExecutor extends SprayMetaDrive<SprayProcessSte
     default Map<String, Object> getProcessData() {
         return this.getCoordinator().getProcessData();
     }
-
     SprayStepResultInstance<? extends SprayProcessStepExecutor> getStepResult();
+
+
 
     default void publishData(SprayData data, boolean still) {
         this.getCoordinator().runNextNodes(this, data, still);

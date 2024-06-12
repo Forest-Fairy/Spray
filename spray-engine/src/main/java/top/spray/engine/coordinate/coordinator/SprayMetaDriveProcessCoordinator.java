@@ -75,32 +75,29 @@ public class SprayMetaDriveProcessCoordinator implements
 
     @Override
     public SprayCoordinateStatus execute() {
-        ExecutorService executorService = null;
-        if (this.coordinatorMeta.minThreadCount() > 1) {
-            executorService = new ThreadPoolExecutor(
-                    this.coordinatorMeta.minThreadCount(),
-                    Integer.MAX_VALUE, 3, TimeUnit.SECONDS, new LinkedBlockingQueue<>(this.coordinatorMeta.minThreadCount())
-            );
-        }
         SprayCoordinateStatus coordinateResult = SprayCoordinateStatus.SUCCESS;
         List<CompletableFuture<SprayStepResultInstance<?>>> futureResults = new ArrayList<>();
         Map<String, SprayStepResultInstance<?>> executorResultMap = new HashMap<>();
         for (SprayProcessStepMeta startNode : this.coordinatorMeta.getStartNodes()) {
-            if (startNode.isAsync() && executorService != null) {
+            if (startNode.isAsync() && this.getThreadExecutor() != null) {
                 futureResults.add(CompletableFuture.supplyAsync(
                         // this will create a new thread to run the step fully
                         () -> this.execute(startNode),
-                        executorService));
+                        this.getThreadExecutor()));
             } else {
                 String executorId = SprayProcessStepExecutor.getExecutorId(this, startNode);
                 executorResultMap.put(executorId, this.execute(startNode));
             }
         }
+        // collect the result by async running
         for (CompletableFuture<SprayStepResultInstance<?>> futureResult : futureResults) {
-            SprayStepResultInstance<?> sprayStepResultInstance = futureResult.get();
-
+            SprayStepResultInstance<?> stepResultInstance = futureResult.join();
+            String executorId = SprayProcessStepExecutor.getExecutorId(this, stepResultInstance.getExecutor().getMeta());
+            executorResultMap.put(executorId, stepResultInstance);
         }
-        return SprayCoordinateStatus.FAILED;
+        executorResultMap
+
+        return coordinateResult;
     }
 
 
