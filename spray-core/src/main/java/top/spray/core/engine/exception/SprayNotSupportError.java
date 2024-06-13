@@ -32,7 +32,7 @@ public class SprayNotSupportError extends SprayMetaError {
         }
 
         @Override
-        public String listJarFiles() {
+        public String jarFiles() {
             return "";
         }
 

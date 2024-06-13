@@ -23,9 +23,6 @@ public interface SprayBaseMeta<T extends SprayBaseMeta<?>> extends Cloneable {
 
     Logger logger();
 
-    /** the jars for running */
-    String listJarFiles();
-
     /** run this step async */
     boolean isAsync();
 
