@@ -10,6 +10,7 @@ import top.spray.engine.coordinate.meta.SprayProcessCoordinatorMeta;
 import top.spray.engine.step.executor.SprayProcessStepExecutor;
 import top.spray.engine.step.executor.closeable.SprayCloseableExecutor;
 import top.spray.engine.step.executor.factory.SprayExecutorFactory;
+import top.spray.engine.step.executor.storage.SprayFileStorageSupportExecutor;
 import top.spray.engine.step.executor.transaction.SprayTransactionSupportExecutor;
 import top.spray.engine.step.instance.SprayStepResultInstance;
 import top.spray.engine.step.meta.SprayProcessStepMeta;
@@ -102,13 +103,11 @@ public class SprayMetaDriveProcessCoordinator implements
     }
 
 
-
-
-
     @Override
     public Executor getThreadExecutor() {
         return this.executor;
     }
+
 
     @Override
     public void run() {
@@ -131,9 +130,14 @@ public class SprayMetaDriveProcessCoordinator implements
     }
 
     private SprayCoordinateStatus calculateTheResult() {
-        this.executorResultMap.entrySet().stream().filter(entry -> {
-            entry.getValue().getStatus().equals(SprayStepStatus.FAILED)
-        });
+        if (this.executorResultMap.entrySet().stream()
+                .filter(entry ->
+                        entry.getValue().getStatus().equals(SprayStepStatus.FAILED))
+                .findAny().isPresent()) {
+            return SprayCoordinateStatus.FAILED;
+        } else {
+            return SprayCoordinateStatus.SUCCESS;
+        }
 
     }
 
@@ -146,9 +150,11 @@ public class SprayMetaDriveProcessCoordinator implements
     public void beforeExecute(SprayProcessStepExecutor executor) {}
 
     @Override
-    public SprayStepResultInstance<?> execute(SprayProcessStepExecutor stepExecutor) {
+    public SprayStepResultInstance<?> executeNext(SprayProcessStepExecutor stepExecutor,
+                                              SprayProcessStepExecutor fromExecutor,
+                                              SprayData data, boolean still) {
         try {
-            stepExecutor.run();
+            stepExecutor.execute(fromExecutor, data, still);
         } catch (Throwable e) {
             if (!stepExecutor.getMeta().ignoreError()) {
                 stepExecutor.getStepResult().setStatus(SprayStepStatus.FAILED);
@@ -185,15 +191,15 @@ public class SprayMetaDriveProcessCoordinator implements
             List<CompletableFuture<SprayStepResultInstance<?>>> futureResults = new ArrayList<>();
             for (SprayProcessStepMeta nodeMeta : nodes) {
                 SprayProcessStepExecutor nodeExecutor = SprayExecutorFactory.create(this, nodeMeta);
+                // if the executor support to storage data in file then try
+                if (nodeExecutor instanceof SprayFileStorageSupportExecutor storageSupportExecutor) {
+                    if (storageSupportExecutor.timeToStorageInFile(fromExecutor, data, still)) {
+                        storageSupportExecutor.storageInFile(fromExecutor, data, still);
+                    }
+                }
                 if (nodeExecutor.needWait(fromExecutor, data, still)) {
                     // the executor need to wait for all data
-                    nodeExecutor.dataInput(fromExecutor, data, still);
                     continue;
-                }
-                if (fromExecutor != null) {
-                    // if fromExecutor is null means no data need for the executor to run
-                    // send data to next executor
-                    nodeExecutor.dataInput(fromExecutor, data, still);
                 }
                 // run it
                 {
@@ -202,10 +208,10 @@ public class SprayMetaDriveProcessCoordinator implements
                 if (nodeMeta.isAsync() && this.getThreadExecutor() != null) {
                     futureResults.add(CompletableFuture.supplyAsync(
                             // this will create a new thread to run the step fully
-                            () -> this.execute(nodeExecutor),
+                            () -> this.executeNext(nodeExecutor, fromExecutor, data, still),
                             this.getThreadExecutor()));
                 } else {
-                    this.executorResultMap.put(nodeExecutor.getExecutorId(), this.execute(nodeExecutor));
+                    this.executorResultMap.put(nodeExecutor.getExecutorId(), this.executeNext(nodeExecutor, fromExecutor, data, still));
                 }
             }
             futureResults.forEach(future -> {

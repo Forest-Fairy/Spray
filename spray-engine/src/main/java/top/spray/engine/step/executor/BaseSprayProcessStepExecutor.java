@@ -79,10 +79,18 @@ public abstract class BaseSprayProcessStepExecutor implements SprayProcessStepEx
     protected void publishData(SprayData data, boolean still) {
         this.getCoordinator().dispatch(this, data, still);
     }
+
     @Override
-    public void run() {
+    public boolean needWait(SprayProcessStepExecutor fromExecutor, SprayData data, boolean still) {
+        // TODO if it is true we can require a threshold to storage the data in the file instead of the memory
+        return false;
+    }
+
+
+    @Override
+    public void execute(SprayProcessStepExecutor fromExecutor, SprayData data, boolean still) {
         initBeforeRun();
-        this.execute();
+        this.execute0(fromExecutor, data, still);
     }
 
     protected void initBeforeRun() {
@@ -90,5 +98,5 @@ public abstract class BaseSprayProcessStepExecutor implements SprayProcessStepEx
         MDC.put("executorId", this.getExecutorId());
     }
 
-    protected abstract void execute();
+    protected abstract void execute0(SprayProcessStepExecutor fromExecutor, SprayData data, boolean still);
 }

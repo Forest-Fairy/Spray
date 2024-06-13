@@ -38,7 +38,23 @@ public class SprayData implements Map<String, Object>, Serializable {
 
     public <T> T get(final String key, final T defaultValue) {
         Object value = inside.get(key);
-        return value == null ? defaultValue : (T) value;
+        if (value == null) {
+            return defaultValue;
+        } else {
+            if (defaultValue == null || defaultValue instanceof String ||
+                    // class of the value can be assigned as the defaultValue
+                    defaultValue.getClass().isAssignableFrom(value.getClass())) {
+                return (T) value;
+            }
+            try {
+                // TODO cast with value castor util
+                return (T) defaultValue.getClass()
+                        .getMethod("valueOf", String.class)
+                        .invoke(null, value.toString().trim());
+            } catch (Exception ignored) {
+                return (T) value;
+            }
+        }
     }
 
     public Integer getInteger(final String key) {

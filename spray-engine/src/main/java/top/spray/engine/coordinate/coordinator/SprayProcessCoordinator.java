@@ -5,9 +5,11 @@ import top.spray.core.engine.props.SprayData;
 import top.spray.core.engine.result.SprayCoordinateStatus;
 import top.spray.engine.coordinate.meta.SprayProcessCoordinatorMeta;
 import top.spray.engine.step.executor.SprayProcessStepExecutor;
+import top.spray.engine.step.executor.closeable.SprayCloseableExecutor;
 import top.spray.engine.step.instance.SprayStepResultInstance;
 import top.spray.engine.step.meta.SprayProcessStepMeta;
 
+import java.io.Closeable;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
@@ -16,7 +18,9 @@ import java.util.function.Supplier;
 /**
  * Define the coordinator of a process
  */
-public interface SprayProcessCoordinator extends SprayMetaDrive<SprayProcessCoordinatorMeta>, Supplier<SprayCoordinateStatus>, Runnable {
+public interface SprayProcessCoordinator extends
+        SprayMetaDrive<SprayProcessCoordinatorMeta>,
+        Supplier<SprayCoordinateStatus>, Runnable, Closeable {
     @Override
     SprayProcessCoordinatorMeta getMeta();
 
@@ -46,7 +50,7 @@ public interface SprayProcessCoordinator extends SprayMetaDrive<SprayProcessCoor
 
     void beforeExecute(SprayProcessStepExecutor executor);
 
-    SprayStepResultInstance<?> execute(SprayProcessStepExecutor executor);
+    SprayStepResultInstance<?> executeNext(SprayProcessStepExecutor executor, SprayProcessStepExecutor fromExecutor, SprayData data, boolean still);
 
     void postExecute(SprayProcessStepExecutor executor);
 }

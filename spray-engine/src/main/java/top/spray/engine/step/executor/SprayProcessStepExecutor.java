@@ -13,7 +13,7 @@ import java.util.Map;
 /**
  * Define the executor of a process node
  */
-public interface SprayProcessStepExecutor extends SprayMetaDrive<SprayProcessStepMeta>, Runnable {
+public interface SprayProcessStepExecutor extends SprayMetaDrive<SprayProcessStepMeta> {
     default String getExecutorId() {
         return SprayExecutorFactory.getExecutorId(this.getCoordinator(), this.getMeta());
     }
@@ -30,27 +30,8 @@ public interface SprayProcessStepExecutor extends SprayMetaDrive<SprayProcessSte
     }
     SprayStepResultInstance<? extends SprayProcessStepExecutor> getStepResult();
 
-    /**
-     * data input like a subscribe method
-     * @param fromExecutor data from executor
-     * @param data  data
-     * @param still if the data is still
-     * @return return current executor for running
-     */
-    default SprayProcessStepExecutor dataInput(SprayProcessStepExecutor fromExecutor, SprayData data, boolean still) {
-        // run with each data by default
-        initOnlyAtCreate();
-        if (getStepResult().getStartTime() == 0) {
-            getStepResult().synchronizedInit();
-        }
-        return this;
-    }
-
-    @Override
-    void run();
+    void execute(SprayProcessStepExecutor fromExecutor, SprayData data, boolean still);
 
     /** true if the executor need to run with batch data */
-    default boolean needWait(SprayProcessStepExecutor fromExecutor, SprayData data, boolean still) {
-        return false;
-    }
+    boolean needWait(SprayProcessStepExecutor fromExecutor, SprayData data, boolean still);
 }

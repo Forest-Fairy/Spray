@@ -67,13 +67,24 @@ public class SprayProcessStepMeta implements SprayBaseMeta<SprayProcessStepMeta>
         return this.nextNodes;
     }
 
-    Class<? extends SprayProcessStepExecutor> executorClass();
-
-    String get(String key);
-    Integer getInteger(String key, Integer defVal);
-    Boolean getBoolean(String key, Boolean bool);
-    Date getDate(String key, Date defVal);
+    public <T> T get(String key, Class<T> tClass) {
+        return dataInside.get(key, tClass);
+    }
+    public String getString(String key) {
+        return dataInside.getString(key);
+    }
+    public Integer getInteger(String key, Integer defVal) {
+        return dataInside.getInteger(key, defVal);
+    }
+    public Long getLong(String key, Long defVal) {
+        return dataInside.get(key, defVal);
+    }
+    public Boolean getBoolean(String key, Boolean bool) {
+        return dataInside.get(key, bool);
+    }
 
     /** the jars for running */
-    String jarFiles();
+    public String jarFiles() {
+        return this.jarFiles;
+    }
 }
