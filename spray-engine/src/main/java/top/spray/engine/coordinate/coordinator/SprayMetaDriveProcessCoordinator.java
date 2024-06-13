@@ -10,6 +10,7 @@ import top.spray.engine.coordinate.meta.SprayProcessCoordinatorMeta;
 import top.spray.engine.step.executor.SprayProcessStepExecutor;
 import top.spray.engine.step.executor.closeable.SprayCloseableExecutor;
 import top.spray.engine.step.executor.factory.SprayExecutorFactory;
+import top.spray.engine.step.executor.filter.SprayStepMetaFilter;
 import top.spray.engine.step.executor.storage.SprayFileStorageSupportExecutor;
 import top.spray.engine.step.executor.transaction.SprayTransactionSupportExecutor;
 import top.spray.engine.step.instance.SprayStepResultInstance;
@@ -18,6 +19,7 @@ import top.spray.engine.step.meta.SprayProcessStepMeta;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.LongAdder;
+import java.util.stream.Collectors;
 
 public class SprayMetaDriveProcessCoordinator implements
         SprayProcessCoordinator,
@@ -116,8 +118,14 @@ public class SprayMetaDriveProcessCoordinator implements
     }
     @Override
     public void dispatch(SprayProcessStepExecutor fromExecutor,
-                         SprayData data, boolean still) {
-        this.runNodes(fromExecutor.getMeta().nextNodes(), fromExecutor, data, still);
+                         SprayData data, boolean still, SprayStepMetaFilter filter) {
+        if (filter == null) {
+            this.runNodes(fromExecutor.getMeta().nextNodes(), fromExecutor, data, still);
+        } else {
+            this.runNodes(fromExecutor.getMeta().nextNodes().stream()
+                    .filter(nextMeta -> filter.filter(fromExecutor, data, still, nextMeta))
+                    .collect(Collectors.toList()), fromExecutor, data, still);
+        }
     }
 
     @Override

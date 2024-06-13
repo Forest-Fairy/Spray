@@ -5,6 +5,7 @@ import top.spray.core.engine.props.SprayData;
 import top.spray.core.util.SprayClassLoader;
 import top.spray.engine.coordinate.coordinator.SprayProcessCoordinator;
 import top.spray.engine.step.executor.factory.SprayExecutorFactory;
+import top.spray.engine.step.executor.filter.SprayStepMetaFilter;
 import top.spray.engine.step.instance.SprayStepResultInstance;
 import top.spray.engine.step.meta.SprayProcessStepMeta;
 
@@ -77,7 +78,10 @@ public abstract class BaseSprayProcessStepExecutor implements SprayProcessStepEx
     }
 
     protected void publishData(SprayData data, boolean still) {
-        this.getCoordinator().dispatch(this, data, still);
+        this.publishData(data, still, null);
+    }
+    protected void publishData(SprayData data, boolean still, SprayStepMetaFilter filter) {
+        this.getCoordinator().dispatch(this, data, still, filter);
     }
 
     @Override

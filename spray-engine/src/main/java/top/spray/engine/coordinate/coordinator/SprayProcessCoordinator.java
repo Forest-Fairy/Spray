@@ -5,12 +5,10 @@ import top.spray.core.engine.props.SprayData;
 import top.spray.core.engine.result.SprayCoordinateStatus;
 import top.spray.engine.coordinate.meta.SprayProcessCoordinatorMeta;
 import top.spray.engine.step.executor.SprayProcessStepExecutor;
-import top.spray.engine.step.executor.closeable.SprayCloseableExecutor;
+import top.spray.engine.step.executor.filter.SprayStepMetaFilter;
 import top.spray.engine.step.instance.SprayStepResultInstance;
-import top.spray.engine.step.meta.SprayProcessStepMeta;
 
 import java.io.Closeable;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.function.Supplier;
@@ -42,7 +40,7 @@ public interface SprayProcessCoordinator extends
     SprayProcessStepExecutor getThreadExecutor(String executorId);
 
 
-    void dispatch(SprayProcessStepExecutor fromExecutor, SprayData data, boolean still);
+    void dispatch(SprayProcessStepExecutor fromExecutor, SprayData data, boolean still, SprayStepMetaFilter filter);
 
     void finish(SprayProcessStepExecutor sprayProcessStepExecutor);
 
