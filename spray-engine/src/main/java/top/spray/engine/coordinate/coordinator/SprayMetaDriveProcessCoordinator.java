@@ -116,10 +116,9 @@ public class SprayMetaDriveProcessCoordinator implements
                 null, null, false);
     }
     @Override
-    public void dispatch(List<SprayProcessStepMeta> nodes,
-                         SprayProcessStepExecutor fromExecutor,
+    public void dispatch(SprayProcessStepExecutor fromExecutor,
                          SprayData data, boolean still) {
-        this.runNodes(nodes, fromExecutor, data, still);
+        this.runNodes(fromExecutor.getMeta().nextNodes(), fromExecutor, data, still);
     }
 
     @Override
@@ -183,7 +182,6 @@ public class SprayMetaDriveProcessCoordinator implements
     private void runNodes(List<SprayProcessStepMeta> nodes, SprayProcessStepExecutor fromExecutor, SprayData data, boolean still) {
         this.counter.increment();
         try {
-
             List<CompletableFuture<SprayStepResultInstance<?>>> futureResults = new ArrayList<>();
             for (SprayProcessStepMeta nodeMeta : nodes) {
                 SprayProcessStepExecutor nodeExecutor = SprayExecutorFactory.create(this, nodeMeta);

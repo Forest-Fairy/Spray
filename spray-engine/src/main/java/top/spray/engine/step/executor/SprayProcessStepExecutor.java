@@ -30,14 +30,6 @@ public interface SprayProcessStepExecutor extends SprayMetaDrive<SprayProcessSte
     }
     SprayStepResultInstance<? extends SprayProcessStepExecutor> getStepResult();
 
-
-
-    default void publishData(SprayData data, boolean still) {
-        this.getCoordinator().dispatch(
-                this.getMeta().nextNodes(),
-                this, data, still);
-    }
-
     /**
      * data input like a subscribe method
      * @param fromExecutor data from executor

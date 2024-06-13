@@ -14,7 +14,7 @@ import java.util.List;
 /**
  * 节点引擎
  */
-public class SprayProcessStepMeta extends SprayBaseMeta<SprayProcessStepMeta> {
+public class SprayProcessStepMeta implements SprayBaseMeta<SprayProcessStepMeta> {
     private SprayData dataInside;
     private String id;
     private String name;
@@ -31,6 +31,16 @@ public class SprayProcessStepMeta extends SprayBaseMeta<SprayProcessStepMeta> {
         } catch (Exception e) {
             throw new SprayMetaError(this, "failed to init the step meta " + this.getName(), e);
         }
+    }
+
+    /**
+     * @return
+     *  0 -> no
+     *  1 -> simple
+     *  2 -> deep
+     */
+    public int varCopy() {
+        return dataInside.getInteger("varCopy", 0);
     }
 
     private void init() throws ClassNotFoundException {

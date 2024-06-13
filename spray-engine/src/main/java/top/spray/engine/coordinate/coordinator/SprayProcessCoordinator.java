@@ -38,7 +38,7 @@ public interface SprayProcessCoordinator extends SprayMetaDrive<SprayProcessCoor
     SprayProcessStepExecutor getThreadExecutor(String executorId);
 
 
-    void dispatch(List<SprayProcessStepMeta> nodes, SprayProcessStepExecutor fromExecutor, SprayData data, boolean still);
+    void dispatch(SprayProcessStepExecutor fromExecutor, SprayData data, boolean still);
 
     void finish(SprayProcessStepExecutor sprayProcessStepExecutor);
 
