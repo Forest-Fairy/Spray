@@ -175,6 +175,11 @@ public class SprayMetaDriveProcessCoordinator implements
 
     @Override
     public void postExecute(SprayProcessStepExecutor executor) {
+        if (SprayStepStatus.DONE.equals(executor.getStepResult().getStatus())) {
+            this.endUpWithExecutor(executor);
+        }
+    }
+    private void endUpWithExecutor(SprayProcessStepExecutor executor) {
         if (executor instanceof SprayTransactionSupportExecutor transactionSupportExecutor) {
             if (SprayStepStatus.DONE.equals(executor.getStepResult().getStatus())) {
                 transactionSupportExecutor.commit();
