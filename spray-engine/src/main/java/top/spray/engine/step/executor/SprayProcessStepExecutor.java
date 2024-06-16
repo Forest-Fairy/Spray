@@ -4,7 +4,6 @@ import top.spray.core.engine.execute.SprayMetaDrive;
 import top.spray.core.engine.props.SprayData;
 import top.spray.core.util.SprayClassLoader;
 import top.spray.engine.coordinate.coordinator.SprayProcessCoordinator;
-import top.spray.engine.step.executor.factory.SprayExecutorFactory;
 import top.spray.engine.step.instance.SprayStepResultInstance;
 import top.spray.engine.step.meta.SprayProcessStepMeta;
 
@@ -14,9 +13,7 @@ import java.util.Map;
  * Define the executor of a process node
  */
 public interface SprayProcessStepExecutor extends SprayMetaDrive<SprayProcessStepMeta> {
-    default String getExecutorId() {
-        return SprayExecutorFactory.getExecutorId(this.getCoordinator(), this.getMeta());
-    }
+    String getExecutorId();
     void initOnlyAtCreate();
     @Override
     SprayProcessStepMeta getMeta();
@@ -32,6 +29,9 @@ public interface SprayProcessStepExecutor extends SprayMetaDrive<SprayProcessSte
 
     void execute(SprayProcessStepExecutor fromExecutor, SprayData data, boolean still);
 
-    /** true if the executor need to run with batch data */
+    /** true if the executor need to run with batch data or other reason
+     *  - the executor can collect data by overwrite this method
+     * @return false by default, that also means the executor can run with stream data
+     */
     boolean needWait(SprayProcessStepExecutor fromExecutor, SprayData data, boolean still);
 }

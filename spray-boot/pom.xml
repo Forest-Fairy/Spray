@@ -10,6 +10,11 @@
     </parent>
 
     <artifactId>spray-boot</artifactId>
+    <packaging>pom</packaging>
+    <modules>
+        <module>spray-admin</module>
+        <module>spray-springboot-starter</module>
+    </modules>
 
     <dependencies>
         <dependency>

@@ -1,14 +1,12 @@
 package top.spray.engine.step.meta;
 
-import cn.hutool.poi.excel.cell.setters.RichTextCellSetter;
+
 import top.spray.core.engine.exception.SprayMetaError;
+import top.spray.core.engine.exception.SprayNotSupportError;
+import top.spray.core.engine.execute.SprayStepActiveType;
 import top.spray.core.engine.meta.SprayBaseMeta;
 import top.spray.core.engine.props.SprayData;
-import top.spray.core.util.SprayClassLoader;
-import top.spray.engine.step.executor.SprayProcessStepExecutor;
-import top.spray.engine.step.executor.transaction.SprayTransactionSupportExecutor;
 
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -18,11 +16,16 @@ public class SprayProcessStepMeta implements SprayBaseMeta<SprayProcessStepMeta>
     private SprayData dataInside;
     private String id;
     private String name;
-    private boolean transactional;
-    private boolean ignoreError;
     private List<SprayProcessStepMeta> nextNodes;
     private String executorClass;
     private String jarFiles;
+    private SprayStepActiveType stepActiveType;
+    private boolean transactional;
+    private boolean rollbackIfError;
+    private boolean ignoreError;
+    private boolean isAsync;
+    private int maxThreadCount;
+    private int varCopy;
 
     public SprayProcessStepMeta(SprayData dataInside) {
         this.dataInside = dataInside.unmodifiable();
@@ -33,6 +36,82 @@ public class SprayProcessStepMeta implements SprayBaseMeta<SprayProcessStepMeta>
         }
     }
 
+    private void init() throws ClassNotFoundException {
+        this.id = dataInside.getString("stepId");
+        this.name = dataInside.getString("stepName");
+        this.nextNodes = dataInside.getList("nextNodes", SprayProcessStepMeta.class);
+        this.executorClass = dataInside.getString("executorClass");
+        this.jarFiles = dataInside.getString("jarFiles");
+        this.stepActiveType = SprayStepActiveType.valueOf(dataInside.get("activeType", "ACTIVE").toUpperCase());
+        this.transactional = dataInside.get("isTransactional", false);
+        this.rollbackIfError = this.transactional && dataInside.get("rollbackIfError", false);
+        // only effect when rollbackIfError is false
+        this.ignoreError = (! this.rollbackIfError) && (dataInside.get("ignoreError", false));
+        this.isAsync = dataInside.get("isAsync", false);
+        this.maxThreadCount = dataInside.get("maxThreadCount", 1);
+        this.varCopy = dataInside.get("varCopy", 0);
+    }
+
+
+    @Override
+    public String getId() {
+        return this.id;
+    }
+
+    @Override
+    public String getName() {
+        return this.name;
+    }
+
+    @Override
+    public String transactionId() {
+        throw new SprayNotSupportError(this,
+                new IllegalAccessError("couldn't get the transactionId from step meta"));
+    }
+
+    public List<SprayProcessStepMeta> nextNodes() {
+        return this.nextNodes;
+    }
+
+    public String executorClass() {
+        return this.executorClass;
+    }
+
+    /** the jars for running */
+    public String jarFiles() {
+        return this.jarFiles;
+    }
+
+    /**
+     * 1    - run current node
+     * 0    - skip current node
+     * -1   - skip all from current node
+     */
+    public SprayStepActiveType stepActiveType() {
+        return this.stepActiveType;
+    }
+
+    public boolean transactional() {
+        return this.transactional;
+    }
+
+    public boolean rollbackIfError() {
+        return rollbackIfError;
+    }
+
+    public boolean ignoreError() {
+        return this.ignoreError;
+    }
+
+    @Override
+    public boolean isAsync() {
+        return this.isAsync;
+    }
+
+    public int maxThreadCount() {
+        return this.maxThreadCount;
+    }
+
     /**
      * @return
      *  0 -> no
@@ -40,31 +119,7 @@ public class SprayProcessStepMeta implements SprayBaseMeta<SprayProcessStepMeta>
      *  2 -> deep
      */
     public int varCopy() {
-        return dataInside.getInteger("varCopy", 0);
-    }
-
-    private void init() throws ClassNotFoundException {
-        this.id = dataInside.getString("id");
-        this.name = dataInside.getString("name");
-        if (SprayTransactionSupportExecutor.class.isAssignableFrom(this.executorClass())) {
-            // 执行器支持事务
-            this.transactional = dataInside.get("isTransactional", false);
-            this.rollbackIfError = this.transactional && dataInside.get("rollbackIfError", false);
-        } else {
-            this.transactional = false;
-            this.rollbackIfError = false;
-        }
-        // effect when rollbackIfError is false
-        this.ignoreError = (!this.rollbackIfError) &&
-                (dataInside.get("ignoreError", false));
-        this.nextNodes = dataInside.getList("nextNodes", SprayProcessStepMeta.class);
-        this.executorClass = dataInside.getString("executorClass");
-        this.jarFiles = dataInside.getString("jarFiles");
-
-    }
-
-    public List<SprayProcessStepMeta> nextNodes() {
-        return this.nextNodes;
+        return this.varCopy;
     }
 
     public <T> T get(String key, Class<T> tClass) {
@@ -73,18 +128,16 @@ public class SprayProcessStepMeta implements SprayBaseMeta<SprayProcessStepMeta>
     public String getString(String key) {
         return dataInside.getString(key);
     }
+    public String getString(String key, String defVal) {
+        return dataInside.get(key, defVal);
+    }
     public Integer getInteger(String key, Integer defVal) {
-        return dataInside.getInteger(key, defVal);
+        return dataInside.get(key, defVal);
     }
     public Long getLong(String key, Long defVal) {
         return dataInside.get(key, defVal);
     }
     public Boolean getBoolean(String key, Boolean bool) {
         return dataInside.get(key, bool);
-    }
-
-    /** the jars for running */
-    public String jarFiles() {
-        return this.jarFiles;
     }
 }

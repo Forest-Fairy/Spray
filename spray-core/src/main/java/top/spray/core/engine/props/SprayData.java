@@ -1,20 +1,17 @@
 package top.spray.core.engine.props;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONWriter;
 import org.apache.commons.lang3.StringUtils;
+import top.spray.core.util.JsonUtil;
 
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.*;
 
-/**
- * TODO 支持文件存储
- */
 public class SprayData implements Map<String, Object>, Serializable {
     @Serial
     private static final long serialVersionUID = 102262040630237L;
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     private final LinkedHashMap<String, Object> inside;
 
@@ -57,34 +54,8 @@ public class SprayData implements Map<String, Object>, Serializable {
         }
     }
 
-    public Integer getInteger(final String key) {
-        Object o = get(key);
-        return o == null ? null : Integer.valueOf(o.toString().trim());
-    }
-
-    public int getInteger(final String key, final int defaultValue) {
-        return get(key, defaultValue);
-    }
-
-
-    public Long getLong(final String key) {
-        Object o = get(key);
-        return o == null ? null : Long.valueOf(o.toString().trim());
-    }
-
-    public Double getDouble(final String key) {
-        Object o = get(key);
-        return o == null ? null : Double.valueOf(o.toString().trim());
-    }
-
-
     public String getString(final String key) {
         return (String) get(key);
-    }
-
-    public Boolean getBoolean(final String key) {
-        Object o = get(key);
-        return o == null ? null : Boolean.valueOf(o.toString().trim());
     }
 
     public SprayData append(String key, Object val) {
@@ -95,28 +66,37 @@ public class SprayData implements Map<String, Object>, Serializable {
         return new UnmodifiableData(this);
     }
 
-    public <T> List<T> getList(String key, Class<T> clazz) {
-        List o = (List) this.get(key);
+    public <T> List<T> getList(String key, Class<T> tClass) {
+        List<?> o = (List<?>) this.get(key);
         if (o == null) {
             return null;
         }
         try {
-            List<T> newList = new ArrayList<>(o.size());
+            boolean useNew = false;
+            List<T> list = new ArrayList<>(o.size());
             for (Object each : o) {
-                newList.add(OBJECT_MAPPER.convertValue(each, clazz));
+                if (each == null) {
+                    list.add(null);
+                } else if (each.getClass() == tClass) {
+                    list.add((T) each);
+                } else {
+                    if (!useNew) {
+                        useNew = true;
+                    }
+                    list.add(null);
+                }
             }
-            return newList;
+            return useNew ? list : (List<T>) o;
         } catch (Exception e) {
             throw new RuntimeException("failed to cast object value to list value", e);
         }
     }
     @SuppressWarnings("deprecation")
     public String toJson() {
-        try {
-            return OBJECT_MAPPER.writeValueAsString(this.inside);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+        return toJson(false);
+    }
+    public String toJson(boolean pretty) {
+        return JsonUtil.toJson(this, pretty);
     }
 
     public static SprayData fromJson(String json) {
@@ -125,24 +105,11 @@ public class SprayData implements Map<String, Object>, Serializable {
         if (! json.startsWith("{") && ! json.endsWith("}")) {
             throw new RuntimeException("invalid json string");
         }
-        return OBJECT_MAPPER.convertValue(json, SprayData.class);
+        return JsonUtil.parseToSprayData(json);
     }
 
-    public static SprayData deepCopy(Map map) {
-        String json = null;
-        try {
-            json = OBJECT_MAPPER.writeValueAsString(map);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException("failed to parse the map object to a json string", e);
-        }
-        Map valueMap = OBJECT_MAPPER.convertValue(json, Map.class);
-        SprayData sprayData = new SprayData();
-        valueMap.forEach((k, v) -> {
-            if (k != null) {
-                sprayData.put(k.toString(), v);
-            }
-        });
-        return sprayData;
+    public static SprayData deepCopy(Map<?, ?> map) {
+        return JsonUtil.parseToSprayData(JsonUtil.toJson(map));
     }
 
 
@@ -232,11 +199,7 @@ public class SprayData implements Map<String, Object>, Serializable {
 
     @Override
     public String toString() {
-        try {
-            return OBJECT_MAPPER.writeValueAsString(this.inside);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+        return this.toJson();
     }
 
     static class UnmodifiableData extends SprayData {

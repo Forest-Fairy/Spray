@@ -1,10 +1,13 @@
-package top.spray.engine.step.executor.filter;
+package top.spray.engine.step.condition;
 
 import top.spray.core.engine.props.SprayData;
 import top.spray.engine.step.executor.SprayProcessStepExecutor;
 import top.spray.engine.step.meta.SprayProcessStepMeta;
 
-public interface SprayStepMetaFilter {
+/**
+ * reg the executor that can be executed
+ */
+public interface SprayStepConditionalFilter {
     /**
      * to filter the data
      * @param fromExecutor the data comes from

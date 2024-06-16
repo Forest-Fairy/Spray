@@ -2,15 +2,16 @@ package top.spray.engine.coordinate.coordinator;
 
 import top.spray.core.engine.execute.SprayMetaDrive;
 import top.spray.core.engine.props.SprayData;
+import top.spray.core.engine.props.SprayPoolExecutor;
 import top.spray.core.engine.result.SprayCoordinateStatus;
+import top.spray.core.engine.result.SprayStepStatus;
 import top.spray.engine.coordinate.meta.SprayProcessCoordinatorMeta;
 import top.spray.engine.step.executor.SprayProcessStepExecutor;
-import top.spray.engine.step.executor.filter.SprayStepMetaFilter;
+import top.spray.engine.step.condition.SprayTargetStepFilter;
 import top.spray.engine.step.instance.SprayStepResultInstance;
 
 import java.io.Closeable;
 import java.util.Map;
-import java.util.concurrent.Executor;
 import java.util.function.Supplier;
 
 /**
@@ -22,33 +23,37 @@ public interface SprayProcessCoordinator extends
     @Override
     SprayProcessCoordinatorMeta getMeta();
 
+    Map<String, Object> getProcessData();
+
+    /** a method for completable future */
     @Override
     default SprayCoordinateStatus get() {
         this.run();
+        // this method run after the run method so that can get the result status.
         return status();
     }
+    /** the execution method */
     @Override
     void run();
 
-    boolean isDone();
+    /** the coordinator's status: none-blocked method  */
     SprayCoordinateStatus status();
 
+    /** the spray pooled executor */
+    SprayPoolExecutor getSprayPoolExecutor();
 
-    Executor getThreadExecutor();
-
+    /** register the executor by this way */
     void registerExecutor(String executorId, SprayProcessStepExecutor executor);
-    SprayProcessStepExecutor getThreadExecutor(String executorId);
+    /** the only way to get the executor */
+    SprayProcessStepExecutor getStepExecutor(String executorId);
+    int createExecutorCount();
 
+    /** a method for executor to publish its data */
+    void dispatch(SprayProcessStepExecutor fromExecutor, SprayData data, boolean still, SprayTargetStepFilter filter);
 
-    void dispatch(SprayProcessStepExecutor fromExecutor, SprayData data, boolean still, SprayStepMetaFilter filter);
+    /**
+     * unit method for executing
+     */
+    SprayStepResultInstance<?> executeNext(SprayProcessStepExecutor nextStepExecutor, SprayProcessStepExecutor fromExecutor, SprayData data, boolean still);
 
-    void finish(SprayProcessStepExecutor sprayProcessStepExecutor);
-
-    Map<String, Object> getProcessData();
-
-    void beforeExecute(SprayProcessStepExecutor executor);
-
-    SprayStepResultInstance<?> executeNext(SprayProcessStepExecutor executor, SprayProcessStepExecutor fromExecutor, SprayData data, boolean still);
-
-    void postExecute(SprayProcessStepExecutor executor);
 }

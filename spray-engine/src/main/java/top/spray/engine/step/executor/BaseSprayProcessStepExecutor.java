@@ -4,8 +4,8 @@ import org.slf4j.MDC;
 import top.spray.core.engine.props.SprayData;
 import top.spray.core.util.SprayClassLoader;
 import top.spray.engine.coordinate.coordinator.SprayProcessCoordinator;
-import top.spray.engine.step.executor.factory.SprayExecutorFactory;
-import top.spray.engine.step.executor.filter.SprayStepMetaFilter;
+import top.spray.engine.factory.SprayExecutorFactory;
+import top.spray.engine.step.condition.SprayTargetStepFilter;
 import top.spray.engine.step.instance.SprayStepResultInstance;
 import top.spray.engine.step.meta.SprayProcessStepMeta;
 
@@ -28,16 +28,18 @@ public abstract class BaseSprayProcessStepExecutor implements SprayProcessStepEx
         return this.executorId;
     }
 
+
     @Override
     public void initOnlyAtCreate() {
         this.executorId = SprayExecutorFactory.getExecutorId(this.getCoordinator(), this.getMeta());
+        // TODO define the result container
         this.stepResult = xxx;
         switch (this.getMeta().varCopy()) {
             case 1: {
                 this.processData = new HashMap<>(this.getCoordinator().getProcessData());
             } break;
             case 2: {
-                this.processData = new HashMap<>(SprayData.deepCopy(this.getCoordinator().getProcessData()))
+                this.processData = new HashMap<>(SprayData.deepCopy(this.getCoordinator().getProcessData()));
             } break;
             default: {
                 this.processData = this.getCoordinator().getProcessData();
@@ -80,7 +82,7 @@ public abstract class BaseSprayProcessStepExecutor implements SprayProcessStepEx
     protected void publishData(SprayData data, boolean still) {
         this.publishData(data, still, null);
     }
-    protected void publishData(SprayData data, boolean still, SprayStepMetaFilter filter) {
+    protected void publishData(SprayData data, boolean still, SprayTargetStepFilter filter) {
         this.getCoordinator().dispatch(this, data, still, filter);
     }
 

@@ -1,4 +1,4 @@
-package top.spray.engine.step.executor.factory;
+package top.spray.engine.factory;
 
 import top.spray.core.util.SprayClassLoader;
 import top.spray.engine.coordinate.coordinator.SprayProcessCoordinator;
@@ -14,21 +14,21 @@ public class SprayExecutorFactory {
     public static SprayProcessStepExecutor create(
             SprayProcessCoordinator coordinator, SprayProcessStepMeta stepMeta) {
         String executorId = getExecutorId(coordinator, stepMeta);
-        SprayProcessStepExecutor stepExecutor = coordinator.getThreadExecutor(executorId);
+        SprayProcessStepExecutor stepExecutor = coordinator.getStepExecutor(executorId);
         if (stepExecutor == null) {
             synchronized (coordinator) {
-                if ((stepExecutor = coordinator.getThreadExecutor(stepMeta.getId())) == null) {
+                if ((stepExecutor = coordinator.getStepExecutor(stepMeta.getId())) == null) {
                     try {
                         SprayClassLoader sprayClassLoader = new SprayClassLoader(stepMeta.jarFiles());
-                        stepExecutor = sprayClassLoader.loadClass(stepMeta.executorClass())
-                                .getConstructor().newInstance();
+                        stepExecutor = (SprayProcessStepExecutor) sprayClassLoader
+                                .loadClass(stepMeta.executorClass()).getConstructor().newInstance();
                         stepExecutor.setMeta(stepMeta);
                         stepExecutor.setCoordinator(coordinator);
                         stepExecutor.setClassLoader(sprayClassLoader);
                         Thread.currentThread().setContextClassLoader(sprayClassLoader);
                         stepExecutor.initOnlyAtCreate();
                     } catch (InstantiationException | IllegalAccessException | NoSuchMethodException |
-                             InvocationTargetException e) {
+                             InvocationTargetException | ClassNotFoundException e) {
                         throw new RuntimeException(e);
                     }
                     coordinator.registerExecutor(executorId, stepExecutor);
