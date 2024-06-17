@@ -27,16 +27,6 @@ public class SprayNotSupportError extends SprayMetaError {
         }
 
         @Override
-        public Logger logger() {
-            return null;
-        }
-
-        @Override
-        public String jarFiles() {
-            return "";
-        }
-
-        @Override
         public boolean isAsync() {
             return false;
         }

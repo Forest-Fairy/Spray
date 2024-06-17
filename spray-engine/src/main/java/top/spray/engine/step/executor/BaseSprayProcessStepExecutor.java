@@ -32,8 +32,7 @@ public abstract class BaseSprayProcessStepExecutor implements SprayProcessStepEx
     @Override
     public void initOnlyAtCreate() {
         this.executorId = SprayExecutorFactory.getExecutorId(this.getCoordinator(), this.getMeta());
-        // TODO define the result container
-        this.stepResult = xxx;
+        this.stepResult = new SprayStepResultInstance<>(this.getCoordinator(), this);
         switch (this.getMeta().varCopy()) {
             case 1: {
                 this.processData = new HashMap<>(this.getCoordinator().getProcessData());
