@@ -1,6 +1,6 @@
 package top.spray.core.engine.result;
 
-public enum SprayStepStatus {
+public enum SprayStepStatus implements SprayStatusType {
     /** pause by config (debug or collecting data) */
     PAUSED(3, "暂停"),
     /** stop by human. need stop reason */
@@ -22,11 +22,27 @@ public enum SprayStepStatus {
         this.describeMsg = describeMsg;
     }
 
-    public int getStatusCode() {
-        return statusCode;
+    @Override
+    public int getCode() {
+        return this.statusCode;
     }
 
+    @Override
     public String getDescribeMsg() {
-        return describeMsg;
+        return this.describeMsg;
+    }
+
+    @Override
+    public String typeName() {
+        return this.name();
+    }
+
+    @Override
+    public boolean match(SprayStatusType statusType) {
+        if (statusType instanceof SprayStatusHolder || statusType instanceof SprayStepStatus) {
+            return statusType.equals(this);
+        } else {
+            return false;
+        }
     }
 }

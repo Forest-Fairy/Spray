@@ -1,6 +1,6 @@
 package top.spray.core.engine.result;
 
-public enum SprayCoordinateStatus {
+public enum SprayCoordinateStatus implements SprayStatusType {
     /** stop by human. need stop reason */
     STOP(2, "手动停止"),
     /** stop normally. need result message */
@@ -13,15 +13,33 @@ public enum SprayCoordinateStatus {
     ERROR(-2, "异常停止"),
     ;
     private final int code;
-    private final String msg;
-    SprayCoordinateStatus(int code, String msg) {
+    private final String describeMsg;
+    SprayCoordinateStatus(int code, String describeMsg) {
         this.code = code;
-        this.msg = msg;
+        this.describeMsg = describeMsg;
     }
+
+    @Override
     public int getCode() {
-        return code;
+        return this.code;
     }
-    public String getMsg() {
-        return msg;
+
+    @Override
+    public String getDescribeMsg() {
+        return this.describeMsg;
+    }
+
+    @Override
+    public String typeName() {
+        return this.name();
+    }
+
+    @Override
+    public boolean match(SprayStatusType statusType) {
+        if (statusType instanceof SprayStatusHolder || statusType instanceof SprayCoordinateStatus) {
+            return statusType.equals(this);
+        } else {
+            return false;
+        }
     }
 }

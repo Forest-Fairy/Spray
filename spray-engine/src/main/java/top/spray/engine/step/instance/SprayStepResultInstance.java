@@ -2,6 +2,8 @@ package top.spray.engine.step.instance;
 
 import org.apache.commons.lang3.tuple.Pair;
 import top.spray.core.engine.props.SprayData;
+import top.spray.core.engine.result.SprayStatusType;
+import top.spray.core.engine.result.SprayStatusHolder;
 import top.spray.engine.coordinate.coordinator.SprayProcessCoordinator;
 import top.spray.engine.step.executor.SprayProcessStepExecutor;
 import top.spray.core.engine.result.SprayStepStatus;
@@ -17,7 +19,7 @@ import java.util.Map;
 public class SprayStepResultInstance<Executor extends SprayProcessStepExecutor> {
     private final SprayProcessCoordinator coordinator;
     private final Executor executor;
-    private SprayStepStatus stepStatus;
+    private SprayStatusHolder stepStatus;
     /**
      * ['NONE', 'ALL', 'SUCCESS', 'BAD']
      *  - NONE means not record
@@ -35,7 +37,7 @@ public class SprayStepResultInstance<Executor extends SprayProcessStepExecutor> 
         init();
     }
     private void init() {
-        this.stepStatus = SprayStepStatus.RUNNING;
+        this.stepStatus = SprayStatusType.create(SprayStepStatus.RUNNING);
         this.errorList = new ArrayList<>();
         this.dataRecordStrategy = executor.getMeta()
                 .getString("dataRecordStrategy", "NONE").toUpperCase();
@@ -50,10 +52,13 @@ public class SprayStepResultInstance<Executor extends SprayProcessStepExecutor> 
     }
 
     public void setStatus(SprayStepStatus status) {
-        this.stepStatus = status;
+        this.stepStatus.setStatus(status);
+    }
+    public SprayStatusType getStatus() {
+        return this.stepStatus;
     }
 
-    public void setError(Throwable error) {
+    public void addError(Throwable error) {
         this.errorList.add(Pair.of(System.currentTimeMillis(), error));
     }
 
@@ -78,8 +83,6 @@ public class SprayStepResultInstance<Executor extends SprayProcessStepExecutor> 
     public Map<String, Long> outputInfos() {
 
     }
-    public SprayStepStatus getStatus() {
 
-    }
 
 }

@@ -1,6 +1,5 @@
 package top.spray.engine.coordinate.coordinator;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import top.spray.core.engine.exception.SprayNotSupportError;
 import top.spray.core.engine.execute.SprayListenable;
 import top.spray.core.engine.execute.SprayStepActiveType;
@@ -146,7 +145,7 @@ public class SprayDefaultProcessCoordinator implements
     }
     private SprayCoordinateStatus calculateTheResult() {
         if (this.executorResultMap.entrySet().stream()
-                .anyMatch(entry -> SprayStepStatus.FAILED.equals(entry.getValue().getStatus()))) {
+                .anyMatch(entry -> SprayStepStatus.FAILED.match(entry.getValue().getStatus()))) {
             return SprayCoordinateStatus.FAILED;
         } else {
             return SprayCoordinateStatus.SUCCESS;
@@ -248,7 +247,7 @@ public class SprayDefaultProcessCoordinator implements
         } catch (Throwable e) {
             if (!nextStepExecutor.getMeta().ignoreError()) {
                 nextStepExecutor.getStepResult().setStatus(SprayStepStatus.FAILED);
-                nextStepExecutor.getStepResult().setError(e);
+                nextStepExecutor.getStepResult().addError(e);
             }
         } finally {
             this.executingStepCounter.decrement();
@@ -260,16 +259,16 @@ public class SprayDefaultProcessCoordinator implements
     protected void afterExecute(SprayProcessStepExecutor nextStepExecutor,
                                 SprayProcessStepExecutor fromExecutor,
                                 SprayData data, boolean still) {
-        if (SprayStepStatus.DONE.equals(nextStepExecutor.getStepResult().getStatus())) {
+        if (SprayStepStatus.DONE.match(nextStepExecutor.getStepResult().getStatus())) {
             this.endUpWithExecutor(nextStepExecutor);
         }
     }
     private void endUpWithExecutor(SprayProcessStepExecutor executor) {
         if (executor instanceof SprayTransactionSupportExecutor transactionSupportExecutor) {
-            if (SprayStepStatus.DONE.equals(executor.getStepResult().getStatus())) {
+            if (SprayStepStatus.DONE.match(executor.getStepResult().getStatus())) {
                 transactionSupportExecutor.commit();
-            } else if (SprayStepStatus.FAILED.equals(executor.getStepResult().getStatus()) ||
-                    SprayStepStatus.STOP.equals(executor.getStepResult().getStatus())) {
+            } else if (SprayStepStatus.FAILED.match(executor.getStepResult().getStatus()) ||
+                    SprayStepStatus.STOP.match(executor.getStepResult().getStatus())) {
                 transactionSupportExecutor.rollback();
             }
         }
