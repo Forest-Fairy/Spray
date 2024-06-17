@@ -145,7 +145,7 @@ public class SprayDefaultProcessCoordinator implements
     }
     private SprayCoordinateStatus calculateTheResult() {
         if (this.executorResultMap.entrySet().stream()
-                .anyMatch(entry -> SprayStepStatus.FAILED.match(entry.getValue().getStatus()))) {
+                .anyMatch(entry -> SprayStepStatus.FAILED.equals(entry.getValue().getStatus()))) {
             return SprayCoordinateStatus.FAILED;
         } else {
             return SprayCoordinateStatus.SUCCESS;
@@ -259,16 +259,16 @@ public class SprayDefaultProcessCoordinator implements
     protected void afterExecute(SprayProcessStepExecutor nextStepExecutor,
                                 SprayProcessStepExecutor fromExecutor,
                                 SprayData data, boolean still) {
-        if (SprayStepStatus.DONE.match(nextStepExecutor.getStepResult().getStatus())) {
+        if (SprayStepStatus.DONE.equals(nextStepExecutor.getStepResult().getStatus())) {
             this.endUpWithExecutor(nextStepExecutor);
         }
     }
     private void endUpWithExecutor(SprayProcessStepExecutor executor) {
         if (executor instanceof SprayTransactionSupportExecutor transactionSupportExecutor) {
-            if (SprayStepStatus.DONE.match(executor.getStepResult().getStatus())) {
+            if (SprayStepStatus.DONE.equals(executor.getStepResult().getStatus())) {
                 transactionSupportExecutor.commit();
-            } else if (SprayStepStatus.FAILED.match(executor.getStepResult().getStatus()) ||
-                    SprayStepStatus.STOP.match(executor.getStepResult().getStatus())) {
+            } else if (SprayStepStatus.FAILED.equals(executor.getStepResult().getStatus()) ||
+                    SprayStepStatus.STOP.equals(executor.getStepResult().getStatus())) {
                 transactionSupportExecutor.rollback();
             }
         }
