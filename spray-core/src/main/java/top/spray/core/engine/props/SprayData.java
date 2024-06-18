@@ -13,31 +13,49 @@ public class SprayData implements Map<String, Object>, Serializable {
 
     private final LinkedHashMap<String, Object> inside;
 
-    public SprayData(Object... keyValues) {
-        if (keyValues != null) {
-            if (keyValues.length > 1 && keyValues.length % 2 == 0) {
-                inside = new LinkedHashMap<>();
-                for (int i = 0; i < keyValues.length; i += 2) {
-                    if (keyValues[i] == null) {
-                        throw new IllegalArgumentException("key can not be null");
-                    }
-                    inside.put(String.valueOf(keyValues[i]), keyValues[i + 1]);
-                }
-            } else if (keyValues.length == 1 && keyValues[0] instanceof Map map) {
-                inside = new LinkedHashMap<>();
-                map.forEach((k, v) -> {
-                    if (k != null) {
-                        inside.put(String.valueOf(k), v);
-                    }
-                });
-            } else {
-                throw new IllegalArgumentException("SprayData must be initialize with a map or key-value pairs!");
+    public SprayData(Map map) {
+        inside = new LinkedHashMap<>();
+        map.forEach((k, v) -> {
+            if (k != null) {
+                inside.put(String.valueOf(k), v);
             }
-        } else {
-            inside = new LinkedHashMap<>();
+        });
+    }
+    public SprayData(String key0, Object value0, Object... keyValues) {
+        inside = new LinkedHashMap<>();
+        if (key0 == null) {
+            throw new IllegalArgumentException("key can not be null");
+        }
+        inside.put(key0, value0);
+        if (keyValues != null && keyValues.length > 0) {
+            if (! (keyValues.length % 2 == 0)) {
+                throw new IllegalArgumentException("keyValues must be key-value pairs!");
+            }
+            for (int i = 0; i < keyValues.length; i += 2) {
+                if (keyValues[i] == null) {
+                    throw new IllegalArgumentException("key can not be null");
+                }
+                inside.put(String.valueOf(keyValues[i]), keyValues[i + 1]);
+            }
         }
     }
 
+    /**
+     * a get method witch requires the result is not null
+     */
+    public <T> T getNoneNull(final String key, final Class<T> clazz) {
+        return this.getNoneNull(key, clazz, null);
+    }
+    public <T> T getNoneNull(final String key, final Class<T> clazz, final Throwable throwable) {
+        T t = this.get(key, clazz);
+        if (t != null) {
+            return t;
+        } else {
+            throw throwable == null ?
+                    new NullPointerException("the value on " + key + " is null") :
+                    new RuntimeException(throwable);
+        }
+    }
 
     public <T> T get(final String key, final Class<T> clazz) {
         return clazz.cast(inside.get(key));

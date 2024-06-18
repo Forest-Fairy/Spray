@@ -1,7 +1,6 @@
 package top.spray.engine.step.meta;
 
 
-import com.alibaba.fastjson2.JSONObject;
 import top.spray.core.engine.exception.SprayMetaError;
 import top.spray.core.engine.exception.SprayNotSupportError;
 import top.spray.core.engine.execute.SprayStepActiveType;
@@ -17,7 +16,7 @@ import java.util.List;
  * 节点引擎
  */
 public class SprayProcessStepMeta implements SprayBaseMeta<SprayProcessStepMeta> {
-    private SprayData dataInside;
+    private final SprayData metaContainer;
     private String id;
     private String name;
     private List<SprayProcessStepMeta> nextNodes;
@@ -32,8 +31,8 @@ public class SprayProcessStepMeta implements SprayBaseMeta<SprayProcessStepMeta>
     private int varCopy;
     private Collection<SprayStepExecuteConditionFilter> executeConditionFilters;
 
-    public SprayProcessStepMeta(SprayData dataInside) {
-        this.dataInside = dataInside.unmodifiable();
+    public SprayProcessStepMeta(SprayData metaContainer) {
+        this.metaContainer = metaContainer.unmodifiable();
         try {
             init();
         } catch (Exception e) {
@@ -42,20 +41,20 @@ public class SprayProcessStepMeta implements SprayBaseMeta<SprayProcessStepMeta>
     }
 
     private void init() throws ClassNotFoundException {
-        this.id = dataInside.getString("stepId");
-        this.name = dataInside.getString("stepName");
-        this.nextNodes = dataInside.getList("nextNodes", SprayProcessStepMeta.class);
-        this.executorClass = dataInside.getString("executorClass");
-        this.jarFiles = dataInside.getString("jarFiles");
-        this.stepActiveType = SprayStepActiveType.valueOf(dataInside.get("activeType", "ACTIVE").toUpperCase());
-        this.transactional = dataInside.get("isTransactional", false);
-        this.rollbackIfError = this.transactional && dataInside.get("rollbackIfError", false);
+        this.id = metaContainer.getNoneNull("stepId", String.class);
+        this.name = metaContainer.getNoneNull("stepName", String.class);
+        this.nextNodes = metaContainer.getList("nextNodes", SprayProcessStepMeta.class);
+        this.executorClass = metaContainer.getNoneNull("executorClass", String.class);
+        this.jarFiles = metaContainer.getString("jarFiles");
+        this.stepActiveType = SprayStepActiveType.valueOf(metaContainer.get("activeType", "ACTIVE").toUpperCase());
+        this.transactional = metaContainer.get("isTransactional", false);
+        this.rollbackIfError = this.transactional && metaContainer.get("rollbackIfError", false);
         // only effect when rollbackIfError is false
-        this.ignoreError = (!this.rollbackIfError) && (dataInside.get("ignoreError", false));
-        this.isAsync = dataInside.get("isAsync", false);
-        this.maxThreadCount = dataInside.get("maxThreadCount", 1);
-        this.varCopy = dataInside.get("varCopy", 0);
-        this.executeConditionFilters = SprayStepExecuteConditionFilterHandler.createFilters(this.dataInside);
+        this.ignoreError = (!this.rollbackIfError) && (metaContainer.get("ignoreError", false));
+        this.isAsync = metaContainer.get("isAsync", false);
+        this.maxThreadCount = metaContainer.get("maxThreadCount", 1);
+        this.varCopy = metaContainer.get("varCopy", 0);
+        this.executeConditionFilters = SprayStepExecuteConditionFilterHandler.createFilters(this.metaContainer);
     }
 
 
@@ -134,31 +133,31 @@ public class SprayProcessStepMeta implements SprayBaseMeta<SprayProcessStepMeta>
     }
 
     public <T> T get(String key, Class<T> tClass) {
-        return dataInside.get(key, tClass);
+        return metaContainer.get(key, tClass);
     }
 
     public String getString(String key) {
-        return dataInside.getString(key);
+        return metaContainer.getString(key);
     }
 
     public String getString(String key, String defVal) {
-        return dataInside.get(key, defVal);
+        return metaContainer.get(key, defVal);
     }
 
     public Integer getInteger(String key, Integer defVal) {
-        return dataInside.get(key, defVal);
+        return metaContainer.get(key, defVal);
     }
 
     public Long getLong(String key, Long defVal) {
-        return dataInside.get(key, defVal);
+        return metaContainer.get(key, defVal);
     }
 
     public Boolean getBoolean(String key, Boolean bool) {
-        return dataInside.get(key, bool);
+        return metaContainer.get(key, bool);
     }
 
-    public SprayData getDataInside() {
-        return dataInside;
+    public SprayData getMetaContainer() {
+        return metaContainer;
     }
 
 }
