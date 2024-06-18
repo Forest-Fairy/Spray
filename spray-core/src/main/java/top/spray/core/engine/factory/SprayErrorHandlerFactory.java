@@ -1,12 +1,12 @@
 package top.spray.core.engine.factory;
 
 import top.spray.core.engine.handler.error.SprayErrorHandler;
-import top.spray.core.util.ServiceUtil;
+import top.spray.core.util.SprayServiceUtil;
 
 import java.util.Map;
 
 public class SprayErrorHandlerFactory {
-    private static final Map<String, SprayErrorHandler> INSTANCE_MAP = ServiceUtil.loadServiceClassNameMap(SprayErrorHandler.class);
+    private static final Map<String, SprayErrorHandler> INSTANCE_MAP = SprayServiceUtil.loadServiceClassNameMap(SprayErrorHandler.class);
     public static SprayErrorHandler<?> getInstance(String handlerName) {
         return INSTANCE_MAP.get(handlerName);
     }

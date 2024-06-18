@@ -30,9 +30,9 @@ public class SprayDefaultProcessCoordinator implements
     private final Map<String, SprayProcessStepExecutor> cachedExecutorMap = new ConcurrentHashMap<>();
     private final SprayProcessCoordinatorMeta coordinatorMeta;
     private final List<SprayExecutorListener> listeners;
-    private final Map<String, Object> processData;
+    private final SprayData processData;
     private final LongAdder executingStepCounter;
-    private final Map<String, SprayStepResultInstance<?>> executorResultMap;
+    private final Map<String, SprayStepResultInstance> executorResultMap;
     private final List<SprayData> defaultDataList;
 
     private SprayPoolExecutor executor;
@@ -42,7 +42,7 @@ public class SprayDefaultProcessCoordinator implements
     public SprayDefaultProcessCoordinator(SprayProcessCoordinatorMeta coordinatorMeta) {
         this.coordinatorMeta = coordinatorMeta;
         this.listeners = new ArrayList<>();
-        this.processData = new HashMap<>();
+        this.processData = new SprayData().keyBanned("stream", "globalVar");
         this.executingStepCounter = new LongAdder();
         this.executorResultMap = new ConcurrentHashMap<>();
         this.defaultDataList = new ArrayList<>();
@@ -185,7 +185,7 @@ public class SprayDefaultProcessCoordinator implements
         if (nodes == null) {
             return;
         }
-        List<CompletableFuture<SprayStepResultInstance<?>>> futureResults = new ArrayList<>();
+        List<CompletableFuture<SprayStepResultInstance>> futureResults = new ArrayList<>();
         for (SprayProcessStepMeta nodeMeta : nodes) {
             SprayProcessStepExecutor nextExecutor = getNextStepExecutor(fromExecutor, data, still, nodeMeta);
             if (nextExecutor == null) continue;
@@ -203,7 +203,7 @@ public class SprayDefaultProcessCoordinator implements
             }
         }
         futureResults.forEach(future -> {
-            SprayStepResultInstance<?> result = future.join();
+            SprayStepResultInstance result = future.join();
             this.executorResultMap.put(result.getExecutor().getExecutorId(), result);
         });
     }
@@ -237,7 +237,7 @@ public class SprayDefaultProcessCoordinator implements
     }
 
     @Override
-    public SprayStepResultInstance<?> executeNext(SprayProcessStepExecutor nextStepExecutor,
+    public SprayStepResultInstance executeNext(SprayProcessStepExecutor nextStepExecutor,
                                               SprayProcessStepExecutor fromExecutor,
                                               SprayData data, boolean still) {
         beforeExecute(nextStepExecutor, fromExecutor, data, still);

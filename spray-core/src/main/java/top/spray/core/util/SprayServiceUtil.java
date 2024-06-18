@@ -4,13 +4,13 @@ import cn.hutool.cache.Cache;
 import cn.hutool.cache.CacheUtil;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.stream.Collectors;
 
-public class ServiceUtil {
-    private static Cache<String, Map<String, ?>> CACHE =
+public class SprayServiceUtil {
+    /* cache expire time is 1 hour */
+    private static final Cache<String, Map<String, ?>> CACHE =
             CacheUtil.newTimedCache(1000L * 60L * 60L);
     static {
         CACHE.setListener((k, v) -> v.clear());

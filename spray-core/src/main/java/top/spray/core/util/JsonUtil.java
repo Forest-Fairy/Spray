@@ -1,17 +1,10 @@
 package top.spray.core.util;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import com.alibaba.fastjson2.JSON;
-import com.alibaba.fastjson2.JSONArray;
-import com.alibaba.fastjson2.JSONObject;
-import com.alibaba.fastjson2.JSONWriter;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.alibaba.fastjson2.*;
 import top.spray.core.engine.props.SprayData;
 
 public class JsonUtil {
@@ -73,5 +66,14 @@ public class JsonUtil {
         List<SprayData> sprayData = JSON.parseArray(jsonText, SprayData.class);
         return sprayData.stream().map(JsonUtil::convertMapToSprayData).collect(Collectors.toList());
     }
+
+    public static JSONPath GenerateJsonPath(String jsonPath, JSONPath.Feature... features) {
+        return (features == null || features.length == 0) ?
+                JSONPath.of(jsonPath) :
+                JSONPath.of(jsonPath, features);
+    }
+
+
+
 }
 

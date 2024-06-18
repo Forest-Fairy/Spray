@@ -1,7 +1,5 @@
 package top.spray.core.engine.props;
 
-import com.alibaba.fastjson2.JSON;
-import com.alibaba.fastjson2.JSONWriter;
 import org.apache.commons.lang3.StringUtils;
 import top.spray.core.util.JsonUtil;
 
@@ -15,17 +13,29 @@ public class SprayData implements Map<String, Object>, Serializable {
 
     private final LinkedHashMap<String, Object> inside;
 
-    public SprayData() {
-        inside = new LinkedHashMap<>();
-    }
-
-    public SprayData(final String key, final Object value) {
-        inside = new LinkedHashMap<>();
-        inside.put(key, value);
-    }
-
-    public SprayData(final Map<String, Object> map) {
-        inside = new LinkedHashMap<String, Object>(map);
+    public SprayData(Object... keyValues) {
+        if (keyValues != null) {
+            if (keyValues.length > 1 && keyValues.length % 2 == 0) {
+                inside = new LinkedHashMap<>();
+                for (int i = 0; i < keyValues.length; i += 2) {
+                    if (keyValues[i] == null) {
+                        throw new IllegalArgumentException("key can not be null");
+                    }
+                    inside.put(String.valueOf(keyValues[i]), keyValues[i + 1]);
+                }
+            } else if (keyValues.length == 1 && keyValues[0] instanceof Map map) {
+                inside = new LinkedHashMap<>();
+                map.forEach((k, v) -> {
+                    if (k != null) {
+                        inside.put(String.valueOf(k), v);
+                    }
+                });
+            } else {
+                throw new IllegalArgumentException("SprayData must be initialize with a map or key-value pairs!");
+            }
+        } else {
+            inside = new LinkedHashMap<>();
+        }
     }
 
 
@@ -64,6 +74,9 @@ public class SprayData implements Map<String, Object>, Serializable {
     }
     public SprayData unmodifiable() {
         return new UnmodifiableData(this);
+    }
+    public SprayData keyBanned(String... keys) {
+        return new KeysBannedData(this, Set.of(keys));
     }
 
     public <T> List<T> getList(String key, Class<T> tClass) {
@@ -225,6 +238,41 @@ public class SprayData implements Map<String, Object>, Serializable {
         @Override
         public void clear() {
             throw new UnsupportedOperationException();
+        }
+    }
+
+    static class KeysBannedData extends SprayData {
+        private final Set<String> keysBanned;
+        private KeysBannedData(final SprayData data, final Set<String> keysBanned) {
+            super(data);
+            this.keysBanned = keysBanned;
+        }
+
+        @Override
+        public Object put(final String key, final Object value) {
+            if (keysBanned.contains(key)) {
+                throw new UnsupportedOperationException(key + " can not be operate in current data");
+            }
+            return super.put(key, value);
+        }
+
+        @Override
+        public void putAll(final Map<? extends String, ?> map) {
+            HashSet<? extends String> tmpKeySet = new HashSet<>(map.keySet());
+            tmpKeySet.retainAll(keysBanned);
+            if (! tmpKeySet.isEmpty()) {
+                throw new UnsupportedOperationException(tmpKeySet + " can not be operate in current data");
+            }
+            super.putAll(map);
+        }
+
+        @Override
+        public Object remove(final Object key) {
+            if (keysBanned.contains(key)) {
+                throw new UnsupportedOperationException(key + " can not be operate in current data");
+            } else {
+                return super.remove(key);
+            }
         }
     }
 }

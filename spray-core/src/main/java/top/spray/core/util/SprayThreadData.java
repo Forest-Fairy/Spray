@@ -12,16 +12,6 @@ import java.util.Arrays;
 public class SprayThreadData extends SprayData {
     private static final ThreadLocal<SprayThreadData> THREAD_LOCAL = new ThreadLocal<>();
     public static final String SEPARATOR = "(^_^)";
-    public static final String MAC_ADDRESS;
-    static {
-        String macAddress;
-        try {
-            macAddress = Arrays.toString(NetworkInterface.getByInetAddress(InetAddress.getLocalHost()).getHardwareAddress());
-        } catch (SocketException | UnknownHostException ignored) {
-            macAddress = "UNKNOWN_MAC_ADDRESS";
-        }
-        MAC_ADDRESS = macAddress;
-    }
 
     public static SprayThreadData Get() {
         SprayThreadData threadData = THREAD_LOCAL.get();
@@ -42,7 +32,7 @@ public class SprayThreadData extends SprayData {
     private void init() {
         super.put("tid", String.valueOf(Thread.currentThread().getId()));
         super.put("transaction", HexUtil.encodeHexStr(
-                MAC_ADDRESS + SEPARATOR +
+                SpraySystemUtil.Const.MAC_ADDRESS + SEPARATOR +
                         Thread.currentThread().getId() + SEPARATOR +
                         System.currentTimeMillis()) + SEPARATOR +
                         System.nanoTime());
