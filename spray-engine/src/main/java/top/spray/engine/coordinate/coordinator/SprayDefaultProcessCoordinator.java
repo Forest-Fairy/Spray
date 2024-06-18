@@ -7,6 +7,7 @@ import top.spray.core.engine.props.SprayData;
 import top.spray.core.engine.props.SprayPoolExecutor;
 import top.spray.core.engine.result.SprayStepStatus;
 import top.spray.core.engine.result.SprayCoordinateStatus;
+import top.spray.engine.step.condition.SprayStepExecuteConditionFilter;
 import top.spray.engine.step.executor.SprayExecutorListener;
 import top.spray.engine.coordinate.meta.SprayProcessCoordinatorMeta;
 import top.spray.engine.step.executor.SprayProcessStepExecutor;
@@ -214,6 +215,13 @@ public class SprayDefaultProcessCoordinator implements
                 this.runNodes(nodeMeta.nextNodes(), fromExecutor, data, still);
             }
             return null;
+        }
+        if (!nodeMeta.getExecuteConditionFilter().isEmpty()) {
+            for (SprayStepExecuteConditionFilter filter : nodeMeta.getExecuteConditionFilter()) {
+                if (!filter.filter(fromExecutor, data, still, nodeMeta)) {
+                    return null;
+                }
+            }
         }
         SprayProcessStepExecutor nextExecutor = SprayExecutorFactory.create(this, nodeMeta);
         // if the executor support to storage data in file then try

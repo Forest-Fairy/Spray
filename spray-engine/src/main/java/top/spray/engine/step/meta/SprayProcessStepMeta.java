@@ -6,7 +6,10 @@ import top.spray.core.engine.exception.SprayNotSupportError;
 import top.spray.core.engine.execute.SprayStepActiveType;
 import top.spray.core.engine.meta.SprayBaseMeta;
 import top.spray.core.engine.props.SprayData;
+import top.spray.engine.factory.SprayStepExecuteConditionHandlerFactory;
+import top.spray.engine.step.condition.SprayStepExecuteConditionFilter;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -26,6 +29,7 @@ public class SprayProcessStepMeta implements SprayBaseMeta<SprayProcessStepMeta>
     private boolean isAsync;
     private int maxThreadCount;
     private int varCopy;
+    private Collection<SprayStepExecuteConditionFilter> executeConditionFilters;
 
     public SprayProcessStepMeta(SprayData dataInside) {
         this.dataInside = dataInside.unmodifiable();
@@ -50,6 +54,7 @@ public class SprayProcessStepMeta implements SprayBaseMeta<SprayProcessStepMeta>
         this.isAsync = dataInside.get("isAsync", false);
         this.maxThreadCount = dataInside.get("maxThreadCount", 1);
         this.varCopy = dataInside.get("varCopy", 0);
+        this.executeConditionFilters = SprayStepExecuteConditionHandlerFactory.createFilters(this);
     }
 
 
@@ -71,6 +76,10 @@ public class SprayProcessStepMeta implements SprayBaseMeta<SprayProcessStepMeta>
 
     public List<SprayProcessStepMeta> nextNodes() {
         return this.nextNodes;
+    }
+
+    public Collection<SprayStepExecuteConditionFilter> getExecuteConditionFilter() {
+        return executeConditionFilters;
     }
 
     public String executorClass() {

@@ -2,6 +2,7 @@ package top.spray.engine.step.condition;
 
 import top.spray.core.engine.props.SprayData;
 import top.spray.engine.step.executor.SprayProcessStepExecutor;
+import top.spray.engine.step.handler.SprayExecutorHandler;
 import top.spray.engine.step.meta.SprayProcessStepMeta;
 
 import java.util.Collection;
@@ -9,7 +10,7 @@ import java.util.Collection;
 /**
  * reg the executor that can be executed
  */
-public interface SprayStepExecuteCondition {
+public interface SprayStepExecuteConditionFilter {
     /**
      * to filter the data
      *  - like ① -> ②，that means fromExecutor is 1 and stepMetaForExecuting is 2
@@ -20,7 +21,5 @@ public interface SprayStepExecuteCondition {
      * @return false means pass
      */
     boolean filter(SprayProcessStepExecutor fromExecutor, SprayData data, boolean still, SprayProcessStepMeta stepMetaForExecuting);
-
-    Collection<SprayStepExecuteCondition> getConditionsInMeta(SprayProcessStepMeta stepMetaForExecuting);
 
 }
