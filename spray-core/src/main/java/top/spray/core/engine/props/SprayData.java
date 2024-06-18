@@ -13,6 +13,10 @@ public class SprayData implements Map<String, Object>, Serializable {
 
     private final LinkedHashMap<String, Object> inside;
 
+    public SprayData() {
+        inside = new LinkedHashMap<>();
+    }
+
     public SprayData(Map map) {
         inside = new LinkedHashMap<>();
         map.forEach((k, v) -> {
@@ -35,7 +39,7 @@ public class SprayData implements Map<String, Object>, Serializable {
                 if (keyValues[i] == null) {
                     throw new IllegalArgumentException("key can not be null");
                 }
-                inside.put(String.valueOf(keyValues[i]), keyValues[i + 1]);
+                inside.put(keyValues[i].toString(), keyValues[i + 1]);
             }
         }
     }
