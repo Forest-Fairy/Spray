@@ -17,6 +17,7 @@ import java.util.Map;
 public interface SprayProcessStepExecutor extends SprayMetaDrive<SprayProcessStepMeta> {
     String getExecutorId();
     void initOnlyAtCreate();
+    long getCreateTime();
     @Override
     SprayProcessStepMeta getMeta();
     SprayProcessCoordinator getCoordinator();

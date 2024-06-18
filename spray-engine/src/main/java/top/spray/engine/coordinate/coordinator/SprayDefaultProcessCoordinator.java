@@ -29,6 +29,7 @@ public class SprayDefaultProcessCoordinator implements
         SprayProcessCoordinator,
         SprayListenable<SprayExecutorListener> {
     private final Map<String, SprayProcessStepExecutor> cachedExecutorMap = new ConcurrentHashMap<>();
+    private final Map<String, LongAdder> executorCounterMap = new ConcurrentHashMap<>();
     private final SprayProcessCoordinatorMeta coordinatorMeta;
     private final List<SprayExecutorListener> listeners;
     private final SprayData processData;
@@ -50,7 +51,7 @@ public class SprayDefaultProcessCoordinator implements
         init();
     }
 
-    private synchronized void init() {
+    private void init() {
         // don't let the coordinator run twice so that we could clear the default data list when we run
 //        while (this.counter.sum() > 0) {
 //            Thread.yield();

@@ -23,6 +23,7 @@ public abstract class BaseSprayProcessStepExecutor implements SprayProcessStepEx
     private SprayClassLoader classLoader;
     private SprayStepResultInstance stepResult;
     private Map<String, Object> processData;
+    private long createTime;
 
     @Override
     public String getExecutorId() {
@@ -34,6 +35,7 @@ public abstract class BaseSprayProcessStepExecutor implements SprayProcessStepEx
     public void initOnlyAtCreate() {
         this.executorId = SprayExecutorFactory.getExecutorId(this.getCoordinator(), this.getMeta());
         this.stepResult = new SprayStepResultInstance(this.getCoordinator(), this);
+        this.createTime = System.currentTimeMillis();
         switch (this.getMeta().varCopy()) {
             case 1: {
                 this.processData = new HashMap<>(this.getCoordinator().getProcessData());
@@ -46,6 +48,12 @@ public abstract class BaseSprayProcessStepExecutor implements SprayProcessStepEx
             } break;
         }
     }
+
+    @Override
+    public long getCreateTime() {
+        return this.createTime;
+    }
+
     @Override
     public void setMeta(SprayProcessStepMeta meta) {
         this.stepMeta = meta;

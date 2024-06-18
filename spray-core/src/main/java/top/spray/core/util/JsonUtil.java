@@ -67,10 +67,14 @@ public class JsonUtil {
         return sprayData.stream().map(JsonUtil::convertMapToSprayData).collect(Collectors.toList());
     }
 
-    public static JSONPath GenerateJsonPath(String jsonPath, JSONPath.Feature... features) {
+    public static JSONPath createJsonPath(String jsonPath, JSONPath.Feature... features) {
         return (features == null || features.length == 0) ?
                 JSONPath.of(jsonPath) :
                 JSONPath.of(jsonPath, features);
+    }
+
+    public static Object getByJsonPath(JSONPath jsonPath, Object targetObj) {
+        return jsonPath.eval(targetObj);
     }
 
 

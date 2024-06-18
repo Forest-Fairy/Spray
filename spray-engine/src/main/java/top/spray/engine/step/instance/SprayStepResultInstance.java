@@ -11,7 +11,6 @@ import top.spray.core.engine.result.SprayStepStatus;
 import top.spray.engine.step.meta.SprayProcessStepMeta;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -37,7 +36,9 @@ public class SprayStepResultInstance implements SprayMetaDrive<SprayProcessStepM
     private List<Pair<Long, Throwable>> errorList;
     private Map<String, LongAdder> inputInfos;
     private Map<String, LongAdder> outputInfos;
-    private LongAdder dataCounter;
+    private LongAdder dataProcessingCounter;
+    private long startTime;
+    private long endTime;
 
     public SprayStepResultInstance(SprayProcessCoordinator coordinator, SprayProcessStepExecutor executor) {
         this.coordinator = coordinator;
@@ -52,7 +53,6 @@ public class SprayStepResultInstance implements SprayMetaDrive<SprayProcessStepM
         this.outputInfos = new ConcurrentHashMap<>(0);
         this.dataRecordStrategy = executor.getMeta()
                 .getString("dataRecordStrategy", "NONE").toUpperCase();
-
     }
     public SprayProcessStepExecutor getExecutor() {
         return this.executor;
@@ -71,9 +71,17 @@ public class SprayStepResultInstance implements SprayMetaDrive<SprayProcessStepM
     public Map<String, LongAdder> inputInfos() {
         return this.inputInfos;
     }
+    public void addInputInfo(String infoKey, long count) {
+        this.inputInfos.computeIfAbsent(infoKey, key -> new LongAdder())
+                .add(count);
+    }
 
     public Map<String, LongAdder> outputInfos() {
         return this.outputInfos;
+    }
+    public void addOutputInfo(String infoKey, long count) {
+        this.outputInfos.computeIfAbsent(infoKey, key -> new LongAdder())
+                .add(count);
     }
 
     public void setStatus(SprayStepStatus status) {
@@ -95,9 +103,7 @@ public class SprayStepResultInstance implements SprayMetaDrive<SprayProcessStepM
      * @param still still
      */
     public void recordBeforeExecute(SprayStepStatus status, SprayProcessStepExecutor fromExecutor, SprayData data, boolean still) {
-        this.dataCounter.increment();
-
-
+        dataProcessingCounter.increment();
     }
 
     /**
@@ -108,13 +114,25 @@ public class SprayStepResultInstance implements SprayMetaDrive<SprayProcessStepM
      * @param still still
      */
     public void recordInputAgain(SprayStepStatus status, SprayProcessStepExecutor fromExecutor, SprayData data, boolean still) {
-        this.executor.getMeta()
+        dataProcessingCounter.decrement();
     }
 
+    public void setStartTime(long startTime) {
+        this.startTime = startTime;
+    }
     public long getStartTime() {
-
+        return this.startTime;
     }
-    public long duration() {
+    public void setEndTime(long endTime) {
+        this.endTime = endTime;
+    }
+    public long getEndTime() {
+        return this.endTime;
+    }
 
+
+    public long duration() {
+        return this.endTime == 0 ? 0 :
+                this.endTime - this.startTime;
     }
 }

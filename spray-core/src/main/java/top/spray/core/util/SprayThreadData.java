@@ -1,6 +1,7 @@
 package top.spray.core.util;
 
 import cn.hutool.core.util.HexUtil;
+import org.slf4j.MDC;
 import top.spray.core.engine.props.SprayData;
 
 import java.net.InetAddress;
@@ -19,7 +20,6 @@ public class SprayThreadData extends SprayData {
             synchronized (THREAD_LOCAL) {
                 if ((threadData = THREAD_LOCAL.get()) == null) {
                     THREAD_LOCAL.set(threadData = new SprayThreadData());
-                    threadData.init();
                 }
             }
         }
@@ -27,9 +27,11 @@ public class SprayThreadData extends SprayData {
     }
 
     public SprayThreadData() {
+        init();
     }
 
     private void init() {
+        super.putAll(MDC.getCopyOfContextMap());
         super.put("tid", String.valueOf(Thread.currentThread().getId()));
         super.put("transaction", HexUtil.encodeHexStr(
                 SpraySystemUtil.Const.MAC_ADDRESS + SEPARATOR +
