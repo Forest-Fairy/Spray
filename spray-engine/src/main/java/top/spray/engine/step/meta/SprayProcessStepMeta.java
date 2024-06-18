@@ -1,13 +1,14 @@
 package top.spray.engine.step.meta;
 
 
+import com.alibaba.fastjson2.JSONObject;
 import top.spray.core.engine.exception.SprayMetaError;
 import top.spray.core.engine.exception.SprayNotSupportError;
 import top.spray.core.engine.execute.SprayStepActiveType;
 import top.spray.core.engine.meta.SprayBaseMeta;
 import top.spray.core.engine.props.SprayData;
-import top.spray.engine.factory.SprayStepExecuteConditionHandlerFactory;
 import top.spray.engine.step.condition.SprayStepExecuteConditionFilter;
+import top.spray.engine.step.handler.filter.SprayStepExecuteConditionFilterHandler;
 
 import java.util.Collection;
 import java.util.List;
@@ -50,11 +51,11 @@ public class SprayProcessStepMeta implements SprayBaseMeta<SprayProcessStepMeta>
         this.transactional = dataInside.get("isTransactional", false);
         this.rollbackIfError = this.transactional && dataInside.get("rollbackIfError", false);
         // only effect when rollbackIfError is false
-        this.ignoreError = (! this.rollbackIfError) && (dataInside.get("ignoreError", false));
+        this.ignoreError = (!this.rollbackIfError) && (dataInside.get("ignoreError", false));
         this.isAsync = dataInside.get("isAsync", false);
         this.maxThreadCount = dataInside.get("maxThreadCount", 1);
         this.varCopy = dataInside.get("varCopy", 0);
-        this.executeConditionFilters = SprayStepExecuteConditionHandlerFactory.createFilters(this);
+        this.executeConditionFilters = SprayStepExecuteConditionFilterHandler.createFilters(this.dataInside);
     }
 
 
@@ -86,7 +87,9 @@ public class SprayProcessStepMeta implements SprayBaseMeta<SprayProcessStepMeta>
         return this.executorClass;
     }
 
-    /** the jars for running */
+    /**
+     * the jars for running
+     */
     public String jarFiles() {
         return this.jarFiles;
     }
@@ -122,10 +125,9 @@ public class SprayProcessStepMeta implements SprayBaseMeta<SprayProcessStepMeta>
     }
 
     /**
-     * @return
-     *  0 -> no
-     *  1 -> simple
-     *  2 -> deep
+     * @return 0 -> no
+     * 1 -> simple
+     * 2 -> deep
      */
     public int varCopy() {
         return this.varCopy;
@@ -134,19 +136,29 @@ public class SprayProcessStepMeta implements SprayBaseMeta<SprayProcessStepMeta>
     public <T> T get(String key, Class<T> tClass) {
         return dataInside.get(key, tClass);
     }
+
     public String getString(String key) {
         return dataInside.getString(key);
     }
+
     public String getString(String key, String defVal) {
         return dataInside.get(key, defVal);
     }
+
     public Integer getInteger(String key, Integer defVal) {
         return dataInside.get(key, defVal);
     }
+
     public Long getLong(String key, Long defVal) {
         return dataInside.get(key, defVal);
     }
+
     public Boolean getBoolean(String key, Boolean bool) {
         return dataInside.get(key, bool);
     }
+
+    public SprayData getDataInside() {
+        return dataInside;
+    }
+
 }

@@ -5,9 +5,7 @@ import top.spray.core.engine.props.SprayData;
 import top.spray.core.util.SprayClassLoader;
 import top.spray.engine.coordinate.coordinator.SprayProcessCoordinator;
 import top.spray.engine.factory.SprayExecutorFactory;
-import top.spray.engine.factory.SprayStepExecuteConditionHandlerFactory;
 import top.spray.engine.step.condition.SprayNextStepFilter;
-import top.spray.engine.step.condition.SprayStepExecuteConditionFilter;
 import top.spray.engine.step.instance.SprayStepResultInstance;
 import top.spray.engine.step.meta.SprayProcessStepMeta;
 
@@ -25,7 +23,6 @@ public abstract class BaseSprayProcessStepExecutor implements SprayProcessStepEx
     private SprayClassLoader classLoader;
     private SprayStepResultInstance stepResult;
     private Map<String, Object> processData;
-    private Collection<SprayStepExecuteConditionFilter> executeConditionFitler;
 
     @Override
     public String getExecutorId() {
@@ -37,7 +34,6 @@ public abstract class BaseSprayProcessStepExecutor implements SprayProcessStepEx
     public void initOnlyAtCreate() {
         this.executorId = SprayExecutorFactory.getExecutorId(this.getCoordinator(), this.getMeta());
         this.stepResult = new SprayStepResultInstance(this.getCoordinator(), this);
-        this.executeConditionFitler = SprayStepExecuteConditionHandlerFactory.createFilters(this.getMeta());
         switch (this.getMeta().varCopy()) {
             case 1: {
                 this.processData = new HashMap<>(this.getCoordinator().getProcessData());
