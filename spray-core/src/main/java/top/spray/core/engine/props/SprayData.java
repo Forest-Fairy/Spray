@@ -154,6 +154,9 @@ public class SprayData implements Map<String, Object>, Serializable {
 
     @Override
     public Object put(final String key, final Object value) {
+        if (key == null) {
+            throw new IllegalArgumentException("key can not be null");
+        }
         return inside.put(key, value);
     }
 
@@ -257,13 +260,18 @@ public class SprayData implements Map<String, Object>, Serializable {
         }
 
         @Override
-        public void putAll(final Map<? extends String, ?> map) {
-            HashSet<? extends String> tmpKeySet = new HashSet<>(map.keySet());
-            tmpKeySet.retainAll(keysBanned);
-            if (! tmpKeySet.isEmpty()) {
-                throw new UnsupportedOperationException(tmpKeySet + " can not be operate in current data");
+        public void putAll(final Map map) {
+            HashSet<Object> tmpKeySet = new HashSet<Object>(map.keySet());
+            for (Object o : tmpKeySet) {
+                if (o != null && keysBanned.contains(String.valueOf(o))) {
+                    throw new UnsupportedOperationException(o + " can not be operate in current data");
+                }
             }
-            super.putAll(map);
+            map.forEach((k, v) -> {
+                if (k != null) {
+                    super.put(String.valueOf(k), v);
+                }
+            });
         }
 
         @Override

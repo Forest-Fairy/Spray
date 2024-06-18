@@ -4,10 +4,9 @@ import top.spray.core.engine.execute.SprayMetaDrive;
 import top.spray.core.engine.props.SprayData;
 import top.spray.core.engine.props.SprayPoolExecutor;
 import top.spray.core.engine.result.SprayCoordinateStatus;
-import top.spray.core.engine.result.SprayStepStatus;
 import top.spray.engine.coordinate.meta.SprayProcessCoordinatorMeta;
 import top.spray.engine.step.executor.SprayProcessStepExecutor;
-import top.spray.engine.step.condition.SprayTargetStepFilter;
+import top.spray.engine.step.condition.SprayNextStepFilter;
 import top.spray.engine.step.instance.SprayStepResultInstance;
 
 import java.io.Closeable;
@@ -49,7 +48,7 @@ public interface SprayProcessCoordinator extends
     int createExecutorCount();
 
     /** a method for executor to publish its data */
-    void dispatch(SprayProcessStepExecutor fromExecutor, SprayData data, boolean still, SprayTargetStepFilter filter);
+    void dispatch(SprayProcessStepExecutor fromExecutor, SprayData data, boolean still, SprayNextStepFilter filter);
 
     /**
      * unit method for executing

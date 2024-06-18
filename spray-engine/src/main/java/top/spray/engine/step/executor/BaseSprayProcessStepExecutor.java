@@ -5,7 +5,7 @@ import top.spray.core.engine.props.SprayData;
 import top.spray.core.util.SprayClassLoader;
 import top.spray.engine.coordinate.coordinator.SprayProcessCoordinator;
 import top.spray.engine.factory.SprayExecutorFactory;
-import top.spray.engine.step.condition.SprayTargetStepFilter;
+import top.spray.engine.step.condition.SprayNextStepFilter;
 import top.spray.engine.step.instance.SprayStepResultInstance;
 import top.spray.engine.step.meta.SprayProcessStepMeta;
 
@@ -20,7 +20,7 @@ public abstract class BaseSprayProcessStepExecutor implements SprayProcessStepEx
     private SprayProcessStepMeta stepMeta;
     private SprayProcessCoordinator coordinator;
     private SprayClassLoader classLoader;
-    private SprayStepResultInstance<? extends BaseSprayProcessStepExecutor> stepResult;
+    private SprayStepResultInstance stepResult;
     private Map<String, Object> processData;
 
     @Override
@@ -32,7 +32,7 @@ public abstract class BaseSprayProcessStepExecutor implements SprayProcessStepEx
     @Override
     public void initOnlyAtCreate() {
         this.executorId = SprayExecutorFactory.getExecutorId(this.getCoordinator(), this.getMeta());
-        this.stepResult = new SprayStepResultInstance<>(this.getCoordinator(), this);
+        this.stepResult = new SprayStepResultInstance(this.getCoordinator(), this);
         switch (this.getMeta().varCopy()) {
             case 1: {
                 this.processData = new HashMap<>(this.getCoordinator().getProcessData());
@@ -73,7 +73,7 @@ public abstract class BaseSprayProcessStepExecutor implements SprayProcessStepEx
     public Map<String, Object> getProcessData() {
         return this.processData;
     }
-    public SprayStepResultInstance<? extends BaseSprayProcessStepExecutor> getStepResult() {
+    public SprayStepResultInstance getStepResult() {
         // create when init;
         return this.stepResult;
     }
@@ -81,7 +81,7 @@ public abstract class BaseSprayProcessStepExecutor implements SprayProcessStepEx
     protected void publishData(SprayData data, boolean still) {
         this.publishData(data, still, null);
     }
-    protected void publishData(SprayData data, boolean still, SprayTargetStepFilter filter) {
+    protected void publishData(SprayData data, boolean still, SprayNextStepFilter filter) {
         this.getCoordinator().dispatch(this, data, still, filter);
     }
 

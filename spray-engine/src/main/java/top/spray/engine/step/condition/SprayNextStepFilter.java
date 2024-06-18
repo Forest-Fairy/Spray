@@ -4,17 +4,14 @@ import top.spray.core.engine.props.SprayData;
 import top.spray.engine.step.executor.SprayProcessStepExecutor;
 import top.spray.engine.step.meta.SprayProcessStepMeta;
 
-/**
- * reg the executor that can be executed
- */
-public interface SprayStepConditionalFilter {
+public interface SprayNextStepFilter {
     /**
-     * to filter the data
+     * is next step need to execute with
      * @param fromExecutor the data comes from
      * @param data data
      * @param still still has data
      * @param nextStepMeta next step's meta
-     * @return false means pass
+     * @return false means skip
      */
-    boolean filter(SprayProcessStepExecutor fromExecutor, SprayData data, boolean still, SprayProcessStepMeta nextStepMeta);
+    boolean canBeExecute(SprayProcessStepExecutor fromExecutor, SprayData data, boolean still, SprayProcessStepMeta nextStepMeta);
 }

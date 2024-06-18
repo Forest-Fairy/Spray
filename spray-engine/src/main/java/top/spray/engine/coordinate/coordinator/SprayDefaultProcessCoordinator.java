@@ -12,7 +12,7 @@ import top.spray.engine.coordinate.meta.SprayProcessCoordinatorMeta;
 import top.spray.engine.step.executor.SprayProcessStepExecutor;
 import top.spray.engine.step.executor.closeable.SprayCloseableExecutor;
 import top.spray.engine.factory.SprayExecutorFactory;
-import top.spray.engine.step.condition.SprayTargetStepFilter;
+import top.spray.engine.step.condition.SprayNextStepFilter;
 import top.spray.engine.step.executor.storage.SprayFileStorageSupportExecutor;
 import top.spray.engine.step.executor.transaction.SprayTransactionSupportExecutor;
 import top.spray.engine.step.instance.SprayStepResultInstance;
@@ -170,7 +170,7 @@ public class SprayDefaultProcessCoordinator implements
 
     @Override
     public void dispatch(SprayProcessStepExecutor fromExecutor,
-                         SprayData data, boolean still, SprayTargetStepFilter filter) {
+                         SprayData data, boolean still, SprayNextStepFilter filter) {
         if (filter == null) {
             this.runNodes(fromExecutor.getMeta().nextNodes(), fromExecutor, data, still);
         } else {

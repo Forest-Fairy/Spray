@@ -25,7 +25,7 @@ public interface SprayProcessStepExecutor extends SprayMetaDrive<SprayProcessSte
     default Map<String, Object> getProcessData() {
         return this.getCoordinator().getProcessData();
     }
-    SprayStepResultInstance<? extends SprayProcessStepExecutor> getStepResult();
+    SprayStepResultInstance getStepResult();
 
     void execute(SprayProcessStepExecutor fromExecutor, SprayData data, boolean still);
 
