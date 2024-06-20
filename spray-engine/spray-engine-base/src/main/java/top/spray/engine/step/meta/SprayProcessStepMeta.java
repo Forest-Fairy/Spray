@@ -7,7 +7,7 @@ import top.spray.core.engine.execute.SprayStepActiveType;
 import top.spray.core.engine.meta.SprayBaseMeta;
 import top.spray.core.engine.props.SprayData;
 import top.spray.engine.step.condition.SprayStepExecuteConditionFilter;
-import top.spray.engine.step.handler.filter.SprayStepExecuteConditionFilterHandler;
+import top.spray.engine.step.handler.filter.SprayStepExecuteConditionHelper;
 
 import java.util.Collection;
 import java.util.List;
@@ -54,7 +54,7 @@ public class SprayProcessStepMeta implements SprayBaseMeta<SprayProcessStepMeta>
         this.isAsync = metaContainer.get("isAsync", false);
         this.maxThreadCount = metaContainer.get("maxThreadCount", 1);
         this.varCopy = metaContainer.get("varCopy", 0);
-        this.executeConditionFilters = SprayStepExecuteConditionFilterHandler.createFilters(this.metaContainer);
+        this.executeConditionFilters = SprayStepExecuteConditionHelper.createFilters(this.metaContainer);
     }
 
 

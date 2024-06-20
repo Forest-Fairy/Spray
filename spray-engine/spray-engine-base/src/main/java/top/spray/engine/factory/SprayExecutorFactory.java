@@ -1,12 +1,8 @@
 package top.spray.engine.factory;
 
-import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.util.ReUtil;
 import top.spray.core.util.SprayClassLoader;
 import top.spray.engine.coordinate.coordinator.SprayProcessCoordinator;
 import top.spray.engine.step.executor.SprayProcessStepExecutor;
-import top.spray.engine.step.handler.factory.SprayBeforeExecutorCreate;
-import top.spray.engine.step.handler.factory.SprayExecutorBeforeCreateHandler;
 import top.spray.engine.step.meta.SprayProcessStepMeta;
 
 import java.lang.reflect.InvocationTargetException;
@@ -25,12 +21,7 @@ public class SprayExecutorFactory {
                     try {
                         SprayClassLoader sprayClassLoader = new SprayClassLoader(stepMeta.jarFiles());
                         Class<?> executorClass = sprayClassLoader.loadClass(stepMeta.executorClass());
-                        SprayBeforeExecutorCreate beforeExecutorCreate = executorClass.getAnnotation(SprayBeforeExecutorCreate.class);
-                        if (beforeExecutorCreate != null) {
-                            stepExecutor = SprayExecutorBeforeCreateHandler
-                                    .get(beforeExecutorCreate.handlerBeforeCreate())
-                                    .handle(coordinator, stepMeta);
-                        }
+                        stepExecutor = top.spray.engine.step.handler.create.SprayExecutorFactory.tryCreateExecutor(coordinator, stepMeta, executorClass, sprayClassLoader);
                         if (stepExecutor == null) {
                             stepExecutor = (SprayProcessStepExecutor) executorClass.getConstructor().newInstance();
                             stepExecutor.setMeta(stepMeta);

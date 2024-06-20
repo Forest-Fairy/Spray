@@ -5,27 +5,16 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>top.spray</groupId>
-        <artifactId>spray</artifactId>
+        <artifactId>spray-engine</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>spray-engine</artifactId>
-    <packaging>pom</packaging>
-    <modules>
-        <module>spray-engine-base</module>
-    </modules>
+    <artifactId>spray-engine-base</artifactId>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
-
-    <dependencies>
-        <dependency>
-            <groupId>top.spray</groupId>
-            <artifactId>spray-core</artifactId>
-        </dependency>
-    </dependencies>
 
 </project>

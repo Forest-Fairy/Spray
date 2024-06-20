@@ -11,13 +11,13 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-public interface SprayStepExecuteConditionFilterHandler extends SprayExecutorHandler {
+public interface SprayStepExecuteConditionHelper extends SprayExecutorHandler {
     Collection<SprayStepExecuteConditionFilter> createFilters(List<JSONObject> filtersJson);
 
     static Collection<SprayStepExecuteConditionFilter> createFilters(SprayData stepData) {
-        Map<String, SprayStepExecuteConditionFilterHandler> filterHandlerMap =
+        Map<String, SprayStepExecuteConditionHelper> filterHandlerMap =
                 SprayServiceUtil.loadServiceClassNameMapCache(
-                        SprayStepExecuteConditionFilterHandler.class);
+                        SprayStepExecuteConditionHelper.class);
         JSONObject jsonObject = JsonUtil.parseJson(JsonUtil.toJson(stepData), JSONObject.class);
         List<JSONObject> executeConditionFilter =
                 !jsonObject.containsKey("executeConditionFilter") ? new ArrayList<>(0) :

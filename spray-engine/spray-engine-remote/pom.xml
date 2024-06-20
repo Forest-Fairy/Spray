@@ -7,13 +7,10 @@
         <groupId>top.spray</groupId>
         <artifactId>spray</artifactId>
         <version>0.0.1-SNAPSHOT</version>
+        <relativePath>../../pom.xml</relativePath>
     </parent>
 
-    <artifactId>spray-engine</artifactId>
-    <packaging>pom</packaging>
-    <modules>
-        <module>spray-engine-base</module>
-    </modules>
+    <artifactId>spray-engine-remote</artifactId>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
@@ -24,7 +21,7 @@
     <dependencies>
         <dependency>
             <groupId>top.spray</groupId>
-            <artifactId>spray-core</artifactId>
+            <artifactId>spray-engine-base</artifactId>
         </dependency>
     </dependencies>
 
