@@ -16,7 +16,6 @@
 		<module>spray-boot</module>
         <module>spray-engine</module>
         <module>spray-core</module>
-		<module>spray-engine/spray-engine-remote</module>
 	</modules>
 	<packaging>pom</packaging>
 	<description>Spray is a source-open data-integration platform that supports running with dataflow both in stream mode and batch mode in a job.</description>
@@ -80,6 +79,7 @@
 				<groupId>top.spray</groupId>
 				<artifactId>spray-engine</artifactId>
 				<version>${spray.version}</version>
+				<type>pom</type>
 			</dependency>
 
 			<dependency>

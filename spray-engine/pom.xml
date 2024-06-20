@@ -10,10 +10,6 @@
     </parent>
 
     <artifactId>spray-engine</artifactId>
-    <packaging>pom</packaging>
-    <modules>
-        <module>spray-engine-base</module>
-    </modules>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>

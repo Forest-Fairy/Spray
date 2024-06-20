@@ -9,7 +9,6 @@ import top.spray.engine.step.executor.SprayProcessStepExecutor;
 import top.spray.engine.step.condition.SprayNextStepFilter;
 import top.spray.engine.step.instance.SprayStepResultInstance;
 
-import java.io.Closeable;
 import java.util.Map;
 import java.util.function.Supplier;
 
@@ -18,7 +17,7 @@ import java.util.function.Supplier;
  */
 public interface SprayProcessCoordinator extends
         SprayMetaDrive<SprayProcessCoordinatorMeta>,
-        Supplier<SprayCoordinateStatus>, Runnable, Closeable {
+        Supplier<SprayCoordinateStatus>, Runnable, AutoCloseable {
     @Override
     SprayProcessCoordinatorMeta getMeta();
 

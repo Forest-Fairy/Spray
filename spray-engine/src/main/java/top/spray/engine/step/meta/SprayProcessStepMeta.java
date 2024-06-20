@@ -3,6 +3,7 @@ package top.spray.engine.step.meta;
 
 import top.spray.core.engine.exception.SprayMetaError;
 import top.spray.core.engine.exception.SprayNotSupportError;
+import top.spray.core.engine.execute.SprayExecutorType;
 import top.spray.core.engine.execute.SprayStepActiveType;
 import top.spray.core.engine.meta.SprayBaseMeta;
 import top.spray.core.engine.props.SprayData;
@@ -19,6 +20,7 @@ public class SprayProcessStepMeta implements SprayBaseMeta<SprayProcessStepMeta>
     private final SprayData metaContainer;
     private String id;
     private String name;
+    private SprayExecutorType executorType;
     private List<SprayProcessStepMeta> nextNodes;
     private String executorClass;
     private String jarFiles;
@@ -43,6 +45,7 @@ public class SprayProcessStepMeta implements SprayBaseMeta<SprayProcessStepMeta>
     private void init() throws ClassNotFoundException {
         this.id = metaContainer.getNoneNull("stepId", String.class);
         this.name = metaContainer.getNoneNull("stepName", String.class);
+        this.executorType = SprayExecutorType.valueOf(metaContainer.get("executorType", "COMPUTE"));
         this.nextNodes = metaContainer.getList("nextNodes", SprayProcessStepMeta.class);
         this.executorClass = metaContainer.getNoneNull("executorClass", String.class);
         this.jarFiles = metaContainer.getString("jarFiles");
@@ -66,6 +69,10 @@ public class SprayProcessStepMeta implements SprayBaseMeta<SprayProcessStepMeta>
     @Override
     public String getName() {
         return this.name;
+    }
+
+    public SprayExecutorType getExecutorType() {
+        return executorType;
     }
 
     @Override
