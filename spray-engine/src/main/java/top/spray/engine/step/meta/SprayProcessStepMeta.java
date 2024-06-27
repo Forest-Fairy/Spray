@@ -45,18 +45,18 @@ public class SprayProcessStepMeta implements SprayBaseMeta<SprayProcessStepMeta>
     private void init() throws ClassNotFoundException {
         this.id = metaContainer.getNoneNull("stepId", String.class);
         this.name = metaContainer.getNoneNull("stepName", String.class);
-        this.executorType = SprayExecutorType.valueOf(metaContainer.get("executorType", "COMPUTE"));
+        this.executorType = SprayExecutorType.valueOf(metaContainer.getIfAbsent("executorType", "COMPUTE"));
         this.nextNodes = metaContainer.getList("nextNodes", SprayProcessStepMeta.class);
         this.executorClass = metaContainer.getNoneNull("executorClass", String.class);
         this.jarFiles = metaContainer.getString("jarFiles");
-        this.stepActiveType = SprayStepActiveType.valueOf(metaContainer.get("activeType", "ACTIVE").toUpperCase());
-        this.transactional = metaContainer.get("isTransactional", false);
-        this.rollbackIfError = this.transactional && metaContainer.get("rollbackIfError", false);
+        this.stepActiveType = SprayStepActiveType.valueOf(metaContainer.getIfAbsent("activeType", "ACTIVE").toUpperCase());
+        this.transactional = metaContainer.getIfAbsent("isTransactional", false);
+        this.rollbackIfError = this.transactional && metaContainer.getIfAbsent("rollbackIfError", false);
         // only effect when rollbackIfError is false
-        this.ignoreError = (!this.rollbackIfError) && (metaContainer.get("ignoreError", false));
-        this.isAsync = metaContainer.get("isAsync", false);
-        this.maxThreadCount = metaContainer.get("maxThreadCount", 1);
-        this.varCopy = metaContainer.get("varCopy", 0);
+        this.ignoreError = (!this.rollbackIfError) && (metaContainer.getIfAbsent("ignoreError", false));
+        this.isAsync = metaContainer.getIfAbsent("isAsync", false);
+        this.maxThreadCount = metaContainer.getIfAbsent("maxThreadCount", 1);
+        this.varCopy = metaContainer.getIfAbsent("varCopy", 0);
         this.executeConditionFilters = SprayStepExecuteConditionHelper.createFilters(this.metaContainer);
     }
 
@@ -148,19 +148,19 @@ public class SprayProcessStepMeta implements SprayBaseMeta<SprayProcessStepMeta>
     }
 
     public String getString(String key, String defVal) {
-        return metaContainer.get(key, defVal);
+        return metaContainer.getIfAbsent(key, defVal);
     }
 
     public Integer getInteger(String key, Integer defVal) {
-        return metaContainer.get(key, defVal);
+        return metaContainer.getIfAbsent(key, defVal);
     }
 
     public Long getLong(String key, Long defVal) {
-        return metaContainer.get(key, defVal);
+        return metaContainer.getIfAbsent(key, defVal);
     }
 
     public Boolean getBoolean(String key, Boolean bool) {
-        return metaContainer.get(key, bool);
+        return metaContainer.getIfAbsent(key, bool);
     }
 
     public SprayData getMetaContainer() {

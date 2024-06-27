@@ -37,11 +37,6 @@ public class SprayStatusHolder implements SprayStatusType {
     }
 
     @Override
-    public boolean match(SprayStatusType statusType) {
-        return this.equals(statusType);
-    }
-
-    @Override
     public boolean equals(Object obj) {
         return this.actualStatusType.equals(obj);
     }

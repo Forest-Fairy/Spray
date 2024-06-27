@@ -62,57 +62,94 @@ public class SprayData implements Map<String, Object>, Serializable {
     }
 
     public <T> T get(final String key, final Class<T> clazz) {
-        return clazz.cast(inside.get(key));
+        return convertValue(inside.get(key), clazz);
     }
 
-    public <T> T get(final String key, final T defaultValue) {
+    public <T> T getIfAbsent(final String key, final T defaultValue) {
         Object value = inside.get(key);
         if (value == null) {
             return defaultValue;
         } else {
-            if (defaultValue == null || defaultValue instanceof String ||
-                    // class of the value can be assigned as the defaultValue
-                    defaultValue.getClass().isAssignableFrom(value.getClass())) {
-                return (T) value;
+            Class<?> tClass;
+            if (defaultValue != null) {
+                tClass = defaultValue.getClass();
+            } else {
+                tClass = value.getClass();
             }
+            return (T) convertValue(value, tClass);
+        }
+    }
+
+    private static <T> T convertValue(Object val, Class<T> tClass) {
+        if (val == null) {
+            return null;
+        } else if (tClass.isAssignableFrom(val.getClass())) {
+            return (T) val;
+        }
+        Object result = val;
+        if (String.class.isAssignableFrom(tClass)) {
+            result = val.toString();
+        } else {
+            String trimString;
             try {
-                // TODO cast with value castor util
-                return (T) defaultValue.getClass()
-                        .getMethod("valueOf", String.class)
-                        .invoke(null, value.toString().trim());
-            } catch (Exception ignored) {
-                return (T) value;
+                trimString = val.toString().trim();
+            } catch (Exception e) {
+                trimString = null;
+            }
+            if (Integer.class.isAssignableFrom(tClass)) {
+                result = Integer.valueOf(trimString);
+            } else if (Long.class.isAssignableFrom(tClass)) {
+                result = Long.valueOf(trimString);
+            } else if (Double.class.isAssignableFrom(tClass)) {
+                result = Double.valueOf(trimString);
+            } else if (Boolean.class.isAssignableFrom(tClass)) {
+                if ("f".equalsIgnoreCase(trimString)) {
+                    result = Boolean.FALSE;
+                } else if ("t".equalsIgnoreCase(trimString)) {
+                    result = Boolean.TRUE;
+                } else {
+                    result = Boolean.valueOf(trimString);
+                }
+            } else {
+                try {
+                    // TODO cast with value castor util
+                    result = tClass.getMethod("valueOf", String.class)
+                            .invoke(null, trimString);
+                } catch (Exception ignored) {
+                }
             }
         }
+        return tClass.cast(result);
     }
 
     public String getString(final String key) {
-        return (String) get(key);
+        return get(key, String.class);
     }
 
-    public SprayData append(String key, Object val) {
-        this.put(key, val);
-        return this;
+    public <T> List<T> getList(String key, Class<T> tClass, boolean replace) {
+        List<T> list = this.getList(key, tClass);
+        if (replace && list != null) {
+            this.put(key, list);
+        }
+        return list;
     }
-    public SprayData unmodifiable() {
-        return new UnmodifiableData(this);
-    }
-    public SprayData keyBanned(String... keys) {
-        return new KeysBannedData(this, Set.of(keys));
-    }
-
     public <T> List<T> getList(String key, Class<T> tClass) {
-        List<?> o = (List<?>) this.get(key);
-        if (o == null) {
+        Object ol = this.get(key);
+        if (ol == null) {
             return null;
         }
+        if (ol instanceof List) {
+            return (List<T>) ol;
+        }
+
         try {
+            List<?> o = (List<?>) this.get(key);
             boolean useNew = false;
             List<T> list = new ArrayList<>(o.size());
             for (Object each : o) {
                 if (each == null) {
                     list.add(null);
-                } else if (each.getClass() == tClass) {
+                } else if (each.getClass().isAssignableFrom(tClass)) {
                     list.add((T) each);
                 } else {
                     if (!useNew) {
@@ -126,6 +163,18 @@ public class SprayData implements Map<String, Object>, Serializable {
             throw new RuntimeException("failed to cast object value to list value", e);
         }
     }
+
+    public SprayData append(String key, Object val) {
+        this.put(key, val);
+        return this;
+    }
+    public SprayData unmodifiable() {
+        return new UnmodifiableData(this);
+    }
+    public SprayData keyBanned(String... keys) {
+        return new KeysBannedData(this, Set.of(keys));
+    }
+
     @SuppressWarnings("deprecation")
     public String toJson() {
         return toJson(false);
@@ -166,7 +215,7 @@ public class SprayData implements Map<String, Object>, Serializable {
 
     @Override
     public boolean containsKey(final Object key) {
-        return inside.containsKey(key);
+        return key != null && inside.get(key.toString()) != null;
     }
 
     @Override

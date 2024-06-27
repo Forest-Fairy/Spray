@@ -26,11 +26,20 @@
 		<spring-cloud-alibaba.version>2023.0.0.0-RC1</spring-cloud-alibaba.version>
 		<fastjson2.version>2.0.51</fastjson2.version>
         <hutool.version>5.8.9</hutool.version>
+		<brotli4s.version>0.15.1</brotli4s.version>
 	</properties>
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-webflux</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.netty</groupId>
+			<artifactId>netty-all</artifactId>
 		</dependency>
 
 		<dependency>
@@ -59,8 +68,9 @@
             <version>${fastjson2.version}</version>
         </dependency>
 		<dependency>
-			<groupId>org.projectlombok</groupId>
-			<artifactId>lombok</artifactId>
+			<groupId>com.gu</groupId>
+			<artifactId>brotli4s_3</artifactId>
+			<version>${brotli4s.version}</version>
 		</dependency>
 	</dependencies>
 	<dependencyManagement>
