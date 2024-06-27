@@ -4,7 +4,7 @@ import top.spray.core.engine.exception.SprayNotSupportError;
 import top.spray.core.engine.execute.SprayListenable;
 import top.spray.core.engine.execute.SprayStepActiveType;
 import top.spray.core.engine.props.SprayData;
-import top.spray.core.engine.props.SprayPoolExecutor;
+import top.spray.core.thread.SprayPoolExecutor;
 import top.spray.core.engine.result.SprayStepStatus;
 import top.spray.core.engine.result.SprayCoordinateStatus;
 import top.spray.engine.step.condition.SprayStepExecuteConditionFilter;

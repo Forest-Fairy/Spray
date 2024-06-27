@@ -1,7 +1,7 @@
 package top.spray.engine.coordinate.adapter;
 
 import top.spray.core.engine.props.SprayData;
-import top.spray.core.engine.props.SprayPoolExecutor;
+import top.spray.core.thread.SprayPoolExecutor;
 import top.spray.core.engine.result.SprayCoordinateStatus;
 import top.spray.core.util.SprayClassLoader;
 import top.spray.engine.coordinate.coordinator.SprayProcessCoordinator;

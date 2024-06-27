@@ -2,7 +2,7 @@ package top.spray.engine.coordinate.coordinator;
 
 import top.spray.core.engine.execute.SprayMetaDrive;
 import top.spray.core.engine.props.SprayData;
-import top.spray.core.engine.props.SprayPoolExecutor;
+import top.spray.core.thread.SprayPoolExecutor;
 import top.spray.core.engine.result.SprayCoordinateStatus;
 import top.spray.engine.coordinate.meta.SprayProcessCoordinatorMeta;
 import top.spray.engine.step.executor.SprayProcessStepExecutor;
