@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 import com.alibaba.fastjson2.*;
 import top.spray.core.engine.props.SprayData;
 
-public class JsonUtil {
+public class SprayFastJsonUtil {
     public static String toJson(Object bean) {
         return toJson(bean, false);
     }
@@ -64,7 +64,7 @@ public class JsonUtil {
 
     public static List<SprayData> parseToSprayDataList(String jsonText) {
         List<SprayData> sprayData = JSON.parseArray(jsonText, SprayData.class);
-        return sprayData.stream().map(JsonUtil::convertMapToSprayData).collect(Collectors.toList());
+        return sprayData.stream().map(SprayFastJsonUtil::convertMapToSprayData).collect(Collectors.toList());
     }
 
     public static JSONPath createJsonPath(String jsonPath, JSONPath.Feature... features) {

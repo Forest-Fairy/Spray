@@ -2,6 +2,7 @@ package top.spray.core.thread;
 
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class SprayPoolExecutor extends ThreadPoolExecutor {
     public SprayPoolExecutor(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit, BlockingQueue<Runnable> workQueue) {
@@ -18,12 +19,18 @@ public class SprayPoolExecutor extends ThreadPoolExecutor {
 
     public SprayPoolExecutor(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit, BlockingQueue<Runnable> workQueue, SprayThreadFactory threadFactory, RejectedExecutionHandler handler) {
         super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue, threadFactory, handler);
+
     }
 
+    public static SprayPoolExecutor newThreadPerTaskExecutor() {
+        return new SprayPoolExecutor(0, Integer.MAX_VALUE, 0,
+                TimeUnit.SECONDS, new LinkedBlockingQueue<>(),
+                new SprayDefaultThreadFactory());
+    }
     private static class SprayDefaultThreadFactory implements SprayThreadFactory {
         private static final AtomicInteger poolNumber = new AtomicInteger(1);
         private final ThreadGroup group;
-        private final AtomicInteger threadNumber = new AtomicInteger(1);
+        private final AtomicLong threadNumber = new AtomicLong(1);
         private final String namePrefix;
 
         SprayDefaultThreadFactory() {

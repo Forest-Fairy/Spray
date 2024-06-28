@@ -1,7 +1,7 @@
 package top.spray.core.engine.props;
 
 import org.apache.commons.lang3.StringUtils;
-import top.spray.core.util.JsonUtil;
+import top.spray.core.util.SprayFastJsonUtil;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -21,7 +21,7 @@ public class SprayData implements Map<String, Object>, Serializable {
         inside = new LinkedHashMap<>();
         map.forEach((k, v) -> {
             if (k != null) {
-                inside.put(String.valueOf(k), v);
+                this.put(String.valueOf(k), v);
             }
         });
     }
@@ -30,7 +30,7 @@ public class SprayData implements Map<String, Object>, Serializable {
         if (key0 == null) {
             throw new IllegalArgumentException("key can not be null");
         }
-        inside.put(key0, value0);
+        this.put(key0, value0);
         if (keyValues != null && keyValues.length > 0) {
             if (! (keyValues.length % 2 == 0)) {
                 throw new IllegalArgumentException("keyValues must be key-value pairs!");
@@ -39,7 +39,7 @@ public class SprayData implements Map<String, Object>, Serializable {
                 if (keyValues[i] == null) {
                     throw new IllegalArgumentException("key can not be null");
                 }
-                inside.put(keyValues[i].toString(), keyValues[i + 1]);
+                this.put(keyValues[i].toString(), keyValues[i + 1]);
             }
         }
     }
@@ -180,7 +180,7 @@ public class SprayData implements Map<String, Object>, Serializable {
         return toJson(false);
     }
     public String toJson(boolean pretty) {
-        return JsonUtil.toJson(this, pretty);
+        return SprayFastJsonUtil.toJson(this, pretty);
     }
 
     public static SprayData fromJson(String json) {
@@ -189,11 +189,11 @@ public class SprayData implements Map<String, Object>, Serializable {
         if (! json.startsWith("{") && ! json.endsWith("}")) {
             throw new RuntimeException("invalid json string");
         }
-        return JsonUtil.parseToSprayData(json);
+        return SprayFastJsonUtil.parseToSprayData(json);
     }
 
     public static SprayData deepCopy(Map<?, ?> map) {
-        return JsonUtil.parseToSprayData(JsonUtil.toJson(map));
+        return SprayFastJsonUtil.parseToSprayData(SprayFastJsonUtil.toJson(map));
     }
 
 

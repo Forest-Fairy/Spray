@@ -50,10 +50,10 @@ public class NettyServer {
  
             System.out.println("服务端启动，等待客户端连接...");
             // 绑定端口并启动服务
-            ChannelFuture future = bootstrap.bind(8888).sync();
+            ChannelFuture future = bootstrap.bind(port).sync();
             future.channel().closeFuture().sync();
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         } finally {
             // 关闭两个事件循环组，释放资源
             bossGroup.shutdownGracefully();
@@ -62,6 +62,10 @@ public class NettyServer {
     }
  
     private class ServerHandler extends ChannelInboundHandlerAdapter {
+        @Override
+        public void channelRegistered(ChannelHandlerContext ctx) throws Exception {
+            super.channelRegistered(ctx);
+        }
         @Override
         public void channelRead(ChannelHandlerContext ctx, Object msg) {
             System.out.println(SprayServerProperties.CLIENT_PREFIX + msg); // 打印收到的客户端信息

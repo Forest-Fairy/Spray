@@ -22,6 +22,8 @@
 	<properties>
 		<java.version>17</java.version>
 		<spray.version>0.0.1-SNAPSHOT</spray.version>
+		<junit_jupiter_version>5.9.3</junit_jupiter_version>
+
 		<spring-cloud.version>2023.0.0</spring-cloud.version>
 		<spring-cloud-alibaba.version>2023.0.0.0-RC1</spring-cloud-alibaba.version>
 		<fastjson2.version>2.0.51</fastjson2.version>
@@ -29,6 +31,32 @@
 		<brotli4s.version>0.15.1</brotli4s.version>
 	</properties>
 	<dependencies>
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+		</dependency>
+
+
+		<!--JUnit Jupiter Engine to depend on the JUnit5 engine and JUnit 5 API -->
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-engine</artifactId>
+			<version>${junit_jupiter_version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-api</artifactId>
+			<version>${junit_jupiter_version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-params</artifactId>
+			<version>${junit_jupiter_version}</version>
+			<scope>test</scope>
+		</dependency>
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-webflux</artifactId>
