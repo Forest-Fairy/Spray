@@ -1,6 +1,7 @@
 package top.spray.engine.step.meta;
 
 
+import cn.hutool.core.getter.OptNullBasicTypeFromStringGetter;
 import top.spray.core.engine.exception.SprayMetaError;
 import top.spray.core.engine.exception.SprayNotSupportError;
 import top.spray.core.engine.execute.SprayExecutorType;
@@ -12,18 +13,33 @@ import top.spray.engine.step.handler.filter.SprayStepExecuteConditionHelper;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.PriorityQueue;
 
 /**
  * 节点引擎
  */
 public class SprayProcessStepMeta implements SprayBaseMeta<SprayProcessStepMeta> {
+    /* executor meta container */
+
     private final SprayData metaContainer;
+
+    /* base meta */
+
     private String id;
     private String name;
     private SprayExecutorType executorType;
     private List<SprayProcessStepMeta> nextNodes;
     private String executorClass;
     private String jarFiles;
+
+    /* dubbo meta */
+    private String host;
+    private int port;
+
+
+
+    /* execution options meta */
+
     private SprayStepActiveType stepActiveType;
     private boolean transactional;
     private boolean rollbackIfError;

@@ -6,7 +6,7 @@
     <parent>
         <groupId>top.spray</groupId>
         <artifactId>spray</artifactId>
-        <version>0.0.1-SNAPSHOT</version>
+        <version>${revision}</version>
     </parent>
 
     <artifactId>spray-engine</artifactId>
@@ -21,6 +21,10 @@
         <dependency>
             <groupId>top.spray</groupId>
             <artifactId>spray-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.dubbo</groupId>
+            <artifactId>dubbo</artifactId>
         </dependency>
     </dependencies>
 

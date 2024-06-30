@@ -8,13 +8,13 @@ import top.spray.engine.step.meta.SprayProcessStepMeta;
 import java.lang.reflect.InvocationTargetException;
 
 public class SprayExecutorFactory {
-    public static String getExecutorId(SprayProcessCoordinator coordinator, SprayProcessStepMeta stepMeta) {
+    public static String getExecutorNameKey(SprayProcessCoordinator coordinator, SprayProcessStepMeta stepMeta) {
         return coordinator.getMeta().transactionId() + "_" + stepMeta.getId();
     }
     public static SprayProcessStepExecutor create(
             SprayProcessCoordinator coordinator, SprayProcessStepMeta stepMeta) {
-        String executorId = getExecutorId(coordinator, stepMeta);
-        SprayProcessStepExecutor stepExecutor = coordinator.getStepExecutor(executorId);
+        String executorNameKey = getExecutorNameKey(coordinator, stepMeta);
+        SprayProcessStepExecutor stepExecutor = coordinator.getStepExecutor(executorNameKey);
         if (stepExecutor == null) {
             synchronized (coordinator) {
                 if ((stepExecutor = coordinator.getStepExecutor(stepMeta.getId())) == null) {
@@ -35,7 +35,7 @@ public class SprayExecutorFactory {
                              InvocationTargetException | ClassNotFoundException e) {
                         throw new RuntimeException(e);
                     }
-                    coordinator.registerExecutor(executorId, stepExecutor);
+                    coordinator.registerExecutor(executorNameKey, stepExecutor);
                 }
             }
         }

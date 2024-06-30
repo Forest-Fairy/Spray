@@ -12,16 +12,16 @@ public class SprayCrypto_SM4 implements SprayCrypto {
     }
 
     @Override
-    public String encrypt(String text, String key) {
+    public byte[] encrypt(byte[] content, String key) {
         Assert.notBlank(key, "SM4 key could not be blank!");
         SM4 sm4 = new SM4(key.getBytes(StandardCharsets.UTF_8));
-        return new String(sm4.encrypt(text));
+        return sm4.encrypt(content);
     }
 
     @Override
-    public String decrypt(String text, String key) {
+    public byte[] decrypt(byte[] content, String key) {
         Assert.notBlank(key, "SM4 key could not be blank!");
         SM4 sm4 = new SM4(key.getBytes(StandardCharsets.UTF_8));
-        return sm4.decryptStr(text);
+        return sm4.decrypt(content);
     }
 }

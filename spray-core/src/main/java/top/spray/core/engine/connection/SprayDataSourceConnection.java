@@ -1,13 +1,29 @@
 package top.spray.core.engine.connection;
 
+import top.spray.core.engine.props.SprayData;
 import top.spray.core.engine.props.SprayPageData;
+import top.spray.core.engine.props.SprayQueryParams;
 
-public interface SprayDataSourceConnection<T, E> extends SprayConnection<T>{
+import java.util.Iterator;
+import java.util.List;
+
+public interface SprayDataSourceConnection<Conn> extends SprayConnection<Conn> {
     @Override
-    T getOriginalConnection();
+    Conn getOriginalConnection();
     @Override
     void close() throws Exception;
 
-    SprayPageData<E> readPage(int page, int pageSize, Object... args) throws Exception;
+    /**
+     * query data by page
+     * @return a spray data iterator for the result data iterator
+     * @throws Exception e
+     */
+    SprayPageData<?> readPage(int page, int pageSize, SprayQueryParams queryParams) throws Exception;
+
+    Iterator<SprayData> query(int page, int pageSize, SprayQueryParams queryParams) throws Exception;
+
+    boolean insert(SprayData sprayData, boolean commit) throws Exception;
+    boolean update(SprayData sprayData, SprayQueryParams queryParams, boolean commit) throws Exception;
+    boolean delete(SprayQueryParams queryParams, boolean commit) throws Exception;
 
 }

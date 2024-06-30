@@ -19,26 +19,26 @@ public class SprayBrotliCompressUtil {
         }
     }
 
-    public static String compress(String text) throws IOException {
-        if (text == null || text.isEmpty()) {
-            return "";
+    public static byte[] compress(byte[] content) throws IOException {
+        if (content == null || content.length == 0) {
+            return new byte[0];
         }
         ByteBuf source = PooledByteBufAllocator.DEFAULT.directBuffer()
-                .writeBytes(text.getBytes(StandardCharsets.UTF_8));
+                .writeBytes(content);
         ByteBuf compressed = PooledByteBufAllocator.DEFAULT.directBuffer().asByteBuf();
         Encoders.compress(source, compressed);
-        return new String(Base64.getEncoder().encode(ByteBufUtil.getBytes(compressed)));
+        return Base64.getEncoder().encode(ByteBufUtil.getBytes(compressed));
     }
 
-    public static String depress(String text) throws IOException {
-        if (text == null || text.isEmpty()) {
-            return text;
+    public static byte[] depress(byte[] content) throws IOException {
+        if (content == null || content.length == 0) {
+            return new byte[0];
         }
         ByteBuf compressed = PooledByteBufAllocator.DEFAULT.directBuffer()
-                .writeBytes(Base64.getDecoder().decode(text));
+                .writeBytes(Base64.getDecoder().decode(content));
         ByteBuf depressed = PooledByteBufAllocator.DEFAULT.directBuffer().asByteBuf();
         Decoders.decompress(compressed, depressed);
-        return StandardCharsets.UTF_8.decode(depressed.nioBuffer()).toString();
+        return ByteBufUtil.getBytes(depressed);
     }
 
 }

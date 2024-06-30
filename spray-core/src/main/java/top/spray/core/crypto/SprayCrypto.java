@@ -6,6 +6,6 @@ public interface SprayCrypto {
         SprayCryptoFactory.register(crypto);
     }
     boolean match(String name);
-    String encrypt(String text, String key);
-    String decrypt(String text, String key);
+    byte[] encrypt(byte[] content, String key);
+    byte[] decrypt(byte[] content, String key);
 }
