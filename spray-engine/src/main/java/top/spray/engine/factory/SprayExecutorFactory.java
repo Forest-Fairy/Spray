@@ -4,10 +4,13 @@ import top.spray.core.util.SprayClassLoader;
 import top.spray.engine.coordinate.coordinator.SprayProcessCoordinator;
 import top.spray.engine.step.executor.SprayProcessStepExecutor;
 import top.spray.engine.step.meta.SprayProcessStepMeta;
+import top.spray.engine.step.remoting.SprayRemoteExecutorAdapter;
 
 import java.lang.reflect.InvocationTargetException;
 
 public class SprayExecutorFactory {
+    private SprayExecutorFactory() {}
+
     public static String getExecutorNameKey(SprayProcessCoordinator coordinator, SprayProcessStepMeta stepMeta) {
         return coordinator.getMeta().transactionId() + "_" + stepMeta.getId();
     }
@@ -40,5 +43,10 @@ public class SprayExecutorFactory {
             }
         }
         return stepExecutor;
+    }
+
+
+    public static SprayRemoteExecutorAdapter createAdapter(SprayProcessStepExecutor stepExecutor) {
+
     }
 }

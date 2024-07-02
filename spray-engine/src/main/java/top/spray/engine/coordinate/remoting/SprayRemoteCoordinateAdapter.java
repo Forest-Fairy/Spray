@@ -1,4 +1,4 @@
-package top.spray.engine.coordinate.adapter;
+package top.spray.engine.coordinate.remoting;
 
 import top.spray.core.engine.props.SprayData;
 import top.spray.core.thread.SprayPoolExecutor;

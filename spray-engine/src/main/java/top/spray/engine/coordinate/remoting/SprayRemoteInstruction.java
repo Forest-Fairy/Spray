@@ -1,4 +1,4 @@
-package top.spray.engine.coordinate.adapter;
+package top.spray.engine.coordinate.remoting;
 
 public enum SprayRemoteInstruction {
     SEND,
