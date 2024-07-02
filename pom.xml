@@ -24,7 +24,7 @@
 		<!-- Spring Cloud Alibaba -->
 		<spring-cloud-alibaba.version>2023.0.1.0</spring-cloud-alibaba.version>
 		<!-- Spring Boot -->
-		<spring-boot.version>3.2.4</spring-boot.version>
+		<spring-boot.version>3.2.3</spring-boot.version>
 		<!-- Jupiter -->
 		<junit_jupiter_version>5.9.3</junit_jupiter_version>
 		<fastjson2.version>2.0.51</fastjson2.version>

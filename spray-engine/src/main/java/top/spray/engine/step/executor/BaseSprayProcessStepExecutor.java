@@ -48,6 +48,7 @@ public abstract class BaseSprayProcessStepExecutor implements SprayProcessStepEx
             } break;
         }
     }
+    protected void init0() {}
 
     @Override
     public long getCreateTime() {
