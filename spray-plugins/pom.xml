@@ -23,8 +23,11 @@
     <dependencies>
         <dependency>
             <groupId>top.spray</groupId>
+            <artifactId>spray-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>top.spray</groupId>
             <artifactId>spray-engine</artifactId>
-            <type>pom</type>
         </dependency>
     </dependencies>
 

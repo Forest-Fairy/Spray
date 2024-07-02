@@ -20,10 +20,6 @@
             <groupId>top.spray</groupId>
             <artifactId>spray-core</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.apache.dubbo</groupId>
-            <artifactId>dubbo</artifactId>
-        </dependency>
     </dependencies>
 
 </project>

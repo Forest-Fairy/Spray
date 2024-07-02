@@ -11,6 +11,7 @@
 
     <artifactId>spray-ep-dubbo-zk</artifactId>
     <version>${revision}</version>
+    <description>dubbo engine enhancer with zookeeper</description>
 
     <properties>
     </properties>

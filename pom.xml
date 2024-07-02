@@ -43,7 +43,6 @@
 				<groupId>top.spray</groupId>
 				<artifactId>spray-engine</artifactId>
 				<version>${revision}</version>
-				<type>pom</type>
 			</dependency>
 			<!-- Spring Dependencies -->
 			<dependency>
