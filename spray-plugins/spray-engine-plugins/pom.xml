@@ -11,6 +11,7 @@
 
     <artifactId>spray-engine-plugins</artifactId>
     <version>${revision}</version>
+    <description>For adding engine plugins to enhance</description>
     <packaging>pom</packaging>
     <modules>
         <module>spray-ep-dubbo</module>

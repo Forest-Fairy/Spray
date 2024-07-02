@@ -11,6 +11,7 @@
 
     <artifactId>spray-ep-dubbo</artifactId>
     <version>${revision}</version>
+    <description>dubbo engine enhancer</description>
     <packaging>pom</packaging>
     <modules>
         <module>spray-ep-dubbo-zk</module>

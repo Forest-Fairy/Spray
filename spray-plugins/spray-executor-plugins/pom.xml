@@ -11,6 +11,7 @@
 
     <artifactId>spray-executor-plugins</artifactId>
     <version>${revision}</version>
+    <description>For adding executors</description>
     <packaging>pom</packaging>
     <modules>
         <module>spray-executor-basic-package</module>

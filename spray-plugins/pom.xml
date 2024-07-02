@@ -11,6 +11,7 @@
 
     <artifactId>spray-plugins</artifactId>
     <version>${revision}</version>
+    <description>For adding plugins</description>
     <packaging>pom</packaging>
     <modules>
         <module>spray-engine-plugins</module>
