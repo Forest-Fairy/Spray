@@ -5,11 +5,16 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>top.spray</groupId>
-        <artifactId>spray-boot</artifactId>
+        <artifactId>spray-plugins</artifactId>
         <version>${revision}</version>
     </parent>
 
-    <artifactId>spray-admin</artifactId>
+    <artifactId>spray-executor-plugins</artifactId>
+    <version>${revision}</version>
+    <packaging>pom</packaging>
+    <modules>
+        <module>spray-executor-basic-package</module>
+    </modules>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>

@@ -5,19 +5,25 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>top.spray</groupId>
-        <artifactId>spray-boot</artifactId>
+        <artifactId>spray</artifactId>
         <version>${revision}</version>
     </parent>
 
-    <artifactId>spray-springboot-starter</artifactId>
+    <artifactId>spray-plugins</artifactId>
     <version>${revision}</version>
+    <packaging>pom</packaging>
+    <modules>
+        <module>spray-engine-plugins</module>
+        <module>spray-executor-plugins</module>
+    </modules>
+
     <properties>
     </properties>
-
     <dependencies>
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter</artifactId>
+            <groupId>top.spray</groupId>
+            <artifactId>spray-engine</artifactId>
+            <type>pom</type>
         </dependency>
     </dependencies>
 

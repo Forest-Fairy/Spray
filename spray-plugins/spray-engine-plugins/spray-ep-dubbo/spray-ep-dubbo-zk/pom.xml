@@ -5,20 +5,14 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>top.spray</groupId>
-        <artifactId>spray-boot</artifactId>
+        <artifactId>spray-ep-dubbo</artifactId>
         <version>${revision}</version>
     </parent>
 
-    <artifactId>spray-springboot-starter</artifactId>
+    <artifactId>spray-ep-dubbo-zk</artifactId>
     <version>${revision}</version>
+
     <properties>
     </properties>
-
-    <dependencies>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter</artifactId>
-        </dependency>
-    </dependencies>
 
 </project>
