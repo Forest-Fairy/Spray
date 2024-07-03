@@ -12,7 +12,7 @@ public class SprayExecutorFactory {
     private SprayExecutorFactory() {}
 
     public static String getExecutorNameKey(SprayProcessCoordinator coordinator, SprayProcessStepMeta stepMeta) {
-        return coordinator.getMeta().transactionId() + "_" + stepMeta.getId();
+        return String.format("%s-%s[%s]", coordinator.getMeta().transactionId(), stepMeta.getName(), stepMeta.getId());
     }
     public static SprayProcessStepExecutor create(
             SprayProcessCoordinator coordinator, SprayProcessStepMeta stepMeta) {

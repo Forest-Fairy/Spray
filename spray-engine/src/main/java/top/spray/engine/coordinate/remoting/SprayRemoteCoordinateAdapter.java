@@ -2,7 +2,7 @@ package top.spray.engine.coordinate.remoting;
 
 import top.spray.core.engine.props.SprayData;
 import top.spray.core.thread.SprayPoolExecutor;
-import top.spray.core.engine.result.SprayCoordinateStatus;
+import top.spray.core.engine.result.impl.SprayCoordinateStatus;
 import top.spray.core.util.SprayClassLoader;
 import top.spray.engine.coordinate.coordinator.SprayProcessCoordinator;
 import top.spray.engine.coordinate.meta.SprayProcessCoordinatorMeta;
@@ -70,7 +70,7 @@ public class SprayRemoteCoordinateAdapter implements SprayProcessCoordinator {
     }
 
     @Override
-    public void dispatch(SprayProcessStepExecutor fromExecutor, SprayData data, boolean still, SprayNextStepFilter filter) {
+    public void dispatch(SprayProcessStepExecutor fromExecutor, SprayData data, boolean still, SprayNextStepFilter filter, boolean async) {
 
     }
 

@@ -12,6 +12,6 @@ import java.lang.annotation.*;
 public @interface SprayAutoAnalyse {
     /** empty means {@link top.spray.core.util.SpraySystemUtil#getSystemVersion()} */
     String version() default "";
-    /** empty means className */
+    /** Priority is annotation > doc comment > className  */
     String description() default "";
 }

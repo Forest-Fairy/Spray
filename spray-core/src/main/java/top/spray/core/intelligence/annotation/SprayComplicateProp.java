@@ -6,5 +6,9 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.SOURCE)
 @Inherited
 @Target(ElementType.FIELD)
-public @interface SprayVariableSupport {
+public @interface SprayComplicateProp {
+    /**
+     * giving a json to describe the prop
+     */
+    String value();
 }

@@ -9,7 +9,6 @@ import top.spray.engine.step.condition.SprayNextStepFilter;
 import top.spray.engine.step.instance.SprayStepResultInstance;
 import top.spray.engine.step.meta.SprayProcessStepMeta;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,7 +16,7 @@ import java.util.Map;
  * Define the executor of a process node
  */
 public abstract class BaseSprayProcessStepExecutor implements SprayProcessStepExecutor {
-    private String executorId;
+    protected String executorNameKey;
     private SprayProcessStepMeta stepMeta;
     private SprayProcessCoordinator coordinator;
     private SprayClassLoader classLoader;
@@ -26,14 +25,14 @@ public abstract class BaseSprayProcessStepExecutor implements SprayProcessStepEx
     private long createTime;
 
     @Override
-    public String getExecutorId() {
-        return this.executorId;
+    public String getExecutorNameKey() {
+        return this.executorNameKey;
     }
 
 
     @Override
     public void initOnlyAtCreate() {
-        this.executorId = SprayExecutorFactory.getExecutorId(this.getCoordinator(), this.getMeta());
+        this.executorNameKey = SprayExecutorFactory.getExecutorNameKey(this.getCoordinator(), this.getMeta());
         this.stepResult = new SprayStepResultInstance(this.getCoordinator(), this);
         this.createTime = System.currentTimeMillis();
         switch (this.getMeta().varCopy()) {
@@ -92,27 +91,33 @@ public abstract class BaseSprayProcessStepExecutor implements SprayProcessStepEx
     protected void publishData(SprayData data, boolean still) {
         this.publishData(data, still, null);
     }
-    protected void publishData(SprayData data, boolean still, SprayNextStepFilter filter) {
-        this.getCoordinator().dispatch(this, data, still, filter);
+    protected void publishData(SprayData data, boolean still, SprayNextStepFilter stepFilter) {
+        this.getCoordinator().dispatch(this, stepFilter, data, still, false);
+    }
+    protected void publishDataAsync(SprayData data, boolean still) {
+        this.publishDataAsync(data, still, null);
+    }
+    protected void publishDataAsync(SprayData data, boolean still, SprayNextStepFilter stepFilter) {
+        this.getCoordinator().dispatch(this, stepFilter, data, still, true);
     }
 
     @Override
-    public boolean needWait(SprayProcessStepExecutor fromExecutor, SprayData data, boolean still) {
+    public boolean needWait(SprayProcessStepExecutor fromExecutor, SprayData data, boolean still, Map<String, Object> processData) {
         // TODO if it is true we can require a threshold to storage the data in the file instead of the memory
         return false;
     }
 
 
     @Override
-    public void execute(SprayProcessStepExecutor fromExecutor, SprayData data, boolean still) {
+    public void execute(SprayProcessStepExecutor fromExecutor, SprayData data, boolean still, Map<String, Object> processData) {
         initBeforeRun();
-        this.execute0(fromExecutor, data, still);
+        this.execute0(fromExecutor, data, still, processData);
     }
 
     protected void initBeforeRun() {
         MDC.put("transactionId", this.getCoordinator().getMeta().transactionId());
-        MDC.put("executorId", this.getExecutorId());
+        MDC.put("executorId", this.getExecutorNameKey());
     }
 
-    protected abstract void execute0(SprayProcessStepExecutor fromExecutor, SprayData data, boolean still);
+    protected abstract void execute0(SprayProcessStepExecutor fromExecutor, SprayData data, boolean still, Map<String, Object> processData);
 }

@@ -5,13 +5,12 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>top.spray</groupId>
-        <artifactId>spray-ep-dubbo</artifactId>
-        <version>${revision}</version>
+        <artifactId>spray-ep-cache</artifactId>
+        <version>1.0.0</version>
     </parent>
 
-    <artifactId>spray-ep-dubbo-zk</artifactId>
+    <artifactId>spray-ep-cache-file</artifactId>
     <version>${revision}</version>
-    <description>dubbo engine enhancer with zookeeper</description>
 
     <properties>
     </properties>
