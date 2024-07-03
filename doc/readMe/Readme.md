@@ -10,5 +10,10 @@ Spray is a source-open data-integration framework which supports running a job w
 ### Process Design
 ![SpraySystemStructure.png](images%2FSpraySystemStructure.png)
 ![SprayProcessDesign.png](images%2FSprayProcessDesign.png)
+## Target
+1. Big data cache supports
+2. Unified management of datasource
+3. Automatic generation of AI knowledge base
+4. Multi-Protocol remote dispatch solution
 ## Quick Start
 ...incomplete
