@@ -24,12 +24,12 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.LongAdder;
-import java.util.stream.Collectors;
 
 public class SprayDefaultProcessCoordinator implements
         SprayProcessCoordinator,
         SprayListenable<SprayExecutorListener> {
     private final Map<String, SprayProcessStepExecutor> cachedExecutorMap = new ConcurrentHashMap<>();
+    private final Map<String, Map<String, Object>> executorProcessDataNamespace = new ConcurrentHashMap<>();
     private final Map<String, LongAdder> executorCounterMap = new ConcurrentHashMap<>();
     private final SprayProcessCoordinatorMeta coordinatorMeta;
     private final List<SprayExecutorListener> listeners;
@@ -134,11 +134,6 @@ public class SprayDefaultProcessCoordinator implements
     }
 
     @Override
-    public Map<String, Object> getProcessData() {
-        return this.processData;
-    }
-
-    @Override
     public SprayCoordinateStatus status() {
         if (this.executingStepCounter.sum() != 0) {
             // running
@@ -192,26 +187,16 @@ public class SprayDefaultProcessCoordinator implements
 
     private void runNodes(List<SprayProcessStepMeta> nodes, SprayNextStepFilter stepFilter, SprayProcessStepExecutor fromExecutor, SprayData data, boolean still, boolean dispatchAsync) {
         if (nodes == null || nodes.isEmpty()) {
+            this.dispatchResult(fromExecutor, data, still, dispatchAsync, null, SprayDataDispatchResultStatus.ABANDONED);
             return;
         }
         List<CompletableFuture<SprayStepResultInstance>> futureResults = new ArrayList<>();
         for (SprayProcessStepMeta nodeMeta : nodes) {
-            if (stepFilter != null) {
-                if (!stepFilter.canBeExecute(fromExecutor, data, still, nodeMeta)) {
-                    continue;
-                }
-            }
-            if (! beforeCreateValid(fromExecutor, data, still, dispatchAsync, nodeMeta)) {
+            if (! validBeforeCreate(fromExecutor, stepFilter, data, still, dispatchAsync, nodeMeta)) {
                 continue;
             }
             SprayProcessStepExecutor nextExecutor = SprayExecutorFactory.create(this, nodeMeta);
-            // if the executor support to storage data in file then try
-            if (nextExecutor instanceof SprayFileStorageSupportExecutor storageSupportExecutor) {
-                if (storageSupportExecutor.timeToStorageInFile(fromExecutor, data, still)) {
-                    storageSupportExecutor.storageInFile(fromExecutor, data, still);
-                }
-            }
-            if (nextExecutor.needWait(fromExecutor, data, still, this.getProcessData(fromExecutor))) {
+            if (nextExecutor.needWait(fromExecutor, data, still)) {
                 // the executor need to wait
                 continue;
             }
@@ -235,20 +220,26 @@ public class SprayDefaultProcessCoordinator implements
         });
     }
 
-    private boolean beforeCreateValid(SprayProcessStepExecutor fromExecutor, SprayData data, boolean still, boolean async, SprayProcessStepMeta nodeMeta) {
+    private boolean validBeforeCreate(SprayProcessStepExecutor fromExecutor, SprayNextStepFilter stepFilter, SprayData data, boolean still, boolean dispatchAsync, SprayProcessStepMeta nodeMeta) {
         boolean create = true;
         if (!SprayStepActiveType.ACTIVE.equals(nodeMeta.stepActiveType())) {
             if (SprayStepActiveType.IGNORE.equals(nodeMeta.stepActiveType())) {
-                this.runNodes(nodeMeta.nextNodes(), fromExecutor, data, still);
+                this.runNodes(nodeMeta.nextNodes(), stepFilter, fromExecutor, data, still, dispatchAsync);
             }
-            this.dispatchResult(fromExecutor, data, still, async, nodeMeta, SprayDataDispatchResultStatus.SKIPPED);
+            this.dispatchResult(fromExecutor, data, still, dispatchAsync, nodeMeta, SprayDataDispatchResultStatus.SKIPPED);
             create = false;
         }
-        if (!nodeMeta.getExecuteConditionFilter().isEmpty()) {
+        if (stepFilter != null) {
+            if (!stepFilter.canBeExecute(fromExecutor, data, still, nodeMeta)) {
+                this.dispatchResult(fromExecutor, data, still, dispatchAsync, nodeMeta, SprayDataDispatchResultStatus.FILTERED);
+                create = false;
+            }
+        }
+        if (! nodeMeta.getExecuteConditionFilter().isEmpty()) {
             for (SprayStepExecuteConditionFilter filter : nodeMeta.getExecuteConditionFilter()) {
                 if (!filter.filter(fromExecutor, data, still, nodeMeta)) {
                     create = false;
-                    this.dispatchResult(fromExecutor, data, still, async, nodeMeta, SprayDataDispatchResultStatus.FILTERED);
+                    this.dispatchResult(fromExecutor, data, still, dispatchAsync, nodeMeta, SprayDataDispatchResultStatus.ABANDONED);
                     break;
                 }
             }
@@ -270,7 +261,7 @@ public class SprayDefaultProcessCoordinator implements
         beforeExecute(nextStepExecutor, fromExecutor, data, still);
         try {
             this.executingStepCounter.increment();
-            nextStepExecutor.execute(fromExecutor, data, still, this.getProcessData(fromExecutor));
+            nextStepExecutor.execute(fromExecutor, data, still);
         } catch (Throwable e) {
             if (!nextStepExecutor.getMeta().ignoreError()) {
                 nextStepExecutor.getStepResult().setStatus(SprayStepStatus.FAILED);
@@ -283,8 +274,29 @@ public class SprayDefaultProcessCoordinator implements
         return nextStepExecutor.getStepResult();
     }
 
-    private Map<String, Object> getProcessData(SprayProcessStepExecutor fromExecutor) {
-        return fromExecutor == null ? this.processData : fromExecutor.getProcessData();
+    @Override
+    public Map<String, Object> getExecutorProcessData(SprayProcessStepExecutor fromExecutor) {
+        Map<String, Object> processData;
+        if (fromExecutor == null) {
+            processData = this.processData;
+        } else {
+            // see if it needs to create one
+            int copyMode = fromExecutor.getMeta().varCopyMode();
+            if (copyMode == 0) {
+                processData = this.processData;
+            } else {
+                processData = executorProcessDataNamespace.computeIfAbsent(
+                        fromExecutor.getExecutorNameKey(),
+                        k -> {
+                            if (copyMode == 1) {
+                                return new HashMap<>(this.processData);
+                            } else {
+                                return new HashMap<>(SprayData.deepCopy(this.processData));
+                            }}
+                );
+            }
+        }
+        return processData;
     }
 
     protected void afterExecute(SprayProcessStepExecutor nextStepExecutor,

@@ -23,8 +23,6 @@ public interface SprayProcessCoordinator extends
     @Override
     SprayProcessCoordinatorMeta getMeta();
 
-    Map<String, Object> getProcessData();
-
     /** a method for completable future */
     @Override
     default SprayCoordinateStatus get() {
@@ -61,4 +59,5 @@ public interface SprayProcessCoordinator extends
      */
     SprayStepResultInstance executeNext(SprayProcessStepExecutor nextStepExecutor, SprayProcessStepExecutor fromExecutor, SprayData data, boolean still);
 
+    Map<String, Object> getExecutorProcessData(SprayProcessStepExecutor fromExecutor);
 }

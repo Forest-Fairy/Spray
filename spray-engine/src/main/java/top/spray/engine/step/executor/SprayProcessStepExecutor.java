@@ -4,11 +4,10 @@ import top.spray.core.engine.execute.SprayMetaDrive;
 import top.spray.core.engine.props.SprayData;
 import top.spray.core.util.SprayClassLoader;
 import top.spray.engine.coordinate.coordinator.SprayProcessCoordinator;
-import top.spray.engine.step.condition.SprayStepExecuteConditionFilter;
+import top.spray.engine.step.executor.type.SprayReaderExecutorType;
 import top.spray.engine.step.instance.SprayStepResultInstance;
 import top.spray.engine.step.meta.SprayProcessStepMeta;
 
-import java.util.Collection;
 import java.util.Map;
 
 /**
@@ -25,14 +24,27 @@ public interface SprayProcessStepExecutor extends SprayMetaDrive<SprayProcessSte
     void setMeta(SprayProcessStepMeta meta);
     void setCoordinator(SprayProcessCoordinator coordinator);
     void setClassLoader(SprayClassLoader classLoader);
-    Map<String, Object> getProcessData();
+    default Map<String, Object> getProcessData(SprayProcessStepExecutor fromExecutor) {
+        return this.getCoordinator().getExecutorProcessData(fromExecutor);
+    }
     SprayStepResultInstance getStepResult();
 
-    void execute(SprayProcessStepExecutor fromExecutor, SprayData data, boolean still, Map<String, Object> processData);
+    void execute(SprayProcessStepExecutor fromExecutor, SprayData data, boolean still);
 
-    /** true if the executor need to run with batch data or other reason
-     *  - the executor can collect data by overwrite this method
+    /**
+     * true if the executor need to run with batch data or other reason <br>
+     * executor can collect data by overwrite this method <br>
      * @return false by default, that also means the executor can run with stream data
      */
-    boolean needWait(SprayProcessStepExecutor fromExecutor, SprayData data, boolean still, Map<String, Object> processData);
+    boolean needWait(SprayProcessStepExecutor fromExecutor, SprayData data, boolean still);
+
+
+    /**
+     * need auto run next nodes without data by coordinator <br>
+     *  return false if the executor will publish data by itself
+     */
+    default boolean autoRunNext() {
+        // if the executor is reader, it should run next nodes by publishing its data
+        return ! (this instanceof SprayReaderExecutorType);
+    }
 }

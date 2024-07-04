@@ -32,11 +32,7 @@ public class SprayRemoteCoordinateAdapter implements SprayProcessCoordinator {
         return this.coordinatorMeta;
     }
 
-    @Override
-    public Map<String, Object> getProcessData() {
-        return Proxy.newProxyInstance(new SprayClassLoader(""),
-                new Class[]{SprayData.class}, (proxy, method, args) -> null);
-    }
+
 
 
     @Override

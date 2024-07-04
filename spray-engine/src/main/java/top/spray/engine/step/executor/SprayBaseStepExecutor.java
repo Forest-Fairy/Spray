@@ -6,16 +6,16 @@ import top.spray.core.util.SprayClassLoader;
 import top.spray.engine.coordinate.coordinator.SprayProcessCoordinator;
 import top.spray.engine.factory.SprayExecutorFactory;
 import top.spray.engine.step.condition.SprayNextStepFilter;
+import top.spray.engine.step.executor.storage.SprayFileStorageSupportExecutor;
 import top.spray.engine.step.instance.SprayStepResultInstance;
 import top.spray.engine.step.meta.SprayProcessStepMeta;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**
  * Define the executor of a process node
  */
-public abstract class BaseSprayProcessStepExecutor implements SprayProcessStepExecutor {
+public abstract class SprayBaseStepExecutor implements SprayProcessStepExecutor {
     protected String executorNameKey;
     private SprayProcessStepMeta stepMeta;
     private SprayProcessCoordinator coordinator;
@@ -35,19 +35,11 @@ public abstract class BaseSprayProcessStepExecutor implements SprayProcessStepEx
         this.executorNameKey = SprayExecutorFactory.getExecutorNameKey(this.getCoordinator(), this.getMeta());
         this.stepResult = new SprayStepResultInstance(this.getCoordinator(), this);
         this.createTime = System.currentTimeMillis();
-        switch (this.getMeta().varCopy()) {
-            case 1: {
-                this.processData = new HashMap<>(this.getCoordinator().getProcessData());
-            } break;
-            case 2: {
-                this.processData = new HashMap<>(SprayData.deepCopy(this.getCoordinator().getProcessData()));
-            } break;
-            default: {
-                this.processData = this.getCoordinator().getProcessData();
-            } break;
-        }
+        this.initOnlyAtCreate0();
     }
-    protected void init0() {}
+    protected void initOnlyAtCreate0() {}
+
+
 
     @Override
     public long getCreateTime() {
@@ -78,10 +70,6 @@ public abstract class BaseSprayProcessStepExecutor implements SprayProcessStepEx
     public SprayClassLoader getClassLoader() {
         return this.classLoader;
     }
-    @Override
-    public Map<String, Object> getProcessData() {
-        return this.processData;
-    }
 
     public SprayStepResultInstance getStepResult() {
         // create when init;
@@ -102,19 +90,32 @@ public abstract class BaseSprayProcessStepExecutor implements SprayProcessStepEx
     }
 
     @Override
-    public boolean needWait(SprayProcessStepExecutor fromExecutor, SprayData data, boolean still, Map<String, Object> processData) {
+    public boolean needWait(SprayProcessStepExecutor fromExecutor, SprayData data, boolean still) {
         // TODO if it is true we can require a threshold to storage the data in the file instead of the memory
+        if (needWait0(fromExecutor, data, still)) {
+            // if the executor support to storage data in file then try
+            if (this instanceof SprayFileStorageSupportExecutor storageSupportExecutor) {
+                if (storageSupportExecutor.timeToStorageInFile(fromExecutor, data, still)) {
+                    storageSupportExecutor.storageInFile(fromExecutor, data, still);
+                }
+            }
+            return true;
+        }
+        return false;
+    }
+
+    protected boolean needWait0(SprayProcessStepExecutor fromExecutor, SprayData data, boolean still) {
         return false;
     }
 
 
     @Override
-    public void execute(SprayProcessStepExecutor fromExecutor, SprayData data, boolean still, Map<String, Object> processData) {
+    public void execute(SprayProcessStepExecutor fromExecutor, SprayData data, boolean still) {
         initBeforeRun();
         this.execute0(fromExecutor, data, still, processData);
     }
 
-    protected void initBeforeRun() {
+    protected synchronized void initBeforeRun() {
         MDC.put("transactionId", this.getCoordinator().getMeta().transactionId());
         MDC.put("executorId", this.getExecutorNameKey());
     }

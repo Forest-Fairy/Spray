@@ -23,9 +23,6 @@ public interface SprayServerCoordinatorAdapter extends SprayProcessCoordinator {
     SprayProcessCoordinatorMeta getMeta();
 
     @Override
-    Map<String, Object> getProcessData();
-
-    @Override
     void run();
 
     @Override

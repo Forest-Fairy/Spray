@@ -31,7 +31,7 @@
 		<!-- Jupiter -->
 		<junit_jupiter_version>5.9.3</junit_jupiter_version>
 		<fastjson2.version>2.0.51</fastjson2.version>
-		<hutool.version>5.8.9</hutool.version>
+		<hutool.version>5.8.25</hutool.version>
 		<dubbo.version>3.2.13</dubbo.version>
 	</properties>
 

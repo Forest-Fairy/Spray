@@ -4,7 +4,7 @@ import top.spray.core.engine.connection.SprayDataSourceConnection;
 import top.spray.core.engine.props.SprayData;
 import top.spray.core.intelligence.annotation.SprayAutoAnalyse;
 import top.spray.core.intelligence.annotation.SprayVariableSupport;
-import top.spray.engine.step.executor.BaseSprayProcessStepExecutor;
+import top.spray.engine.step.executor.SprayBaseStepExecutor;
 import top.spray.engine.step.executor.SprayProcessStepExecutor;
 
 import java.sql.Connection;
@@ -13,10 +13,10 @@ import java.util.List;
 import java.util.Map;
 
 @SprayAutoAnalyse
-public class SprayExecutor_VariableDefiner extends BaseSprayProcessStepExecutor {
+public class SprayExecutor_VariableDefiner extends SprayBaseStepExecutor {
     private List<SprayData>
-    protected void init0() {
-        super.init0();
+    protected void initOnlyAtCreate0() {
+        super.initOnlyAtCreate0();
         this.getMeta()
     }
 

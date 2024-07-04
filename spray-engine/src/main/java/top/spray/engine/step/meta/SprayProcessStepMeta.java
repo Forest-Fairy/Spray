@@ -1,7 +1,6 @@
 package top.spray.engine.step.meta;
 
 
-import cn.hutool.core.getter.OptNullBasicTypeFromStringGetter;
 import top.spray.core.engine.exception.SprayMetaError;
 import top.spray.core.engine.exception.SprayNotSupportError;
 import top.spray.core.engine.execute.SprayExecutorType;
@@ -13,7 +12,6 @@ import top.spray.engine.step.handler.filter.SprayStepExecuteConditionHelper;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.PriorityQueue;
 
 /**
  * 节点引擎
@@ -117,8 +115,8 @@ public class SprayProcessStepMeta implements SprayBaseMeta<SprayProcessStepMeta>
     }
 
     /**
-     * 1    - run current node
-     * 0    - skip current node
+     * 1    - run current node <br>
+     * 0    - skip current node <br>
      * -1   - skip all from current node
      */
     public SprayStepActiveType stepActiveType() {
@@ -147,11 +145,12 @@ public class SprayProcessStepMeta implements SprayBaseMeta<SprayProcessStepMeta>
     }
 
     /**
-     * @return 0 -> no
-     * 1 -> simple
-     * 2 -> deep
+     * @return
+     *  0 -> no <br>
+     *  1 -> simple <br>
+     *  2 -> deep
      */
-    public int varCopy() {
+    public int varCopyMode() {
         return this.varCopy;
     }
 
