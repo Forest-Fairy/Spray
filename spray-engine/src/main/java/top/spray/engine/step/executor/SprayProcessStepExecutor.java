@@ -15,7 +15,7 @@ import java.util.Map;
  * Define the executor of a process node
  */
 public interface SprayProcessStepExecutor extends SprayMetaDrive<SprayProcessStepMeta> {
-    String getExecutorId();
+    String getExecutorNameKey();
     void initOnlyAtCreate();
     long getCreateTime();
     @Override
@@ -25,16 +25,14 @@ public interface SprayProcessStepExecutor extends SprayMetaDrive<SprayProcessSte
     void setMeta(SprayProcessStepMeta meta);
     void setCoordinator(SprayProcessCoordinator coordinator);
     void setClassLoader(SprayClassLoader classLoader);
-    default Map<String, Object> getProcessData() {
-        return this.getCoordinator().getProcessData();
-    }
+    Map<String, Object> getProcessData();
     SprayStepResultInstance getStepResult();
 
-    void execute(SprayProcessStepExecutor fromExecutor, SprayData data, boolean still);
+    void execute(SprayProcessStepExecutor fromExecutor, SprayData data, boolean still, Map<String, Object> processData);
 
     /** true if the executor need to run with batch data or other reason
      *  - the executor can collect data by overwrite this method
      * @return false by default, that also means the executor can run with stream data
      */
-    boolean needWait(SprayProcessStepExecutor fromExecutor, SprayData data, boolean still);
+    boolean needWait(SprayProcessStepExecutor fromExecutor, SprayData data, boolean still, Map<String, Object> processData);
 }

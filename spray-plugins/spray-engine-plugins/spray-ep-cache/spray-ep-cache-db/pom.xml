@@ -5,13 +5,12 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>top.spray</groupId>
-        <artifactId>spray-executor-dbi</artifactId>
+        <artifactId>spray-ep-cache</artifactId>
         <version>1.0.0</version>
     </parent>
 
-    <artifactId>spray-executor-jdbc</artifactId>
-    <version>${revision}</version>
-    <description>For adding database integration executors in jdbc</description>
+    <artifactId>spray-ep-cache-db</artifactId>
+
     <properties>
     </properties>
 

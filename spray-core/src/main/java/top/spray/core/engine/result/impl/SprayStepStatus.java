@@ -1,4 +1,7 @@
-package top.spray.core.engine.result;
+package top.spray.core.engine.result.impl;
+
+import top.spray.core.engine.result.SprayStatusHolder;
+import top.spray.core.engine.result.SprayStatusType;
 
 public class SprayStepStatus implements SprayStatusType {
     /** pause by config (debug or collecting data) */
@@ -41,12 +44,6 @@ public class SprayStepStatus implements SprayStatusType {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof SprayStatusHolder holder) {
-            return holder.equals(this);
-        } else if (obj instanceof SprayStepStatus) {
-            return super.equals(obj);
-        } else {
-            return false;
-        }
+        return SprayStatusType.equal(this, obj);
     }
 }

@@ -14,7 +14,8 @@
     <description>For adding engine plugins to enhance</description>
     <packaging>pom</packaging>
     <modules>
-        <module>spray-ep-dubbo</module>
+        <module>spray-ep-cache</module>
+        <module>spray-ep-remoting</module>
     </modules>
 
     <properties>

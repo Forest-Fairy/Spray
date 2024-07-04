@@ -7,7 +7,7 @@ import top.spray.core.engine.result.SprayStatusType;
 import top.spray.core.engine.result.SprayStatusHolder;
 import top.spray.engine.coordinate.coordinator.SprayProcessCoordinator;
 import top.spray.engine.step.executor.SprayProcessStepExecutor;
-import top.spray.core.engine.result.SprayStepStatus;
+import top.spray.core.engine.result.impl.SprayStepStatus;
 import top.spray.engine.step.meta.SprayProcessStepMeta;
 
 import java.util.ArrayList;
@@ -47,7 +47,7 @@ public class SprayStepResultInstance implements SprayMetaDrive<SprayProcessStepM
         init();
     }
     private void init() {
-        this.stepStatus = SprayStatusType.create(SprayStepStatus.RUNNING);
+        this.stepStatus = SprayStatusType.holder(SprayStepStatus.RUNNING);
         this.errorList = new ArrayList<>(0);
         this.inputInfos = new ConcurrentHashMap<>(0);
         this.outputInfos = new ConcurrentHashMap<>(0);

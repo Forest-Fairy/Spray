@@ -3,6 +3,8 @@ package top.spray.core.engine.result;
 
 import cn.hutool.core.lang.Assert;
 
+import java.util.Objects;
+
 public class SprayStatusHolder implements SprayStatusType {
     private int code;
     private String describeMsg;
@@ -38,6 +40,10 @@ public class SprayStatusHolder implements SprayStatusType {
 
     @Override
     public boolean equals(Object obj) {
-        return this.actualStatusType.equals(obj);
+        if (obj instanceof SprayStatusHolder holder) {
+            return Objects.equals(this.actualStatusType, holder.actualStatusType);
+        } else {
+            return Objects.equals(this.actualStatusType, obj);
+        }
     }
 }

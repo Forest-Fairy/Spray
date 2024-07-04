@@ -1,4 +1,4 @@
-package top.spray.executor;
+package top.spray.executor.dbi.jdbc;
 
 import top.spray.core.engine.connection.SprayDataSourceConnection;
 import top.spray.core.engine.props.SprayData;
@@ -8,13 +8,21 @@ import top.spray.engine.step.executor.BaseSprayProcessStepExecutor;
 import top.spray.engine.step.executor.SprayProcessStepExecutor;
 
 import java.sql.Connection;
-import java.util.IdentityHashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 @SprayAutoAnalyse
 public class SprayExecutor_JdbcReader extends BaseSprayProcessStepExecutor {
     private SprayDataSourceConnection<Connection> connection;
+
+    /**
+     * 数据源连接id
+     */
     private String datasourceId;
+    /**
+     * 目标表名
+     */
+    @SprayVariableSupport
     private String tableName;
 
     @Override
@@ -24,17 +32,10 @@ public class SprayExecutor_JdbcReader extends BaseSprayProcessStepExecutor {
         this.tableName = this.getMeta().getString("tableName");
     }
 
-    /**
-     * 数据源连接id
-     */
     private String getDatasourceId() {
         return this.datasourceId;
     }
 
-    /**
-     * 目标表名
-     */
-    @SprayVariableSupport
     private String getTableName() {
         return this.tableName;
     }
@@ -44,7 +45,7 @@ public class SprayExecutor_JdbcReader extends BaseSprayProcessStepExecutor {
     }
 
     @Override
-    protected void execute0(SprayProcessStepExecutor fromExecutor, SprayData data, boolean still) {
+    protected void execute0(SprayProcessStepExecutor fromExecutor, SprayData data, boolean still, Map<String, Object> processData) {
         Iterator<SprayData> it = read(this.getConnection(), this.getTableName());
         while (it.hasNext()) {
             this.publishData(it.next(), it.hasNext());
