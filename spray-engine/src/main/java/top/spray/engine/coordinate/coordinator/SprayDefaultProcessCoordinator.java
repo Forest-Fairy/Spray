@@ -159,11 +159,11 @@ public class SprayDefaultProcessCoordinator implements
 
     @Override
     public void run() {
+        boolean isAsyncRun = this.creatorThread != Thread.currentThread();
         if (this.defaultDataList.isEmpty()) {
             this.runNodes(this.getMeta().getStartNodes(),
-                    null, null, false);
+                    null, null, null, false, isAsyncRun);
         } else {
-            boolean isAsyncRun = this.creatorThread != Thread.currentThread();
             for (int i = 0; i < this.defaultDataList.size() - 1; i++) {
                 this.runNodes(this.getMeta().getStartNodes(), null, null,
                         this.defaultDataList.get(i), false, isAsyncRun);
