@@ -65,7 +65,7 @@ public class SprayDefaultProcessCoordinator implements
 //        }
         if (!executeOnlyOnce) {
             throw new SprayNotSupportError(this.coordinatorMeta,
-                    new IllegalAccessError("the coordinator can be run once only"));
+                    new IllegalAccessError("the coordinator can only be run once"));
         }
         executeOnlyOnce = false;
         initVar();
