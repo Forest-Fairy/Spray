@@ -42,6 +42,11 @@ public class SprayDataDispatchResultStatus implements SprayStatusType {
     }
 
     @Override
+    public boolean isSameClass(Class<? extends SprayStatusType> clazz) {
+        return SprayDataDispatchResultStatus.class.isAssignableFrom(clazz);
+    }
+
+    @Override
     public boolean equals(Object obj) {
         return SprayStatusType.equal(this, obj);
     }

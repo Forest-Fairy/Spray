@@ -193,6 +193,9 @@ public class SprayData implements Map<String, Object>, Serializable {
     }
 
     public static SprayData deepCopy(Map<?, ?> map) {
+        if (map == null) {
+            return new SprayData();
+        }
         return SprayFastJsonUtil.parseToSprayData(SprayFastJsonUtil.toJson(map));
     }
 

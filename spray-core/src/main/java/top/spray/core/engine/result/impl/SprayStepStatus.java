@@ -1,6 +1,5 @@
 package top.spray.core.engine.result.impl;
 
-import top.spray.core.engine.result.SprayStatusHolder;
 import top.spray.core.engine.result.SprayStatusType;
 
 public class SprayStepStatus implements SprayStatusType {
@@ -40,6 +39,11 @@ public class SprayStepStatus implements SprayStatusType {
     @Override
     public String typeName() {
         return this.typeName;
+    }
+
+    @Override
+    public boolean isSameClass(Class<? extends SprayStatusType> clazz) {
+        return SprayStepStatus.class.isAssignableFrom(clazz);
     }
 
     @Override

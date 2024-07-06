@@ -6,18 +6,22 @@ import cn.hutool.core.lang.Assert;
 import java.util.Objects;
 
 public class SprayStatusHolder implements SprayStatusType {
+    public static SprayStatusHolder create(SprayStatusType sprayStatusType) {
+        return new SprayStatusHolder(sprayStatusType);
+    }
+    private final SprayStatusType actualStatusType;
     private int code;
     private String describeMsg;
     private String typeName;
-
-    private SprayStatusType actualStatusType;
-
-    public SprayStatusHolder(SprayStatusType statusType) {
+    private SprayStatusHolder(SprayStatusType statusType) {
         Assert.notNull(statusType, "default status type should not be null!");
         this.actualStatusType = statusType;
         this.setStatus(statusType);
     }
     public void setStatus(SprayStatusType statusType) {
+        if (actualStatusType.getClass() != statusType.getClass()) {
+            throw new IllegalArgumentException("can not set status with the different type");
+        }
         this.code = statusType.getCode();
         this.describeMsg = statusType.getDescribeMsg();
         this.typeName = statusType.typeName();
@@ -36,6 +40,11 @@ public class SprayStatusHolder implements SprayStatusType {
     @Override
     public String typeName() {
         return this.typeName;
+    }
+
+    @Override
+    public boolean isSameClass(Class<? extends SprayStatusType> clazz) {
+        return actualStatusType.isSameClass(clazz);
     }
 
     @Override

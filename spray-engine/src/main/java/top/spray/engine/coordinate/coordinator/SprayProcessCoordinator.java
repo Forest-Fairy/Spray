@@ -57,7 +57,7 @@ public interface SprayProcessCoordinator extends
     /**
      * unit method for executing
      */
-    SprayStepResultInstance executeNext(SprayProcessStepExecutor nextStepExecutor, SprayProcessStepExecutor fromExecutor, SprayData data, boolean still);
+    void executeNext(SprayProcessStepExecutor nextStepExecutor, SprayProcessStepExecutor fromExecutor, SprayData data, boolean still);
 
     Map<String, Object> getExecutorProcessData(SprayProcessStepExecutor fromExecutor, SprayProcessStepExecutor curExecutor);
 }

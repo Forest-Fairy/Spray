@@ -6,7 +6,7 @@ import top.spray.core.util.SprayClassLoader;
 import top.spray.engine.coordinate.coordinator.SprayProcessCoordinator;
 import top.spray.engine.factory.SprayExecutorFactory;
 import top.spray.engine.step.condition.SprayNextStepFilter;
-import top.spray.engine.step.executor.storage.SprayFileStorageSupportExecutor;
+import top.spray.engine.step.executor.cache.SprayCacheSupportExecutor;
 import top.spray.engine.step.instance.SprayStepResultInstance;
 import top.spray.engine.step.meta.SprayProcessStepMeta;
 
@@ -89,30 +89,20 @@ public abstract class SprayBaseStepExecutor implements SprayProcessStepExecutor 
     }
 
     @Override
-    public boolean needWait(SprayProcessStepExecutor fromExecutor, SprayData data, boolean still) {
-        // TODO if it is true we can require a threshold to storage the data in the file instead of the memory
-        if (needWait0(fromExecutor, data, still)) {
-            // if the executor support to storage data in file then try
-            if (this instanceof SprayFileStorageSupportExecutor storageSupportExecutor) {
-                if (storageSupportExecutor.timeToStorageInFile(fromExecutor, data, still)) {
-                    storageSupportExecutor.storageInFile(fromExecutor, data, still);
-                }
+    public boolean needWait(SprayProcessStepExecutor fromExecutor, SprayData data, boolean still, Map<String, Object> processData) {
+        // if the executor support to storage data in file then try
+        if (this instanceof SprayCacheSupportExecutor storageSupportExecutor) {
+            if (storageSupportExecutor.needCache(fromExecutor, data, still, processData)) {
+                storageSupportExecutor.cache(fromExecutor, data, still, processData);
             }
-            return true;
         }
+        return needWait0(fromExecutor, data, still, processData);
+    }
+
+    protected boolean needWait0(SprayProcessStepExecutor fromExecutor, SprayData data, boolean still, Map<String, Object> processData) {
         return false;
     }
 
-    protected boolean needWait0(SprayProcessStepExecutor fromExecutor, SprayData data, boolean still) {
-        return false;
-    }
-
-
-    @Override
-    public void execute(SprayProcessStepExecutor fromExecutor, SprayData data, boolean still) {
-        initBeforeRun();
-        this.execute0(fromExecutor, data, still, this.getProcessData(fromExecutor));
-    }
 
     private synchronized void initBeforeRun() {
         MDC.put("transactionId", this.getCoordinator().getMeta().transactionId());
@@ -121,6 +111,11 @@ public abstract class SprayBaseStepExecutor implements SprayProcessStepExecutor 
     }
     protected synchronized void initBeforeRun0() {}
 
+    @Override
+    public void execute(SprayProcessStepExecutor fromExecutor, SprayData data, boolean still, Map<String, Object> processData) {
+        initBeforeRun();
+        this.execute0(fromExecutor, data, still, processData);
+    }
 
     /**
      * a shaded execution method
