@@ -25,10 +25,16 @@ public interface SprayProcessStepExecutor extends SprayMetaDrive<SprayProcessSte
     void setCoordinator(SprayProcessCoordinator coordinator);
     void setClassLoader(SprayClassLoader classLoader);
     default Map<String, Object> getProcessData(SprayProcessStepExecutor fromExecutor) {
-        return this.getCoordinator().getExecutorProcessData(fromExecutor);
+        return this.getCoordinator().getExecutorProcessData(fromExecutor, this);
     }
     SprayStepResultInstance getStepResult();
 
+    /**
+     * an execution method
+     * @param fromExecutor the last executor
+     * @param data data published by the last executor
+     * @param still does it still have data to publish
+     */
     void execute(SprayProcessStepExecutor fromExecutor, SprayData data, boolean still);
 
     /**

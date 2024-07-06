@@ -29,6 +29,7 @@ public class SprayDefaultProcessCoordinator implements
         SprayProcessCoordinator,
         SprayListenable<SprayExecutorListener> {
     private final Map<String, SprayProcessStepExecutor> cachedExecutorMap = new ConcurrentHashMap<>();
+    /** a namespace for executor's process data */
     private final Map<String, Map<String, Object>> executorProcessDataNamespace = new ConcurrentHashMap<>();
     private final Map<String, LongAdder> executorCounterMap = new ConcurrentHashMap<>();
     private final SprayProcessCoordinatorMeta coordinatorMeta;
@@ -275,28 +276,70 @@ public class SprayDefaultProcessCoordinator implements
     }
 
     @Override
-    public Map<String, Object> getExecutorProcessData(SprayProcessStepExecutor fromExecutor) {
-        Map<String, Object> processData;
+    public Map<String, Object> getExecutorProcessData(SprayProcessStepExecutor fromExecutor, SprayProcessStepExecutor curExecutor) {
+        int copyMode = curExecutor.getMeta().varCopyMode();
+        String curExecutorExecutorNameKey = curExecutor.getExecutorNameKey();
+        Map<String, Object> executorProcessDataForUsing;
+        // firstly get the base process data for cur executor
         if (fromExecutor == null) {
-            processData = this.processData;
-        } else {
-            // see if it needs to create one
-            int copyMode = fromExecutor.getMeta().varCopyMode();
+            // first executor in the executor line
+            executorProcessDataForUsing = this.processData;
             if (copyMode == 0) {
-                processData = this.processData;
+                // not copy that it needs no namespace
+                return executorProcessDataForUsing;
+            }
+            // try to get from namespace
+            Map<String, Object> curExecutorProcessData = executorProcessDataNamespace.get(curExecutorExecutorNameKey);
+            if (curExecutorProcessData != null) {
+                return curExecutorProcessData;
+            }
+        } else {
+            String lastExecutorExecutorNameKey = fromExecutor.getExecutorNameKey();
+            if (copyMode == 0) {
+                executorProcessDataForUsing = executorProcessDataNamespace.get(lastExecutorExecutorNameKey);
+                if (executorProcessDataForUsing == null) {
+                    // none copy between last and current that it needs no namespace
+                    return this.processData;
+                }
+//                deal with it in a code block
+//                else {
+//                    // setting a namespace for cur executor
+//                    executorProcessDataNamespace.put(curExecutorExecutorNameKey, executorProcessDataForUsing);
+//                }
+                // try to get from namespace
+                Map<String, Object> curExecutorProcessData = executorProcessDataNamespace.get(curExecutorExecutorNameKey);
+                if (curExecutorProcessData != null) {
+                    return curExecutorProcessData;
+                }
             } else {
-                processData = executorProcessDataNamespace.computeIfAbsent(
-                        fromExecutor.getExecutorNameKey(),
-                        k -> {
-                            if (copyMode == 1) {
-                                return new HashMap<>(this.processData);
-                            } else {
-                                return new HashMap<>(SprayData.deepCopy(this.processData));
-                            }}
-                );
+                // copy mode
+
+                // try to get from namespace
+                Map<String, Object> curExecutorProcessData = executorProcessDataNamespace.get(curExecutorExecutorNameKey);
+                if (curExecutorProcessData != null) {
+                    return curExecutorProcessData;
+                }
+
+                executorProcessDataForUsing = executorProcessDataNamespace.get(lastExecutorExecutorNameKey);
+                if (executorProcessDataForUsing == null) {
+                    // no copy mode executor in all the lasts.
+                    executorProcessDataForUsing = this.processData;
+                }
             }
         }
-        return processData;
+        if (copyMode != 0) {
+            // copy mode
+            if (copyMode == 1) {
+                // easy copy
+                executorProcessDataForUsing = new HashMap<>(executorProcessDataForUsing);
+            } else {
+                // deep copy
+                executorProcessDataForUsing = new HashMap<>(SprayData.deepCopy(executorProcessDataForUsing));
+            }
+        }
+        // setting a namespace for cur executor
+        executorProcessDataNamespace.put(curExecutorExecutorNameKey, executorProcessDataForUsing);
+        return executorProcessDataForUsing;
     }
 
     protected void afterExecute(SprayProcessStepExecutor nextStepExecutor,

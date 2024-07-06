@@ -21,7 +21,6 @@ public abstract class SprayBaseStepExecutor implements SprayProcessStepExecutor 
     private SprayProcessCoordinator coordinator;
     private SprayClassLoader classLoader;
     private SprayStepResultInstance stepResult;
-    private Map<String, Object> processData;
     private long createTime;
 
     @Override
@@ -112,13 +111,23 @@ public abstract class SprayBaseStepExecutor implements SprayProcessStepExecutor 
     @Override
     public void execute(SprayProcessStepExecutor fromExecutor, SprayData data, boolean still) {
         initBeforeRun();
-        this.execute0(fromExecutor, data, still, processData);
+        this.execute0(fromExecutor, data, still, this.getProcessData(fromExecutor));
     }
 
-    protected synchronized void initBeforeRun() {
+    private synchronized void initBeforeRun() {
         MDC.put("transactionId", this.getCoordinator().getMeta().transactionId());
         MDC.put("executorId", this.getExecutorNameKey());
+        initBeforeRun0();
     }
+    protected synchronized void initBeforeRun0() {}
 
+
+    /**
+     * a shaded execution method
+     * @param fromExecutor the last executor
+     * @param data data published by the last executor
+     * @param still does it still have data to publish
+     * @param processData a process data for current executor
+     */
     protected abstract void execute0(SprayProcessStepExecutor fromExecutor, SprayData data, boolean still, Map<String, Object> processData);
 }
