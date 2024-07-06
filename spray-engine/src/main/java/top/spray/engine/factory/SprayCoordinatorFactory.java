@@ -2,7 +2,7 @@ package top.spray.engine.factory;
 
 import top.spray.engine.coordinate.coordinator.SprayProcessCoordinator;
 import top.spray.engine.coordinate.meta.SprayProcessCoordinatorMeta;
-import top.spray.engine.coordinate.remoting.SprayServerCoordinatorAdapter;
+import top.spray.engine.coordinate.adapter.SprayProcessCoordinatorAdapter;
 
 public class SprayCoordinatorFactory {
     private SprayCoordinatorFactory() {}
@@ -11,7 +11,7 @@ public class SprayCoordinatorFactory {
 
     }
 
-    public static SprayServerCoordinatorAdapter createCoordinatorAdapter(SprayProcessCoordinator coordinator) {
+    public static SprayProcessCoordinatorAdapter createCoordinatorAdapter(SprayProcessCoordinator coordinator) {
 
     }
 

@@ -16,7 +16,7 @@ import java.util.Map;
 /**
  * this coordinator will be created by remote
  */
-public class SprayRemoteCoordinateAdapter implements SprayProcessCoordinator {
+public class SprayRemoteCoordinateAdapter implements SprayServerProcessCoordinator {
     public static SprayRemoteCoordinateAdapter create(SprayProcessCoordinatorMeta coordinatorMeta) {
         return new SprayRemoteCoordinateAdapter(coordinatorMeta);
     }

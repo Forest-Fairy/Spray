@@ -4,7 +4,7 @@ import top.spray.core.util.SprayClassLoader;
 import top.spray.engine.coordinate.coordinator.SprayProcessCoordinator;
 import top.spray.engine.step.executor.SprayProcessStepExecutor;
 import top.spray.engine.step.meta.SprayProcessStepMeta;
-import top.spray.engine.step.remoting.SprayRemoteExecutorAdapter;
+import top.spray.engine.step.remoting.SprayRemoteStepExecutor;
 
 import java.lang.reflect.InvocationTargetException;
 
@@ -46,7 +46,7 @@ public class SprayExecutorFactory {
     }
 
 
-    public static SprayRemoteExecutorAdapter createAdapter(SprayProcessStepExecutor stepExecutor) {
+    public static SprayRemoteStepExecutor createAdapter(SprayProcessStepExecutor stepExecutor) {
 
     }
 }
