@@ -6,7 +6,7 @@ import top.spray.core.thread.SprayPoolExecutor;
 import top.spray.core.engine.result.impl.SprayCoordinateStatus;
 import top.spray.engine.coordinate.meta.SprayProcessCoordinatorMeta;
 import top.spray.engine.factory.SprayExecutorFactory;
-import top.spray.engine.prop.SprayExecutorVariable;
+import top.spray.engine.prop.SprayVariableContainer;
 import top.spray.engine.step.executor.SprayProcessStepExecutor;
 import top.spray.engine.step.condition.SprayNextStepFilter;
 import top.spray.engine.step.meta.SprayProcessStepMeta;
@@ -50,11 +50,11 @@ public interface SprayProcessCoordinator extends
     int createExecutorCount();
 
     /** a method for executor to publish its data */
-    void dispatch(SprayExecutorVariable variables, SprayProcessStepExecutor fromExecutor, SprayNextStepFilter stepFilter, SprayData data, boolean still, boolean dispatchAsync);
+    void dispatch(SprayVariableContainer variables, SprayProcessStepExecutor fromExecutor, SprayNextStepFilter stepFilter, SprayData data, boolean still, boolean dispatchAsync);
 
     /**
      * unit method for executing
      */
-    void executeNext(SprayExecutorVariable variables, SprayProcessStepExecutor nextStepExecutor, SprayProcessStepExecutor fromExecutor, SprayData data, boolean still);
+    void executeNext(SprayVariableContainer variables, SprayProcessStepExecutor nextStepExecutor, SprayProcessStepExecutor fromExecutor, SprayData data, boolean still);
 
 }

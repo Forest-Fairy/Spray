@@ -4,7 +4,7 @@ import org.slf4j.MDC;
 import top.spray.core.engine.props.SprayData;
 import top.spray.core.util.SprayClassLoader;
 import top.spray.engine.coordinate.coordinator.SprayProcessCoordinator;
-import top.spray.engine.prop.SprayExecutorVariable;
+import top.spray.engine.prop.SprayVariableContainer;
 import top.spray.engine.step.condition.SprayNextStepFilter;
 import top.spray.engine.step.executor.cache.SprayCacheSupportExecutor;
 import top.spray.engine.step.instance.SprayStepResultInstance;
@@ -86,7 +86,7 @@ public abstract class SprayBaseStepExecutor implements SprayProcessStepExecutor 
     }
 
     @Override
-    public boolean needWait(SprayExecutorVariable variables, SprayProcessStepExecutor fromExecutor, SprayData data, boolean still) {
+    public boolean needWait(SprayVariableContainer variables, SprayProcessStepExecutor fromExecutor, SprayData data, boolean still) {
         // if the executor support to storage data in file then try
         if (this instanceof SprayCacheSupportExecutor storageSupportExecutor) {
             if (storageSupportExecutor.needCache(variables, fromExecutor, data, still)) {
@@ -96,7 +96,7 @@ public abstract class SprayBaseStepExecutor implements SprayProcessStepExecutor 
         return needWait0(variables, fromExecutor, data, still);
     }
 
-    protected boolean needWait0(SprayExecutorVariable variables, SprayProcessStepExecutor fromExecutor, SprayData data, boolean still) {
+    protected boolean needWait0(SprayVariableContainer variables, SprayProcessStepExecutor fromExecutor, SprayData data, boolean still) {
         return false;
     }
 
@@ -109,7 +109,7 @@ public abstract class SprayBaseStepExecutor implements SprayProcessStepExecutor 
     protected synchronized void initBeforeRun0() {}
 
     @Override
-    public void execute(SprayExecutorVariable variables, SprayProcessStepExecutor fromExecutor, SprayData data, boolean still) {
+    public void execute(SprayVariableContainer variables, SprayProcessStepExecutor fromExecutor, SprayData data, boolean still) {
         initBeforeRun();
         try {
             this.getStepResult().incrementRunningCount();
@@ -128,5 +128,5 @@ public abstract class SprayBaseStepExecutor implements SprayProcessStepExecutor 
      * @param data data published by the last executor
      * @param still does it still have data to publish
      */
-    protected abstract void execute0(SprayExecutorVariable variables, SprayProcessStepExecutor fromExecutor, SprayData data, boolean still);
+    protected abstract void execute0(SprayVariableContainer variables, SprayProcessStepExecutor fromExecutor, SprayData data, boolean still);
 }

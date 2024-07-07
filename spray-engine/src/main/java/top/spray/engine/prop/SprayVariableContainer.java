@@ -4,13 +4,13 @@ import top.spray.core.engine.props.SprayData;
 import top.spray.engine.coordinate.coordinator.SprayProcessCoordinator;
 import top.spray.engine.step.executor.SprayProcessStepExecutor;
 
-public class SprayExecutorVariable {
+public class SprayVariableContainer {
     private final String creator;
     private final long createTime;
     private final SprayData data;
     private final String key;
 
-    private SprayExecutorVariable(String creator, long createTime, SprayData data, String key) {
+    private SprayVariableContainer(String creator, long createTime, SprayData data, String key) {
         this.creator = creator;
         this.createTime = createTime;
         this.data = data;
@@ -37,21 +37,25 @@ public class SprayExecutorVariable {
         return this.key + "_" + creator;
     }
 
-    public static SprayExecutorVariable create(SprayProcessCoordinator coordinator) {
+    public static SprayVariableContainer create(SprayProcessCoordinator coordinator) {
         String creator = coordinator.getMeta().getName() + "[" + coordinator.getMeta().transactionId() + "]";
         long createTime = System.currentTimeMillis();
         SprayData data = SprayData.deepCopy(coordinator.getMeta().getDefaultProcessData());
         String key = createTime + "#" + creator;
-        return new SprayExecutorVariable(creator, createTime, data, key);
+        return new SprayVariableContainer(creator, createTime, data, key);
     }
-    public static SprayExecutorVariable easyCopy(SprayExecutorVariable last, SprayProcessStepExecutor executor) {
-        String creator = executor.getCoordinator().getExecutorNameKey(executor.getMeta());
-        String newKey = last.nextKey(executor);
-        return new SprayExecutorVariable(creator, System.currentTimeMillis(), new SprayData(last.data), newKey);
+    public static SprayVariableContainer easyCopy(SprayVariableContainer last, SprayProcessStepExecutor executor) {
+        return new SprayVariableContainer(
+                executor.getCoordinator().getExecutorNameKey(executor.getMeta()),
+                System.currentTimeMillis(),
+                new SprayData(last.data),
+                last.nextKey(executor));
     }
-    public static SprayExecutorVariable deepCopy(SprayExecutorVariable last, SprayProcessStepExecutor executor) {
-        String creator = executor.getCoordinator().getExecutorNameKey(executor.getMeta());
-        String newKey = last.nextKey(executor);
-        return new SprayExecutorVariable(creator, System.currentTimeMillis(), SprayData.deepCopy(last.data), newKey);
+    public static SprayVariableContainer deepCopy(SprayVariableContainer last, SprayProcessStepExecutor executor) {
+        return new SprayVariableContainer(
+                executor.getCoordinator().getExecutorNameKey(executor.getMeta()),
+                System.currentTimeMillis(),
+                SprayData.deepCopy(last.data),
+                last.nextKey(executor));
     }
 }

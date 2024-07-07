@@ -9,7 +9,7 @@ import top.spray.core.engine.result.impl.SprayDataDispatchResultStatus;
 import top.spray.core.thread.SprayPoolExecutor;
 import top.spray.core.engine.result.impl.SprayStepStatus;
 import top.spray.core.engine.result.impl.SprayCoordinateStatus;
-import top.spray.engine.prop.SprayExecutorVariable;
+import top.spray.engine.prop.SprayVariableContainer;
 import top.spray.engine.step.condition.SprayStepExecuteConditionFilter;
 import top.spray.engine.step.executor.SprayExecutorListener;
 import top.spray.engine.coordinate.meta.SprayProcessCoordinatorMeta;
@@ -27,10 +27,10 @@ public class SprayDefaultProcessCoordinator implements
         SprayListenable<SprayExecutorListener> {
     private final Map<String, SprayProcessStepExecutor> cachedExecutorMap;
     /** a namespace for executor's process data */
-    private final Map<String, SprayExecutorVariable> executorVariablesNamespace;
+    private final Map<String, SprayVariableContainer> executorVariablesNamespace;
     private final SprayProcessCoordinatorMeta coordinatorMeta;
     private final List<SprayExecutorListener> listeners;
-    private final SprayExecutorVariable defaultVariables;
+    private final SprayVariableContainer defaultVariables;
     private final List<SprayData> defaultDataList;
     private final long creatorThreadId;
 
@@ -43,7 +43,7 @@ public class SprayDefaultProcessCoordinator implements
         this.executorVariablesNamespace = new ConcurrentHashMap<>();
         this.coordinatorMeta = coordinatorMeta;
         this.listeners = new ArrayList<>();
-        this.defaultVariables = SprayExecutorVariable.create(this);
+        this.defaultVariables = SprayVariableContainer.create(this);
         this.defaultDataList = new ArrayList<>();
         this.creatorThreadId = Thread.currentThread().getId();
         init();
@@ -174,7 +174,7 @@ public class SprayDefaultProcessCoordinator implements
     }
 
     @Override
-    public void dispatch(SprayExecutorVariable variables, SprayProcessStepExecutor fromExecutor, SprayNextStepFilter stepFilter,
+    public void dispatch(SprayVariableContainer variables, SprayProcessStepExecutor fromExecutor, SprayNextStepFilter stepFilter,
                          SprayData data, boolean still, boolean dispatchAsync) {
         if (dispatchAsync) {
             SprayPoolExecutor poolExecutor = this.getSprayPoolExecutor(fromExecutor);
@@ -184,7 +184,7 @@ public class SprayDefaultProcessCoordinator implements
         }
     }
 
-    protected void setDispatchResult(SprayExecutorVariable variables, SprayProcessStepExecutor fromExecutor, SprayData data, boolean still, boolean async,
+    protected void setDispatchResult(SprayVariableContainer variables, SprayProcessStepExecutor fromExecutor, SprayData data, boolean still, boolean async,
                                      SprayProcessStepMeta nextMeta, SprayDataDispatchResultStatus dataDispatchStatus) {
         // TODO get data result save strategies
     }
@@ -192,7 +192,7 @@ public class SprayDefaultProcessCoordinator implements
         // TODO get data result save strategies
     }
 
-    private boolean validBeforeCreate(SprayExecutorVariable variables, SprayProcessStepExecutor fromExecutor, SprayNextStepFilter stepFilter, SprayData data, boolean still, boolean dispatchAsync, SprayProcessStepMeta nodeMeta) {
+    private boolean validBeforeCreate(SprayVariableContainer variables, SprayProcessStepExecutor fromExecutor, SprayNextStepFilter stepFilter, SprayData data, boolean still, boolean dispatchAsync, SprayProcessStepMeta nodeMeta) {
         boolean create = true;
         if (!SprayStepActiveType.ACTIVE.equals(nodeMeta.stepActiveType())) {
             if (SprayStepActiveType.IGNORE.equals(nodeMeta.stepActiveType())) {
@@ -219,7 +219,7 @@ public class SprayDefaultProcessCoordinator implements
         return create;
     }
 
-    private void runNodes(SprayExecutorVariable variables, List<SprayProcessStepMeta> nodes, SprayNextStepFilter stepFilter, SprayProcessStepExecutor fromExecutor, SprayData data, boolean still, boolean dispatchAsync) {
+    private void runNodes(SprayVariableContainer variables, List<SprayProcessStepMeta> nodes, SprayNextStepFilter stepFilter, SprayProcessStepExecutor fromExecutor, SprayData data, boolean still, boolean dispatchAsync) {
         if (nodes == null || nodes.isEmpty()) {
             this.setDispatchResult(variables, fromExecutor, data, still, dispatchAsync, null, SprayDataDispatchResultStatus.ABANDONED);
             return;
@@ -261,7 +261,7 @@ public class SprayDefaultProcessCoordinator implements
 
 
     @Override
-    public void executeNext(SprayExecutorVariable variables, SprayProcessStepExecutor nextStepExecutor,
+    public void executeNext(SprayVariableContainer variables, SprayProcessStepExecutor nextStepExecutor,
                             SprayProcessStepExecutor fromExecutor,
                             SprayData data, boolean still) {
         int copyMode = nextStepExecutor.getMeta().varCopyMode();
@@ -271,13 +271,13 @@ public class SprayDefaultProcessCoordinator implements
             nextStepExecutor.execute(
                     executorVariablesNamespace.computeIfAbsent(
                             variables.nextKey(nextStepExecutor), key -> copyMode == 1 ?
-                                    SprayExecutorVariable.easyCopy(variables, nextStepExecutor) :
-                                    SprayExecutorVariable.deepCopy(variables, nextStepExecutor)),
+                                    SprayVariableContainer.easyCopy(variables, nextStepExecutor) :
+                                    SprayVariableContainer.deepCopy(variables, nextStepExecutor)),
                     fromExecutor, data, still);
         }
     }
 
-    private SprayExecutorVariable computeVariableForExecutor(SprayExecutorVariable variables, SprayProcessStepExecutor nextStepExecutor) {
+    private SprayVariableContainer computeVariableForExecutor(SprayVariableContainer variables, SprayProcessStepExecutor nextStepExecutor) {
         executorVariablesNamespace.computeIfAbsent(this.getExecutorNameKey(nextStepExecutor))
     }
 
