@@ -24,6 +24,7 @@ public class SprayStepResultInstance implements SprayMetaDrive<SprayProcessStepM
     private final SprayProcessCoordinator coordinator;
     private final SprayProcessStepExecutor executor;
     private final SprayProcessStepMeta stepMeta;
+    private final LongAdder runningCounter;
     private SprayStatusHolder stepStatus;
     /**
      * ['NONE', 'ALL', 'SUCCESS', 'BAD']
@@ -44,6 +45,7 @@ public class SprayStepResultInstance implements SprayMetaDrive<SprayProcessStepM
         this.coordinator = coordinator;
         this.executor = executor;
         this.stepMeta = executor.getMeta();
+        this.runningCounter = new LongAdder();
         init();
     }
     private void init() {
@@ -66,6 +68,18 @@ public class SprayStepResultInstance implements SprayMetaDrive<SprayProcessStepM
     public String transactionId() {
         return coordinator.getMeta().transactionId();
     }
+
+
+    public long runningCount() {
+        return this.runningCounter.sum();
+    }
+    public void incrementRunningCount() {
+        this.runningCounter.increment();
+    }
+    public void decrementRunningCount() {
+        this.runningCounter.decrement();
+    }
+
 
 
     public Map<String, LongAdder> inputInfos() {

@@ -18,11 +18,9 @@ import java.util.List;
  */
 public class SprayProcessStepMeta implements SprayBaseMeta<SprayProcessStepMeta> {
     /* executor meta container */
-
     private final SprayData metaContainer;
 
     /* base meta */
-
     private String id;
     private String name;
     private SprayExecutorType executorType;
@@ -33,7 +31,6 @@ public class SprayProcessStepMeta implements SprayBaseMeta<SprayProcessStepMeta>
     /* dubbo meta */
     private String host;
     private int port;
-
 
 
     /* execution options meta */
@@ -135,7 +132,6 @@ public class SprayProcessStepMeta implements SprayBaseMeta<SprayProcessStepMeta>
         return this.ignoreError;
     }
 
-    @Override
     public boolean isAsync() {
         return this.isAsync;
     }

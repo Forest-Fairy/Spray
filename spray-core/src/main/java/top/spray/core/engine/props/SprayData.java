@@ -11,14 +11,14 @@ public class SprayData implements Map<String, Object>, Serializable {
     @Serial
     private static final long serialVersionUID = 102262040630237L;
 
-    private final LinkedHashMap<String, Object> inside;
+    private final Map<String, Object> inside;
 
     public SprayData() {
-        inside = new LinkedHashMap<>();
+        inside = new HashMap<>();
     }
 
     public SprayData(Map map) {
-        inside = new LinkedHashMap<>();
+        inside = new HashMap<>();
         map.forEach((k, v) -> {
             if (k != null) {
                 this.put(String.valueOf(k), v);
@@ -26,7 +26,7 @@ public class SprayData implements Map<String, Object>, Serializable {
         });
     }
     public SprayData(String key0, Object value0, Object... keyValues) {
-        inside = new LinkedHashMap<>();
+        inside = new HashMap<>();
         if (key0 == null) {
             throw new IllegalArgumentException("key can not be null");
         }
@@ -168,11 +168,28 @@ public class SprayData implements Map<String, Object>, Serializable {
         this.put(key, val);
         return this;
     }
-    public SprayData unmodifiable() {
-        return new UnmodifiableData(this);
-    }
     public SprayData keyBanned(String... keys) {
         return new KeysBannedData(this, Set.of(keys));
+    }
+
+    /* create unmodifiable */
+
+    /**
+     * get an unmodifiable data with cur data
+     */
+    public SprayData unmodifiable() {
+        return new UnmodifiableData(new SprayDataWrapper(this));
+    }
+    public static SprayData Unmodifiable(Map<String, Object> data) {
+        return new UnmodifiableData(new SprayDataWrapper(data));
+    }
+    public static SprayData NoneCopy(Map<String, Object> data) {
+        return new SprayData(new SprayDataWrapper(data));
+    }
+    private record SprayDataWrapper(Map<String, Object> data) {
+    }
+    private SprayData(SprayDataWrapper dataWrapper) {
+        inside = dataWrapper.data;
     }
 
     @SuppressWarnings("deprecation")
@@ -293,8 +310,8 @@ public class SprayData implements Map<String, Object>, Serializable {
     }
 
     static class UnmodifiableData extends SprayData {
-        private UnmodifiableData(final SprayData data) {
-            super(data);
+        private UnmodifiableData(SprayDataWrapper dataWrapper) {
+            super(dataWrapper);
         }
 
         @Override

@@ -4,6 +4,7 @@ import top.spray.core.engine.execute.SprayMetaDrive;
 import top.spray.core.engine.props.SprayData;
 import top.spray.core.util.SprayClassLoader;
 import top.spray.engine.coordinate.coordinator.SprayProcessCoordinator;
+import top.spray.engine.prop.SprayRuntimeVariables;
 import top.spray.engine.step.executor.type.SprayReaderExecutorType;
 import top.spray.engine.step.instance.SprayStepResultInstance;
 import top.spray.engine.step.meta.SprayProcessStepMeta;
@@ -14,9 +15,14 @@ import java.util.Map;
  * Define the executor of a process node
  */
 public interface SprayProcessStepExecutor extends SprayMetaDrive<SprayProcessStepMeta> {
-    String getExecutorNameKey();
     void initOnlyAtCreate();
     long getCreateTime();
+
+    /**
+     * how many data is running with the executor
+     */
+    long runningCount();
+
     @Override
     SprayProcessStepMeta getMeta();
     SprayProcessCoordinator getCoordinator();
@@ -31,16 +37,16 @@ public interface SprayProcessStepExecutor extends SprayMetaDrive<SprayProcessSte
      * executor can collect data by overwrite this method <br>
      * @return false by default, that also means the executor can run with stream data
      */
-    boolean needWait(SprayProcessStepExecutor fromExecutor, SprayData data, boolean still, Map<String, Object> processData);
+    boolean needWait(SprayRuntimeVariables variables, SprayProcessStepExecutor fromExecutor, SprayData data, boolean still);
 
     /**
-     * an execution method
+     * an execution method which won't throw exception
+     * @param processData the processData belongs to current executor
      * @param fromExecutor the last executor
      * @param data data published by the last executor
      * @param still does it still have data to publish
-     * @param processData the processData belongs to current executor
      */
-    void execute(SprayProcessStepExecutor fromExecutor, SprayData data, boolean still, Map<String, Object> processData);
+    void execute(SprayRuntimeVariables variables, SprayProcessStepExecutor fromExecutor, SprayData data, boolean still);
 
 
     /**

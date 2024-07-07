@@ -21,7 +21,4 @@ public interface SprayBaseMeta<T extends SprayBaseMeta<?>> extends Cloneable {
      */
     String transactionId();
 
-    /** run this step async */
-    boolean isAsync();
-
 }

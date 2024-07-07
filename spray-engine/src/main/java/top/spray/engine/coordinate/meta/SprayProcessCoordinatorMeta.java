@@ -2,8 +2,6 @@ package top.spray.engine.coordinate.meta;
 
 import top.spray.core.engine.meta.SprayBaseMeta;
 import top.spray.core.engine.props.SprayData;
-import top.spray.engine.coordinate.coordinator.SprayProcessCoordinator;
-import top.spray.engine.coordinate.type.SprayCoordinatorRemoteType;
 import top.spray.engine.step.meta.SprayProcessStepMeta;
 
 import java.util.List;
@@ -14,15 +12,14 @@ public interface SprayProcessCoordinatorMeta extends SprayBaseMeta<SprayProcessC
     String getName();
     String transactionId();
     int minThreadCount();
+    boolean asyncSupport();
 
     /** the execute host if the process is remote task */
     String getCoordinatorHost();
 
-    SprayCoordinatorRemoteType getRemoteType();
-
 
     /** the default variables for the process */
-    Map<String, Object> getDefaultProcessData();
+    SprayData getDefaultProcessData();
     /** the startNodes for the coordinator */
     List<SprayProcessStepMeta> getStartNodes();
 

@@ -6,6 +6,8 @@ import top.spray.core.engine.result.impl.SprayDataDispatchResultStatus;
 import top.spray.core.thread.SprayPoolExecutor;
 import top.spray.core.engine.result.impl.SprayCoordinateStatus;
 import top.spray.engine.coordinate.meta.SprayProcessCoordinatorMeta;
+import top.spray.engine.factory.SprayExecutorFactory;
+import top.spray.engine.prop.SprayRuntimeVariables;
 import top.spray.engine.step.executor.SprayProcessStepExecutor;
 import top.spray.engine.step.condition.SprayNextStepFilter;
 import top.spray.engine.step.instance.SprayStepResultInstance;
@@ -40,6 +42,10 @@ public interface SprayProcessCoordinator extends
     /** the spray pooled executor */
     SprayPoolExecutor getSprayPoolExecutor();
 
+
+    default String getExecutorNameKey(SprayProcessStepMeta executorMeta) {
+        return SprayExecutorFactory.getExecutorNameKey(this, executorMeta);
+    }
     /** register the executor by this way */
     void registerExecutor(String executorId, SprayProcessStepExecutor executor);
     /** the only way to get the executor */
@@ -47,17 +53,11 @@ public interface SprayProcessCoordinator extends
     int createExecutorCount();
 
     /** a method for executor to publish its data */
-    void dispatch(SprayProcessStepExecutor fromExecutor, SprayNextStepFilter stepFilter, SprayData data, boolean still, boolean dispatchAsync);
-
-    /**
-     * handle data dispatch result
-     */
-    void dispatchResult(SprayProcessStepExecutor fromExecutor, SprayData data, boolean still, boolean async, SprayProcessStepMeta nextMeta, SprayDataDispatchResultStatus dataDispatchStatus);
+    void dispatch(SprayRuntimeVariables variables, SprayProcessStepExecutor fromExecutor, SprayNextStepFilter stepFilter, SprayData data, boolean still, boolean dispatchAsync);
 
     /**
      * unit method for executing
      */
-    void executeNext(SprayProcessStepExecutor nextStepExecutor, SprayProcessStepExecutor fromExecutor, SprayData data, boolean still);
+    void executeNext(SprayRuntimeVariables variables, SprayProcessStepExecutor nextStepExecutor, SprayProcessStepExecutor fromExecutor, SprayData data, boolean still);
 
-    Map<String, Object> getExecutorProcessData(SprayProcessStepExecutor fromExecutor, SprayProcessStepExecutor curExecutor);
 }
