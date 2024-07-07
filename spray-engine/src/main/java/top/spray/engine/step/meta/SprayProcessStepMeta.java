@@ -143,7 +143,7 @@ public class SprayProcessStepMeta implements SprayBaseMeta<SprayProcessStepMeta>
     /**
      * @return
      *  0 -> no <br>
-     *  1 -> simple <br>
+     *  1 -> easy <br>
      *  2 -> deep
      */
     public int varCopyMode() {

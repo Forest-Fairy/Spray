@@ -2,18 +2,15 @@ package top.spray.engine.coordinate.coordinator;
 
 import top.spray.core.engine.execute.SprayMetaDrive;
 import top.spray.core.engine.props.SprayData;
-import top.spray.core.engine.result.impl.SprayDataDispatchResultStatus;
 import top.spray.core.thread.SprayPoolExecutor;
 import top.spray.core.engine.result.impl.SprayCoordinateStatus;
 import top.spray.engine.coordinate.meta.SprayProcessCoordinatorMeta;
 import top.spray.engine.factory.SprayExecutorFactory;
-import top.spray.engine.prop.SprayRuntimeVariables;
+import top.spray.engine.prop.SprayExecutorVariable;
 import top.spray.engine.step.executor.SprayProcessStepExecutor;
 import top.spray.engine.step.condition.SprayNextStepFilter;
-import top.spray.engine.step.instance.SprayStepResultInstance;
 import top.spray.engine.step.meta.SprayProcessStepMeta;
 
-import java.util.Map;
 import java.util.function.Supplier;
 
 /**
@@ -53,11 +50,11 @@ public interface SprayProcessCoordinator extends
     int createExecutorCount();
 
     /** a method for executor to publish its data */
-    void dispatch(SprayRuntimeVariables variables, SprayProcessStepExecutor fromExecutor, SprayNextStepFilter stepFilter, SprayData data, boolean still, boolean dispatchAsync);
+    void dispatch(SprayExecutorVariable variables, SprayProcessStepExecutor fromExecutor, SprayNextStepFilter stepFilter, SprayData data, boolean still, boolean dispatchAsync);
 
     /**
      * unit method for executing
      */
-    void executeNext(SprayRuntimeVariables variables, SprayProcessStepExecutor nextStepExecutor, SprayProcessStepExecutor fromExecutor, SprayData data, boolean still);
+    void executeNext(SprayExecutorVariable variables, SprayProcessStepExecutor nextStepExecutor, SprayProcessStepExecutor fromExecutor, SprayData data, boolean still);
 
 }

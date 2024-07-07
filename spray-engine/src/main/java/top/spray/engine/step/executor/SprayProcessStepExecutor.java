@@ -4,12 +4,10 @@ import top.spray.core.engine.execute.SprayMetaDrive;
 import top.spray.core.engine.props.SprayData;
 import top.spray.core.util.SprayClassLoader;
 import top.spray.engine.coordinate.coordinator.SprayProcessCoordinator;
-import top.spray.engine.prop.SprayRuntimeVariables;
+import top.spray.engine.prop.SprayExecutorVariable;
 import top.spray.engine.step.executor.type.SprayReaderExecutorType;
 import top.spray.engine.step.instance.SprayStepResultInstance;
 import top.spray.engine.step.meta.SprayProcessStepMeta;
-
-import java.util.Map;
 
 /**
  * Define the executor of a process node
@@ -37,7 +35,7 @@ public interface SprayProcessStepExecutor extends SprayMetaDrive<SprayProcessSte
      * executor can collect data by overwrite this method <br>
      * @return false by default, that also means the executor can run with stream data
      */
-    boolean needWait(SprayRuntimeVariables variables, SprayProcessStepExecutor fromExecutor, SprayData data, boolean still);
+    boolean needWait(SprayExecutorVariable variables, SprayProcessStepExecutor fromExecutor, SprayData data, boolean still);
 
     /**
      * an execution method which won't throw exception
@@ -46,7 +44,7 @@ public interface SprayProcessStepExecutor extends SprayMetaDrive<SprayProcessSte
      * @param data data published by the last executor
      * @param still does it still have data to publish
      */
-    void execute(SprayRuntimeVariables variables, SprayProcessStepExecutor fromExecutor, SprayData data, boolean still);
+    void execute(SprayExecutorVariable variables, SprayProcessStepExecutor fromExecutor, SprayData data, boolean still);
 
 
     /**
