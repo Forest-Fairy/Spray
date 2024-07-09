@@ -70,12 +70,7 @@ public class SprayData implements Map<String, Object>, Serializable {
         if (value == null) {
             return defaultValue;
         } else {
-            Class<?> tClass;
-            if (defaultValue != null) {
-                tClass = defaultValue.getClass();
-            } else {
-                tClass = value.getClass();
-            }
+            Class<?> tClass = Objects.requireNonNullElse(defaultValue, value).getClass();
             return (T) convertValue(value, tClass);
         }
     }

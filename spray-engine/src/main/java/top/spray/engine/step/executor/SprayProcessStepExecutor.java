@@ -13,6 +13,7 @@ import top.spray.engine.step.meta.SprayProcessStepMeta;
  * Define the executor of a process node
  */
 public interface SprayProcessStepExecutor extends SprayMetaDrive<SprayProcessStepMeta> {
+    String getExecutorNameKey();
     void initOnlyAtCreate();
     long getCreateTime();
 
