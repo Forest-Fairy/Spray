@@ -3,11 +3,11 @@ package top.spray.engine.step.instance;
 import org.apache.commons.lang3.tuple.Pair;
 import top.spray.core.engine.execute.SprayMetaDrive;
 import top.spray.core.engine.props.SprayData;
-import top.spray.core.engine.result.SprayStatusType;
-import top.spray.core.engine.result.SprayStatusHolder;
+import top.spray.core.engine.status.SprayStatusType;
+import top.spray.core.engine.status.SprayStatusHolder;
 import top.spray.engine.coordinate.coordinator.SprayProcessCoordinator;
 import top.spray.engine.step.executor.SprayProcessStepExecutor;
-import top.spray.core.engine.result.impl.SprayStepStatus;
+import top.spray.core.engine.status.impl.SprayStepStatus;
 import top.spray.engine.step.meta.SprayProcessStepMeta;
 
 import java.util.ArrayList;
@@ -17,7 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.LongAdder;
 
 /**
- * the step result instance
+ * the step status instance
  *  - create by an executor with the only instance
  */
 public class SprayStepResultInstance implements SprayMetaDrive<SprayProcessStepMeta> {

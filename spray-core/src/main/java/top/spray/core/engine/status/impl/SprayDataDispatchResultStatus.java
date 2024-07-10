@@ -1,6 +1,6 @@
-package top.spray.core.engine.result.impl;
+package top.spray.core.engine.status.impl;
 
-import top.spray.core.engine.result.SprayStatusType;
+import top.spray.core.engine.status.SprayStatusType;
 
 public class SprayDataDispatchResultStatus implements SprayStatusType {
 

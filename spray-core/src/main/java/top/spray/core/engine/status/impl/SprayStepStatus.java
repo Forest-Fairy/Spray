@@ -1,13 +1,13 @@
-package top.spray.core.engine.result.impl;
+package top.spray.core.engine.status.impl;
 
-import top.spray.core.engine.result.SprayStatusType;
+import top.spray.core.engine.status.SprayStatusType;
 
 public class SprayStepStatus implements SprayStatusType {
     /** pause by config (debug or collecting data) */
     public static final SprayStepStatus PAUSED = new SprayStepStatus("PAUSED", 3, "暂停");
     /** stop by human. need stop reason */
     public static final SprayStepStatus STOP = new SprayStepStatus("STOP", 2, "手动停止");
-    /** stop normally. need result message */
+    /** stop normally. need status message */
     public static final SprayStepStatus DONE = new SprayStepStatus("DONE", 1, "执行完成");
     /** running by default */
     public static final SprayStepStatus RUNNING = new SprayStepStatus("RUNNING", 0, "执行中");

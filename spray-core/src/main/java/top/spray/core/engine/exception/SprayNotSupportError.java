@@ -1,8 +1,7 @@
 package top.spray.core.engine.exception;
 
-import org.slf4j.Logger;
 import top.spray.core.engine.meta.SprayBaseMeta;
-import top.spray.core.util.ThreadUtil;
+import top.spray.core.util.SprayThreadUtil;
 
 public class SprayNotSupportError extends SprayMetaError {
     public SprayNotSupportError(SprayBaseMeta<?> meta, Throwable cause) {
@@ -23,7 +22,7 @@ public class SprayNotSupportError extends SprayMetaError {
 
         @Override
         public String transactionId() {
-            return ThreadUtil.getThreadTransactionId();
+            return SprayThreadUtil.getThreadTransactionId();
         }
 
         @Override

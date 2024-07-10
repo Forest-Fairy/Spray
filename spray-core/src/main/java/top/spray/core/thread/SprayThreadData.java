@@ -1,14 +1,9 @@
-package top.spray.core.util;
+package top.spray.core.thread;
 
 import cn.hutool.core.util.HexUtil;
 import org.slf4j.MDC;
 import top.spray.core.engine.props.SprayData;
-
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
-import java.net.UnknownHostException;
-import java.util.Arrays;
+import top.spray.core.util.SpraySystemUtil;
 
 public class SprayThreadData extends SprayData {
     private static final ThreadLocal<SprayThreadData> THREAD_LOCAL = new ThreadLocal<>();

@@ -1,7 +1,7 @@
 package top.spray.engine.step.handler.filter;
 import com.alibaba.fastjson2.JSONObject;
 import top.spray.core.engine.props.SprayData;
-import top.spray.core.util.SprayFastJsonUtil;
+import top.spray.core.util.SprayDataUtil;
 import top.spray.core.util.SprayServiceUtil;
 import top.spray.engine.step.condition.SprayStepExecuteConditionFilter;
 import top.spray.engine.step.handler.SprayExecutorHandler;
@@ -18,7 +18,7 @@ public interface SprayStepExecuteConditionHelper extends SprayExecutorHandler {
         Map<String, SprayStepExecuteConditionHelper> filterHandlerMap =
                 SprayServiceUtil.loadServiceClassNameMapCache(
                         SprayStepExecuteConditionHelper.class);
-        JSONObject jsonObject = SprayFastJsonUtil.parseJson(SprayFastJsonUtil.toJson(stepData), JSONObject.class);
+        JSONObject jsonObject = SprayDataUtil.parseJson(SprayDataUtil.toJson(stepData), JSONObject.class);
         List<JSONObject> executeConditionFilter =
                 !jsonObject.containsKey("executeConditionFilter") ? new ArrayList<>(0) :
                         jsonObject.getList("executeConditionFilter", JSONObject.class);

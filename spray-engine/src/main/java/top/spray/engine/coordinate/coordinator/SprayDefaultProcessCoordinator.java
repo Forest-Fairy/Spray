@@ -4,11 +4,11 @@ import top.spray.core.engine.exception.SprayNotSupportError;
 import top.spray.core.engine.execute.SprayListenable;
 import top.spray.core.engine.execute.SprayStepActiveType;
 import top.spray.core.engine.props.SprayData;
-import top.spray.core.engine.result.SprayStatusType;
-import top.spray.core.engine.result.impl.SprayDataDispatchResultStatus;
+import top.spray.core.engine.status.SprayStatusType;
+import top.spray.core.engine.status.impl.SprayDataDispatchResultStatus;
 import top.spray.core.thread.SprayPoolExecutor;
-import top.spray.core.engine.result.impl.SprayStepStatus;
-import top.spray.core.engine.result.impl.SprayCoordinateStatus;
+import top.spray.core.engine.status.impl.SprayStepStatus;
+import top.spray.core.engine.status.impl.SprayCoordinateStatus;
 import top.spray.engine.prop.SprayVariableContainer;
 import top.spray.engine.step.condition.SprayStepExecuteConditionFilter;
 import top.spray.engine.step.executor.SprayExecutorListener;
@@ -186,10 +186,10 @@ public class SprayDefaultProcessCoordinator implements
 
     protected void setDispatchResult(SprayVariableContainer variables, SprayProcessStepExecutor fromExecutor, SprayData data, boolean still, boolean async,
                                      SprayProcessStepMeta nextMeta, SprayDataDispatchResultStatus dataDispatchStatus) {
-        // TODO get data result save strategies
+        // TODO get data status save strategies
     }
     protected SprayDataDispatchResultStatus getDispatchResult(String dataKey) {
-        // TODO get data result save strategies
+        // TODO get data status save strategies
     }
 
     private boolean validBeforeCreate(SprayVariableContainer variables, SprayProcessStepExecutor fromExecutor, SprayNextStepFilter stepFilter, SprayData data, boolean still, boolean dispatchAsync, SprayProcessStepMeta nodeMeta) {

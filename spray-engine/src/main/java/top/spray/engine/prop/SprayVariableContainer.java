@@ -1,26 +1,27 @@
 package top.spray.engine.prop;
 
 import top.spray.core.engine.props.SprayData;
+import top.spray.core.util.SprayDataUtil;
 import top.spray.engine.coordinate.coordinator.SprayProcessCoordinator;
 import top.spray.engine.step.executor.SprayProcessStepExecutor;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class SprayVariableContainer {
+    private final Map<String, SprayVariableContainer> ancestors;
+    private final Set<String> bannedKeys;
     private final String creator;
     private final long createTime;
     private final SprayData data;
     private final String key;
-
-    private final List<Listener> listeners;
 
     private SprayVariableContainer(String creator, long createTime, SprayData data, String key) {
         this.creator = creator;
         this.createTime = createTime;
         this.data = data;
         this.key = key;
-        this.listeners = new ArrayList<>();
+        this.ancestors = new HashMap<>(1);
+        this.bannedKeys = new HashSet<>(0);
     }
 
     public String creator() {
@@ -31,21 +32,33 @@ public class SprayVariableContainer {
         return createTime;
     }
 
-    public Object get(SprayProcessStepExecutor executor, String key) {
-        return data.get(key);
+
+    public Object get(SprayProcessStepExecutor lastExecutor, SprayProcessStepExecutor executor, String key) {
+        return this.get(lastExecutor, executor, key, Object.class);
     }
-    public String getString(SprayProcessStepExecutor executor, String key) {
-        return data.getString(key);
-    }
-    public <T> T get(SprayProcessStepExecutor executor, String key, Class<T> clazz) {
-        return data.get(key, clazz);
+    public String getJsonString(SprayProcessStepExecutor lastExecutor, SprayProcessStepExecutor executor, String key) {
+        Object o = this.get(lastExecutor, executor, key);
+        if (o == null) {
+            return null;
+        }
+        return SprayDataUtil.toJson(o);
     }
 
-    public <T> T getIfAbsent(SprayProcessStepExecutor executor, String key, T def) {
-        return data.getIfAbsent(key, def);
+    public <T> T get(SprayProcessStepExecutor lastExecutor, SprayProcessStepExecutor executor, String key, Class<T> clazz) {
+        // TODO compute value with ancestors
+
     }
 
-    public <T> T computeIfAbsent(SprayProcessStepExecutor executor, String key, T value) {
+    public <T> T getOrElse(SprayProcessStepExecutor lastExecutor, SprayProcessStepExecutor executor, String key, T def) {
+        Object o = this.get(lastExecutor, executor, key);
+        if (o == null) {
+            return def;
+        }
+
+        return o;
+    }
+
+    public <T> T computeIfAbsent(SprayProcessStepExecutor lastExecutor, SprayProcessStepExecutor executor, String key, T value) {
         if (value == null) {
             throw new IllegalArgumentException("can not compute with null");
         }
@@ -57,15 +70,13 @@ public class SprayVariableContainer {
         return o;
     }
 
-    public SprayVariableContainer set(SprayProcessStepExecutor executor, String key, Object value) {
-        data.put(key, value);
-        onSet(executor, key, value);
-        return this;
-    }
-
     public void remove(SprayProcessStepExecutor executor, String key) {
         data.remove(key);
-        onRemove(executor, key);
+    }
+
+    public SprayVariableContainer set(String key, Object value) {
+        data.put(key, value);
+        return this;
     }
 
     public String identityDataKey() {
@@ -76,22 +87,22 @@ public class SprayVariableContainer {
         return generateKey(lastExecutor, this, executor);
     }
 
-    private void registerListener(Listener listener) {
-        this.listeners.add(listener);
-    }
-    private void onSet(SprayProcessStepExecutor executor, String key, Object value) {
-        listeners.forEach(listener -> listener.onSet(executor, key, value));
-    }
-    private void onRemove(SprayProcessStepExecutor executor, String key) {
-        listeners.forEach(listener -> listener.onRemove(executor, key));
-    }
-
-    private void receiveSet(Listener listener, SprayProcessStepExecutor executor, String key, Object value) {
-        set(executor, key, value);
-    }
-    private void receiveRemove(Listener listener, SprayProcessStepExecutor executor, String key) {
-        remove(executor, key);
-    }
+//    private void registerListener(Listener listener) {
+//        this.listeners.add(listener);
+//    }
+//    private void onSet(SprayProcessStepExecutor executor, String key, Object value) {
+//        listeners.forEach(listener -> listener.onSet(executor, key, value));
+//    }
+//    private void onRemove(SprayProcessStepExecutor executor, String key) {
+//        listeners.forEach(listener -> listener.onRemove(executor, key));
+//    }
+//
+//    private void receiveSet(Listener listener, SprayProcessStepExecutor executor, String key, Object value) {
+//        set(executor, key, value);
+//    }
+//    private void receiveRemove(Listener listener, SprayProcessStepExecutor executor, String key) {
+//        remove(executor, key);
+//    }
 
 
 

@@ -1,7 +1,7 @@
 package top.spray.core.engine.props;
 
 import org.apache.commons.lang3.StringUtils;
-import top.spray.core.util.SprayFastJsonUtil;
+import top.spray.core.util.SprayDataUtil;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -45,7 +45,7 @@ public class SprayData implements Map<String, Object>, Serializable {
     }
 
     /**
-     * a get method witch requires the result is not null
+     * a get method witch requires the status is not null
      */
     public <T> T getNoneNull(final String key, final Class<T> clazz) {
         return this.getNoneNull(key, clazz, null);
@@ -62,59 +62,17 @@ public class SprayData implements Map<String, Object>, Serializable {
     }
 
     public <T> T get(final String key, final Class<T> clazz) {
-        return convertValue(inside.get(key), clazz);
+        return SprayDataUtil.convertValue(inside.get(key), clazz);
     }
 
-    public <T> T getIfAbsent(final String key, final T defaultValue) {
+    public <T> T getOrElse(final String key, final T defaultValue) {
         Object value = inside.get(key);
         if (value == null) {
             return defaultValue;
         } else {
             Class<?> tClass = Objects.requireNonNullElse(defaultValue, value).getClass();
-            return (T) convertValue(value, tClass);
+            return (T) SprayDataUtil.convertValue(value, tClass);
         }
-    }
-
-    private static <T> T convertValue(Object val, Class<T> tClass) {
-        if (val == null) {
-            return null;
-        } else if (tClass.isAssignableFrom(val.getClass())) {
-            return (T) val;
-        }
-        Object result = val;
-        if (String.class.isAssignableFrom(tClass)) {
-            result = val.toString();
-        } else {
-            String trimString;
-            try {
-                trimString = val.toString().trim();
-            } catch (Exception e) {
-                trimString = null;
-            }
-            if (Integer.class.isAssignableFrom(tClass)) {
-                result = Integer.valueOf(trimString);
-            } else if (Long.class.isAssignableFrom(tClass)) {
-                result = Long.valueOf(trimString);
-            } else if (Double.class.isAssignableFrom(tClass)) {
-                result = Double.valueOf(trimString);
-            } else if (Boolean.class.isAssignableFrom(tClass)) {
-                if ("f".equalsIgnoreCase(trimString)) {
-                    result = Boolean.FALSE;
-                } else if ("t".equalsIgnoreCase(trimString)) {
-                    result = Boolean.TRUE;
-                } else {
-                    result = Boolean.valueOf(trimString);
-                }
-            } else {
-                try {
-                    // TODO cast with value castor util
-                    result = tClass.getMethod("valueOf", String.class)
-                            .invoke(null, trimString);
-                } catch (Exception ignored) {
-                }
-            }
-        }
-        return tClass.cast(result);
     }
 
     public String getString(final String key) {
@@ -192,7 +150,7 @@ public class SprayData implements Map<String, Object>, Serializable {
         return toJson(false);
     }
     public String toJson(boolean pretty) {
-        return SprayFastJsonUtil.toJson(this, pretty);
+        return SprayDataUtil.toJson(this, pretty);
     }
 
     public static SprayData fromJson(String json) {
@@ -201,14 +159,14 @@ public class SprayData implements Map<String, Object>, Serializable {
         if (! json.startsWith("{") && ! json.endsWith("}")) {
             throw new RuntimeException("invalid json string");
         }
-        return SprayFastJsonUtil.parseToSprayData(json);
+        return SprayDataUtil.parseToSprayData(json);
     }
 
     public static SprayData deepCopy(Map<?, ?> map) {
         if (map == null) {
             return new SprayData();
         }
-        return SprayFastJsonUtil.parseToSprayData(SprayFastJsonUtil.toJson(map));
+        return SprayDataUtil.parseToSprayData(SprayDataUtil.toJson(map));
     }
 
 

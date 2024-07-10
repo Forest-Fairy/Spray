@@ -1,12 +1,12 @@
-package top.spray.core.engine.result.impl;
+package top.spray.core.engine.status.impl;
 
-import top.spray.core.engine.result.SprayStatusType;
+import top.spray.core.engine.status.SprayStatusType;
 
 public class SprayCoordinateStatus implements SprayStatusType {
     /** stop by human. need stop reason */
     public static final SprayCoordinateStatus STOP = new SprayCoordinateStatus("STOP", 2, "手动停止");
 
-    /** stop normally. need result message */
+    /** stop normally. need status message */
     public static final SprayCoordinateStatus SUCCESS = new SprayCoordinateStatus("SUCCESS", 1, "执行完成");
     /** running by default */
     public static final SprayCoordinateStatus RUNNING = new SprayCoordinateStatus("RUNNING", 0, "执行中");

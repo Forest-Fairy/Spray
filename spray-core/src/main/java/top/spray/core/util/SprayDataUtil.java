@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 import com.alibaba.fastjson2.*;
 import top.spray.core.engine.props.SprayData;
 
-public class SprayFastJsonUtil {
+public class SprayDataUtil {
     public static String toJson(Object bean) {
         return toJson(bean, false);
     }
@@ -64,7 +64,7 @@ public class SprayFastJsonUtil {
 
     public static List<SprayData> parseToSprayDataList(String jsonText) {
         List<SprayData> sprayData = JSON.parseArray(jsonText, SprayData.class);
-        return sprayData.stream().map(SprayFastJsonUtil::convertMapToSprayData).collect(Collectors.toList());
+        return sprayData.stream().map(SprayDataUtil::convertMapToSprayData).collect(Collectors.toList());
     }
 
     public static JSONPath createJsonPath(String jsonPath, JSONPath.Feature... features) {
@@ -78,6 +78,48 @@ public class SprayFastJsonUtil {
     }
 
 
+
+    public static <T> T convertValue(Object val, Class<T> tClass) {
+        if (val == null) {
+            return null;
+        } else if (tClass.isAssignableFrom(val.getClass())) {
+            return (T) val;
+        }
+        Object result = val;
+        if (String.class.isAssignableFrom(tClass)) {
+            result = val.toString();
+        } else {
+            String trimString;
+            try {
+                trimString = val.toString().trim();
+            } catch (Exception e) {
+                trimString = null;
+            }
+            if (Integer.class.isAssignableFrom(tClass)) {
+                result = Integer.valueOf(trimString);
+            } else if (Long.class.isAssignableFrom(tClass)) {
+                result = Long.valueOf(trimString);
+            } else if (Double.class.isAssignableFrom(tClass)) {
+                result = Double.valueOf(trimString);
+            } else if (Boolean.class.isAssignableFrom(tClass)) {
+                if ("f".equalsIgnoreCase(trimString)) {
+                    result = Boolean.FALSE;
+                } else if ("t".equalsIgnoreCase(trimString)) {
+                    result = Boolean.TRUE;
+                } else {
+                    result = Boolean.valueOf(trimString);
+                }
+            } else {
+                try {
+                    // TODO cast with value castor util
+                    result = tClass.getMethod("valueOf", String.class)
+                            .invoke(null, trimString);
+                } catch (Exception ignored) {
+                }
+            }
+        }
+        return tClass.cast(result);
+    }
 
 }
 

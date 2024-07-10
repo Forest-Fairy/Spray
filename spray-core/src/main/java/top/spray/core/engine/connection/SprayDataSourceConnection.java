@@ -15,7 +15,7 @@ public interface SprayDataSourceConnection<Conn> extends SprayConnection<Conn> {
 
     /**
      * query data by page
-     * @return a spray data iterator for the result data iterator
+     * @return a spray data iterator for the status data iterator
      * @throws Exception e
      */
     SprayPageData<?> readPage(int page, int pageSize, SprayQueryParams queryParams) throws Exception;

@@ -3,7 +3,7 @@ package top.spray.engine.coordinate.coordinator;
 import top.spray.core.engine.execute.SprayMetaDrive;
 import top.spray.core.engine.props.SprayData;
 import top.spray.core.thread.SprayPoolExecutor;
-import top.spray.core.engine.result.impl.SprayCoordinateStatus;
+import top.spray.core.engine.status.impl.SprayCoordinateStatus;
 import top.spray.engine.coordinate.meta.SprayProcessCoordinatorMeta;
 import top.spray.engine.factory.SprayExecutorFactory;
 import top.spray.engine.prop.SprayVariableContainer;
@@ -26,7 +26,7 @@ public interface SprayProcessCoordinator extends
     @Override
     default SprayCoordinateStatus get() {
         this.run();
-        // this method run after the run method so that can get the result status.
+        // this method run after the run method so that can get the status status.
         return status();
     }
     /** the execution method */
