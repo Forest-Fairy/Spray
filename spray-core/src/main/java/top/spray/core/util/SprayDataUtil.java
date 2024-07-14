@@ -79,7 +79,7 @@ public class SprayDataUtil {
 
 
 
-    public static <T> T convertValue(Object val, Class<T> tClass) {
+    public static <T> T convertValue(Object val, Class<? super T> tClass) {
         if (val == null) {
             return null;
         } else if (tClass.isAssignableFrom(val.getClass())) {
@@ -118,7 +118,7 @@ public class SprayDataUtil {
                 }
             }
         }
-        return tClass.cast(result);
+        return (T) tClass.cast(result);
     }
 
 }

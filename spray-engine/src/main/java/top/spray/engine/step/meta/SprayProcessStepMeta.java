@@ -25,6 +25,7 @@ public class SprayProcessStepMeta implements SprayBaseMeta<SprayProcessStepMeta>
     private String name;
     private SprayExecutorType executorType;
     private List<SprayProcessStepMeta> nextNodes;
+    private String executorGeneratorClass;
     private String executorClass;
     private String jarFiles;
 
@@ -58,6 +59,7 @@ public class SprayProcessStepMeta implements SprayBaseMeta<SprayProcessStepMeta>
         this.name = metaContainer.getNoneNull("stepName", String.class);
         this.executorType = SprayExecutorType.valueOf(metaContainer.getOrElse("executorType", "COMPUTE"));
         this.nextNodes = metaContainer.getList("nextNodes", SprayProcessStepMeta.class);
+        this.executorGeneratorClass = metaContainer.getOrElse("executorGeneratorClass", "");
         this.executorClass = metaContainer.getNoneNull("executorClass", String.class);
         this.jarFiles = metaContainer.getString("jarFiles");
         this.stepActiveType = SprayStepActiveType.valueOf(metaContainer.getOrElse("activeType", "ACTIVE").toUpperCase());
@@ -100,6 +102,12 @@ public class SprayProcessStepMeta implements SprayBaseMeta<SprayProcessStepMeta>
         return executeConditionFilters;
     }
 
+    /**
+     * the generator class must implement the interface SprayExecutorGenerator
+     */
+    public String executorGeneratorClass() {
+        return this.executorGeneratorClass;
+    }
     public String executorClass() {
         return this.executorClass;
     }

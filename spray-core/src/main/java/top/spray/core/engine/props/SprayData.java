@@ -94,21 +94,18 @@ public class SprayData implements Map<String, Object>, Serializable {
         if (ol instanceof List) {
             return (List<T>) ol;
         }
-
         try {
-            List<?> o = (List<?>) this.get(key);
+            List<?> o = (List<?>) ol;
             boolean useNew = false;
             List<T> list = new ArrayList<>(o.size());
             for (Object each : o) {
                 if (each == null) {
                     list.add(null);
-                } else if (each.getClass().isAssignableFrom(tClass)) {
-                    list.add((T) each);
                 } else {
                     if (!useNew) {
                         useNew = true;
                     }
-                    list.add(null);
+                    list.add(SprayDataUtil.convertValue(each, tClass));
                 }
             }
             return useNew ? list : (List<T>) o;

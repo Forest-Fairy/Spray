@@ -1,12 +1,14 @@
 package top.spray.engine.factory;
 
+import org.apache.commons.lang3.StringUtils;
 import top.spray.core.util.SprayClassLoader;
 import top.spray.engine.coordinate.coordinator.SprayProcessCoordinator;
+import top.spray.engine.exception.SprayExecutorInitError;
+import top.spray.engine.step.executor.SprayBaseStepExecutor;
 import top.spray.engine.step.executor.SprayProcessStepExecutor;
+import top.spray.engine.step.generator.SprayExecutorGenerator;
 import top.spray.engine.step.meta.SprayProcessStepMeta;
 import top.spray.engine.step.remoting.SprayRemoteStepExecutor;
-
-import java.lang.reflect.InvocationTargetException;
 
 public class SprayExecutorFactory {
     private SprayExecutorFactory() {}
@@ -21,23 +23,19 @@ public class SprayExecutorFactory {
         if (stepExecutor == null) {
             synchronized (coordinator) {
                 if ((stepExecutor = coordinator.getStepExecutor(stepMeta.getId())) == null) {
-                    try {
-                        SprayClassLoader sprayClassLoader = new SprayClassLoader(stepMeta.jarFiles());
-                        Class<?> executorClass = sprayClassLoader.loadClass(stepMeta.executorClass());
-                        stepExecutor = top.spray.engine.step.handler.create.SprayExecutorFactory.tryCreateExecutor(coordinator, stepMeta, executorClass, sprayClassLoader);
-                        if (stepExecutor == null) {
-                            stepExecutor = (SprayProcessStepExecutor) executorClass.getConstructor().newInstance();
-                            stepExecutor.setMeta(stepMeta);
-                            stepExecutor.setCoordinator(coordinator);
-                            stepExecutor.setClassLoader(sprayClassLoader);
-                            stepExecutor.initOnlyAtCreate();
-                        }
-
-                        Thread.currentThread().setContextClassLoader(sprayClassLoader);
-                    } catch (InstantiationException | IllegalAccessException | NoSuchMethodException |
-                             InvocationTargetException | ClassNotFoundException e) {
-                        throw new RuntimeException(e);
+                    SprayClassLoader sprayClassLoader = new SprayClassLoader(stepMeta.jarFiles());
+                    if (StringUtils.isNotBlank(stepMeta.executorGeneratorClass())) {
+                        // create by generator
+                        stepExecutor = SprayExecutorGenerator.generateExecutor(stepMeta.executorGeneratorClass(),
+                                coordinator, stepMeta, sprayClassLoader);
+                    } else {
+                        stepExecutor = CreateExecutor(stepMeta.executorClass(), coordinator, stepMeta, sprayClassLoader);
                     }
+                    Thread.currentThread().setContextClassLoader(sprayClassLoader);
+                    stepExecutor.setMeta(stepMeta);
+                    stepExecutor.setCoordinator(coordinator);
+                    stepExecutor.setClassLoader(sprayClassLoader);
+                    stepExecutor.initOnlyAtCreate();
                     coordinator.registerExecutor(executorNameKey, stepExecutor);
                 }
             }
@@ -46,7 +44,16 @@ public class SprayExecutorFactory {
     }
 
 
-    public static SprayRemoteStepExecutor createAdapter(SprayProcessStepExecutor stepExecutor) {
 
+
+    public static SprayProcessStepExecutor CreateExecutor(
+            String executorFullClassName, SprayProcessCoordinator coordinator,
+            SprayProcessStepMeta executorMeta, SprayClassLoader sprayClassLoader) {
+        try {
+            Class<?> executorClass = sprayClassLoader.loadClass(executorFullClassName);
+            return (SprayBaseStepExecutor) executorClass.getConstructor().newInstance();
+        } catch (Exception e) {
+            throw SprayExecutorInitError.errorWhenCreateExecutor(coordinator, executorMeta, e);
+        }
     }
 }

@@ -55,6 +55,6 @@ public interface SprayProcessCoordinator extends
     /**
      * unit method for executing
      */
-    void executeNext(SprayVariableContainer variables, SprayProcessStepExecutor nextStepExecutor, SprayProcessStepExecutor fromExecutor, SprayData data, boolean still);
+    void executeNext(SprayProcessStepExecutor nextStepExecutor, SprayVariableContainer lastVariables, SprayProcessStepExecutor fromExecutor, SprayData data, boolean still);
 
 }
