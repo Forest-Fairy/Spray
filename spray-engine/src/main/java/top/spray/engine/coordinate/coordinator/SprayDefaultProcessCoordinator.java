@@ -229,7 +229,7 @@ public class SprayDefaultProcessCoordinator implements
         List<CompletableFuture<Void>> futureResults = new ArrayList<>();
         for (SprayProcessStepMeta nodeMeta : nodes) {
             if (! validCoordinatorStatus()) {
-
+                continue;
             }
             if (! validateBeforeCreate(lastVariables, fromExecutor, stepFilter, data, still, dispatchAsync, nodeMeta)) {
                 continue;
@@ -256,9 +256,7 @@ public class SprayDefaultProcessCoordinator implements
     }
 
     private boolean validCoordinatorStatus() {
-        SprayCoordinateStatus status = this.status();
-        if (status)
-        return false;
+        return SprayCoordinateStatus.RUNNING.equals(this.status());
     }
 
 

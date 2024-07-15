@@ -72,17 +72,17 @@ public abstract class SprayBaseStepExecutor implements SprayProcessStepExecutor 
         return this.stepResult;
     }
 
-    protected void publishData(SprayData processData, SprayData data, boolean still) {
-        this.publishData(processData, data, still, null);
+    protected void publishData(SprayVariableContainer variableContainer, SprayData data, boolean still) {
+        this.publishData(variableContainer, data, still, null);
     }
-    protected void publishData(SprayData processData, SprayData data, boolean still, SprayNextStepFilter stepFilter) {
-        this.getCoordinator().dispatch(processData, this, stepFilter, data, still, false);
+    protected void publishData(SprayVariableContainer variableContainer, SprayData data, boolean still, SprayNextStepFilter stepFilter) {
+        this.getCoordinator().dispatch(variableContainer, this, stepFilter, data, still, false);
     }
-    protected void publishDataAsync(SprayData processData, SprayData data, boolean still) {
-        this.publishDataAsync(processData, data, still, null);
+    protected void publishDataAsync(SprayVariableContainer variableContainer, SprayData data, boolean still) {
+        this.publishDataAsync(variableContainer, data, still, null);
     }
-    protected void publishDataAsync(SprayData processData, SprayData data, boolean still, SprayNextStepFilter stepFilter) {
-        this.getCoordinator().dispatch(processData, this, stepFilter, data, still, true);
+    protected void publishDataAsync(SprayVariableContainer variableContainer, SprayData data, boolean still, SprayNextStepFilter stepFilter) {
+        this.getCoordinator().dispatch(variableContainer, this, stepFilter, data, still, true);
     }
 
     @Override
