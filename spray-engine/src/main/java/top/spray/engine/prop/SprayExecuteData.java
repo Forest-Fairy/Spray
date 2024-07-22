@@ -6,8 +6,7 @@ import top.spray.engine.step.executor.SprayProcessStepExecutor;
 
 public class SprayExecuteData {
     public static SprayExecuteData of(SprayProcessStepExecutor fromExecutor, SprayData data) {
-        return new SprayExecuteData(fromExecutor.getCoordinator()
-                .getExecutorNameKey(fromExecutor.getMeta()), data);
+        return new SprayExecuteData(fromExecutor.getExecutorNameKey(), data);
     }
     private final String dataKey;
     private final SprayData data;

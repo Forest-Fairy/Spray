@@ -7,11 +7,14 @@ import top.spray.core.engine.execute.SprayExecutorType;
 import top.spray.core.engine.execute.SprayStepActiveType;
 import top.spray.core.engine.meta.SprayBaseMeta;
 import top.spray.core.engine.props.SprayData;
+import top.spray.engine.coordinate.coordinator.SprayProcessCoordinator;
+import top.spray.engine.factory.SprayExecutorFactory;
 import top.spray.engine.step.condition.SprayStepExecuteConditionFilter;
 import top.spray.engine.step.handler.filter.SprayStepExecuteConditionHelper;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 节点引擎
@@ -23,6 +26,7 @@ public class SprayProcessStepMeta implements SprayBaseMeta<SprayProcessStepMeta>
     /* base meta */
     private String id;
     private String name;
+    private String executorNameKey;
     private SprayExecutorType executorType;
     private List<SprayProcessStepMeta> nextNodes;
     private String executorGeneratorClass;
@@ -41,7 +45,11 @@ public class SprayProcessStepMeta implements SprayBaseMeta<SprayProcessStepMeta>
     private boolean rollbackIfError;
     private boolean ignoreError;
     private boolean isAsync;
+    private int coreThreadCount;
     private int maxThreadCount;
+    private int queueCapacity;
+    private int threadAliveTime;
+    private TimeUnit threadAliveTimeUnit;
     private int varCopy;
     private Collection<SprayStepExecuteConditionFilter> executeConditionFilters;
 
@@ -68,7 +76,11 @@ public class SprayProcessStepMeta implements SprayBaseMeta<SprayProcessStepMeta>
         // only effect when rollbackIfError is false
         this.ignoreError = (!this.rollbackIfError) && (metaContainer.getOrElse("ignoreError", false));
         this.isAsync = metaContainer.getOrElse("isAsync", false);
-        this.maxThreadCount = metaContainer.getOrElse("maxThreadCount", 1);
+        this.coreThreadCount = metaContainer.getOrElse("coreThreadCount", 5);
+        this.maxThreadCount = Math.max(this.coreThreadCount, metaContainer.getOrElse("maxThreadCount", 10));
+        this.queueCapacity = metaContainer.getOrElse("queueCapacity", 20);
+        this.threadAliveTime = metaContainer.getOrElse("threadAliveTime", 30);
+        this.threadAliveTimeUnit = TimeUnit.valueOf(metaContainer.getOrElse("threadAliveTimeUnit", "SECONDS"));
         this.varCopy = metaContainer.getOrElse("varCopy", 0);
         this.executeConditionFilters = SprayStepExecuteConditionHelper.createFilters(this.metaContainer);
     }
@@ -82,6 +94,12 @@ public class SprayProcessStepMeta implements SprayBaseMeta<SprayProcessStepMeta>
     @Override
     public String getName() {
         return this.name;
+    }
+
+    public String getExecutorNameKey(SprayProcessCoordinator coordinator) {
+        return executorNameKey == null ?
+                (executorNameKey = SprayExecutorFactory.getExecutorNameKey(coordinator, this))
+                : executorNameKey;
     }
 
     public SprayExecutorType getExecutorType() {
@@ -144,8 +162,24 @@ public class SprayProcessStepMeta implements SprayBaseMeta<SprayProcessStepMeta>
         return this.isAsync;
     }
 
+    public int coreThreadCount() {
+        return coreThreadCount;
+    }
+
     public int maxThreadCount() {
-        return this.maxThreadCount;
+        return maxThreadCount;
+    }
+
+    public int queueCapacity() {
+        return queueCapacity;
+    }
+
+    public int threadAliveTime() {
+        return threadAliveTime;
+    }
+
+    public TimeUnit threadAliveTimeUnit() {
+        return threadAliveTimeUnit;
     }
 
     /**

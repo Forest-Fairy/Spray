@@ -1,5 +1,7 @@
 package top.spray.core.intelligence.annotation;
 
+import top.spray.core.config.util.SpraySystemConfigurations;
+
 import java.lang.annotation.*;
 
 /**
@@ -10,7 +12,7 @@ import java.lang.annotation.*;
 @Inherited
 @Target(ElementType.TYPE)
 public @interface SprayAutoAnalyse {
-    /** empty means {@link top.spray.core.util.SpraySystemUtil#getSystemVersion()} */
+    /** empty means {@link SpraySystemConfigurations#getSystemVersion()} */
     String version() default "";
     /** Priority is annotation > doc comment > className  */
     String description() default "";

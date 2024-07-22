@@ -2,10 +2,7 @@ package top.spray.engine.step.condition;
 
 import top.spray.core.engine.props.SprayData;
 import top.spray.engine.step.executor.SprayProcessStepExecutor;
-import top.spray.engine.step.handler.SprayExecutorHandler;
 import top.spray.engine.step.meta.SprayProcessStepMeta;
-
-import java.util.Collection;
 
 /**
  * reg the executor that can be executed
@@ -20,6 +17,6 @@ public interface SprayStepExecuteConditionFilter {
      * @param stepMetaForExecuting target step's meta
      * @return false means pass
      */
-    boolean filter(SprayProcessStepExecutor fromExecutor, SprayData data, boolean still, SprayProcessStepMeta stepMetaForExecuting);
+    boolean executableForMe(SprayProcessStepExecutor fromExecutor, SprayData data, boolean still, SprayProcessStepMeta stepMetaForExecuting);
 
 }

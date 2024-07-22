@@ -1,5 +1,8 @@
 package top.spray.core.engine.status;
 
+import top.spray.core.engine.status.impl.SprayDataDispatchResultStatus;
+
+import java.util.List;
 import java.util.Objects;
 
 public interface SprayStatusType {
@@ -22,5 +25,23 @@ public interface SprayStatusType {
             return holder.equals(statusType1);
         }
         return Objects.equals(statusType1, statusType2);
+    }
+
+
+    static <T extends SprayStatusType> T get(List<T> values, int code) {
+        for (T value : values) {
+            if (value.getCode() == code) {
+                return value;
+            }
+        }
+        return null;
+    }
+    static <T extends SprayStatusType> T get(List<T> values, String typeName) {
+        for (T value : values) {
+            if (value.typeName().equals(typeName)) {
+                return value;
+            }
+        }
+        return null;
     }
 }

@@ -18,42 +18,36 @@ public class SprayExecutorFactory {
     }
     public static SprayProcessStepExecutor create(
             SprayProcessCoordinator coordinator, SprayProcessStepMeta stepMeta) {
-        String executorNameKey = getExecutorNameKey(coordinator, stepMeta);
-        SprayProcessStepExecutor stepExecutor = coordinator.getStepExecutor(executorNameKey);
-        if (stepExecutor == null) {
-            synchronized (coordinator) {
-                if ((stepExecutor = coordinator.getStepExecutor(stepMeta.getId())) == null) {
-                    SprayClassLoader sprayClassLoader = new SprayClassLoader(stepMeta.jarFiles());
-                    if (StringUtils.isNotBlank(stepMeta.executorGeneratorClass())) {
-                        // create by generator
-                        stepExecutor = SprayExecutorGenerator.generateExecutor(stepMeta.executorGeneratorClass(),
-                                coordinator, stepMeta, sprayClassLoader);
-                    } else {
-                        stepExecutor = CreateExecutor(stepMeta.executorClass(), coordinator, stepMeta, sprayClassLoader);
-                    }
-                    Thread.currentThread().setContextClassLoader(sprayClassLoader);
-                    stepExecutor.setMeta(stepMeta);
-                    stepExecutor.setCoordinator(coordinator);
-                    stepExecutor.setClassLoader(sprayClassLoader);
-                    stepExecutor.initOnlyAtCreate();
-                    coordinator.registerExecutor(executorNameKey, stepExecutor);
-                }
-            }
+        SprayProcessStepExecutor stepExecutor;
+        SprayClassLoader sprayClassLoader = new SprayClassLoader(stepMeta.jarFiles(),
+                // all executors' classloader should be created with the same classloader
+                // which create the coordinator
+                coordinator.getCreatorThreadClassLoader());
+        if (StringUtils.isNotBlank(stepMeta.executorGeneratorClass())) {
+            // create by generator
+            stepExecutor = SprayExecutorGenerator.generateExecutor(stepMeta.executorGeneratorClass(),
+                    coordinator, stepMeta, sprayClassLoader);
+        } else {
+            stepExecutor = CreateExecutor(stepMeta.executorClass(), coordinator, stepMeta, sprayClassLoader);
         }
+        stepExecutor.setMeta(stepMeta);
+        stepExecutor.setCoordinator(coordinator);
+        stepExecutor.setClassLoader(sprayClassLoader);
+        stepExecutor.initOnlyAtCreate();
         return stepExecutor;
     }
 
 
 
 
-    public static SprayProcessStepExecutor CreateExecutor(
+    private static SprayProcessStepExecutor CreateExecutor(
             String executorFullClassName, SprayProcessCoordinator coordinator,
             SprayProcessStepMeta executorMeta, SprayClassLoader sprayClassLoader) {
         try {
             Class<?> executorClass = sprayClassLoader.loadClass(executorFullClassName);
             return (SprayBaseStepExecutor) executorClass.getConstructor().newInstance();
         } catch (Exception e) {
-            throw SprayExecutorInitError.errorWhenCreateExecutor(coordinator, executorMeta, e);
+            throw new SprayExecutorInitError(coordinator, executorMeta, e);
         }
     }
 }

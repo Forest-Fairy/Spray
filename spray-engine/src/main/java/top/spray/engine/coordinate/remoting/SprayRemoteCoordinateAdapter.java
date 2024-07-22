@@ -7,6 +7,7 @@ import top.spray.engine.coordinate.meta.SprayProcessCoordinatorMeta;
 import top.spray.engine.step.condition.SprayNextStepFilter;
 import top.spray.engine.step.executor.SprayProcessStepExecutor;
 import top.spray.engine.step.instance.SprayStepResultInstance;
+import top.spray.engine.step.meta.SprayProcessStepMeta;
 
 /**
  * this coordinator will be created by remote
@@ -51,7 +52,7 @@ public class SprayRemoteCoordinateAdapter implements SprayServerProcessCoordinat
     }
 
     @Override
-    public SprayProcessStepExecutor getStepExecutor(String executorId) {
+    public SprayProcessStepExecutor getStepExecutor(SprayProcessStepMeta executorMeta) {
         return null;
     }
 

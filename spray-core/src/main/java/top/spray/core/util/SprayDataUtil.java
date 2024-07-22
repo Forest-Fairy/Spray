@@ -82,7 +82,7 @@ public class SprayDataUtil {
     public static <T> T convertValue(Object val, Class<? super T> tClass) {
         if (val == null) {
             return null;
-        } else if (tClass.isAssignableFrom(val.getClass())) {
+        } else if (tClass.isInstance(val)) {
             return (T) val;
         }
         Object result = val;

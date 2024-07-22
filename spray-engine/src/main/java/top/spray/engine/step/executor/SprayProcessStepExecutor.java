@@ -2,10 +2,10 @@ package top.spray.engine.step.executor;
 
 import top.spray.core.engine.execute.SprayMetaDrive;
 import top.spray.core.engine.props.SprayData;
+import top.spray.core.thread.SprayPoolExecutor;
 import top.spray.core.util.SprayClassLoader;
 import top.spray.engine.coordinate.coordinator.SprayProcessCoordinator;
 import top.spray.engine.prop.SprayVariableContainer;
-import top.spray.engine.step.executor.type.SprayReaderExecutorType;
 import top.spray.engine.step.instance.SprayStepResultInstance;
 import top.spray.engine.step.meta.SprayProcessStepMeta;
 
@@ -13,7 +13,9 @@ import top.spray.engine.step.meta.SprayProcessStepMeta;
  * Define the executor of a process node
  */
 public interface SprayProcessStepExecutor extends SprayMetaDrive<SprayProcessStepMeta> {
-    String getExecutorNameKey();
+    default String getExecutorNameKey() {
+        return getCoordinator().getExecutorNameKey(this);
+    }
     void initOnlyAtCreate();
     long getCreateTime();
 
@@ -40,20 +42,21 @@ public interface SprayProcessStepExecutor extends SprayMetaDrive<SprayProcessSte
 
     /**
      * an execution method which won't throw exception
-     * @param processData the processData belongs to current executor
+     * @param variables the variables belong to current executor
      * @param fromExecutor the last executor
      * @param data data published by the last executor
      * @param still does it still have data to publish
      */
     void execute(SprayVariableContainer variables, SprayProcessStepExecutor fromExecutor, SprayData data, boolean still);
 
-
     /**
-     * need auto run next nodes without data by coordinator <br>
-     *  return false if the executor will publish data by itself
+     * @return
+     *  0 -> no <br>
+     *  1 -> easy <br>
+     *  2 -> deep
      */
-    default boolean autoRunNext() {
-        // if the executor is reader, it should run next nodes by publishing its data
-        return ! (this instanceof SprayReaderExecutorType);
-    }
+    int varCopyMode();
+
+    SprayPoolExecutor getThreadPoll();
+
 }

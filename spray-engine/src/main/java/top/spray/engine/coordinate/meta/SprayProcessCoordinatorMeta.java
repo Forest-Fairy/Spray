@@ -11,12 +11,12 @@ public interface SprayProcessCoordinatorMeta extends SprayBaseMeta<SprayProcessC
     String getId();
     String getName();
     String transactionId();
-    int minThreadCount();
     boolean asyncSupport();
+
+    String dataDispatchResultHandler();
 
     /** the execute host if the process is remote task */
     String getCoordinatorHost();
-
 
     /** the default variables for the process */
     SprayData getDefaultProcessData();

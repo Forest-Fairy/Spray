@@ -13,5 +13,5 @@ public interface SprayNextStepFilter {
      * @param nextStepMeta next step's meta
      * @return false means skip
      */
-    boolean canBeExecute(SprayProcessStepExecutor current, SprayData data, boolean still, SprayProcessStepMeta nextStepMeta);
+    boolean executableForNext(SprayProcessStepExecutor current, SprayData data, boolean still, SprayProcessStepMeta nextStepMeta);
 }

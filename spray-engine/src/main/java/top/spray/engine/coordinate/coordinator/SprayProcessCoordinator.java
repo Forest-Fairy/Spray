@@ -2,7 +2,6 @@ package top.spray.engine.coordinate.coordinator;
 
 import top.spray.core.engine.execute.SprayMetaDrive;
 import top.spray.core.engine.props.SprayData;
-import top.spray.core.thread.SprayPoolExecutor;
 import top.spray.core.engine.status.impl.SprayCoordinateStatus;
 import top.spray.engine.coordinate.meta.SprayProcessCoordinatorMeta;
 import top.spray.engine.factory.SprayExecutorFactory;
@@ -36,21 +35,18 @@ public interface SprayProcessCoordinator extends
     /** the coordinator's status: none-blocked method  */
     SprayCoordinateStatus status();
 
-    /** the spray pooled executor */
-    SprayPoolExecutor getSprayPoolExecutor();
-
-
-    default String getExecutorNameKey(SprayProcessStepMeta executorMeta) {
-        return SprayExecutorFactory.getExecutorNameKey(this, executorMeta);
+    default String getExecutorNameKey(SprayProcessStepExecutor executor) {
+        return executor.getMeta().getExecutorNameKey(this);
     }
-    /** register the executor by this way */
-    void registerExecutor(String executorId, SprayProcessStepExecutor executor);
+
+    ClassLoader getCreatorThreadClassLoader();
+
     /** the only way to get the executor */
-    SprayProcessStepExecutor getStepExecutor(String executorId);
+    SprayProcessStepExecutor getStepExecutor(SprayProcessStepMeta executorMeta);
     int createExecutorCount();
 
     /** a method for executor to publish its data */
-    void dispatch(SprayVariableContainer variables, SprayProcessStepExecutor fromExecutor, SprayNextStepFilter stepFilter, SprayData data, boolean still, boolean dispatchAsync);
+    void dispatch(SprayVariableContainer variables, SprayProcessStepExecutor fromExecutor, SprayNextStepFilter stepFilter, SprayData data, boolean still);
 
     /**
      * unit method for executing

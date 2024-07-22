@@ -2,7 +2,26 @@ package top.spray.core.engine.status.impl;
 
 import top.spray.core.engine.status.SprayStatusType;
 
+import java.util.List;
+
 public class SprayDataDispatchResultStatus implements SprayStatusType {
+    private static final List<SprayDataDispatchResultStatus> values = List.of(
+            SprayDataDispatchResultStatus.SUCCESS,
+            SprayDataDispatchResultStatus.ABANDONED,
+            SprayDataDispatchResultStatus.SKIPPED,
+            SprayDataDispatchResultStatus.FILTERED,
+            SprayDataDispatchResultStatus.FAILED,
+            SprayDataDispatchResultStatus.ERROR
+    );
+    public static List<SprayDataDispatchResultStatus> values() {
+        return values;
+    }
+    public static SprayDataDispatchResultStatus get(int code) {
+        return SprayStatusType.get(values(), code);
+    }
+    public static SprayDataDispatchResultStatus get(String typeName) {
+        return SprayStatusType.get(values(), typeName);
+    }
 
     /** successfully execute with step */
     public static final SprayDataDispatchResultStatus SUCCESS = new SprayDataDispatchResultStatus("SUCCESS", 1, "执行完成");

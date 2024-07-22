@@ -1,9 +1,9 @@
 package top.spray.core.util;
 
 import cn.hutool.core.io.FileUtil;
+import top.spray.core.i18n.SprayUtf8s;
 
 import java.io.File;
-import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -62,7 +62,7 @@ public class SprayClassInfoUtil {
                 baseDir += "/";
             }
         }
-        return FileUtil.writeBytes(code.getBytes(StandardCharsets.UTF_8),
+        return FileUtil.writeBytes(code.getBytes(SprayUtf8s.Charset),
                 new File(baseDir + fullClassName.replace(".", "/") + ".java"));
     }
 

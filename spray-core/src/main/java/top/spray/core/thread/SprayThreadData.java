@@ -3,7 +3,7 @@ package top.spray.core.thread;
 import cn.hutool.core.util.HexUtil;
 import org.slf4j.MDC;
 import top.spray.core.engine.props.SprayData;
-import top.spray.core.util.SpraySystemUtil;
+import top.spray.core.config.util.SpraySystemConfigurations;
 
 public class SprayThreadData extends SprayData {
     private static final ThreadLocal<SprayThreadData> THREAD_LOCAL = new ThreadLocal<>();
@@ -29,7 +29,7 @@ public class SprayThreadData extends SprayData {
         super.putAll(MDC.getCopyOfContextMap());
         super.put("tid", String.valueOf(Thread.currentThread().getId()));
         super.put("transaction", HexUtil.encodeHexStr(
-                SpraySystemUtil.Const.MAC_ADDRESS + SEPARATOR +
+                SpraySystemConfigurations.macAddress() + SEPARATOR +
                         Thread.currentThread().getId() + SEPARATOR +
                         System.currentTimeMillis()) + SEPARATOR +
                         System.nanoTime());
