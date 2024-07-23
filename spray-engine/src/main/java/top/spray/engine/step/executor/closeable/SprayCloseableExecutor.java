@@ -1,7 +1,7 @@
 package top.spray.engine.step.executor.closeable;
 
 import top.spray.core.engine.props.SprayData;
-import top.spray.engine.exception.SprayExecuteError;
+import top.spray.engine.exception.SprayExecuteException;
 import top.spray.engine.prop.SprayVariableContainer;
 import top.spray.engine.step.executor.SprayBaseStepExecutor;
 import top.spray.engine.step.executor.SprayProcessStepExecutor;
@@ -11,7 +11,7 @@ public abstract class SprayCloseableExecutor extends SprayBaseStepExecutor {
 
     abstract boolean timeToClose(SprayVariableContainer variables, SprayProcessStepExecutor fromExecutor, SprayData data, boolean still);
 
-    abstract void close();
+    abstract void close(SprayVariableContainer variables, SprayProcessStepExecutor fromExecutor, SprayData data, boolean still);
 
     abstract void closeFailed(Throwable throwable);
     @Override
@@ -21,7 +21,7 @@ public abstract class SprayCloseableExecutor extends SprayBaseStepExecutor {
             try {
                 close();
             } catch (Throwable throwable) {
-                closeFailed(new SprayExecuteError(
+                closeFailed(new SprayExecuteException(
                         this, throwable, "close failed"));
             }
         }

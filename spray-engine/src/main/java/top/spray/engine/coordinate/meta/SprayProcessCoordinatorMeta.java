@@ -24,4 +24,6 @@ public interface SprayProcessCoordinatorMeta extends SprayBaseMeta<SprayProcessC
     List<SprayProcessStepMeta> getStartNodes();
 
     List<SprayData> getDefaultDataList();
+
+    String getGeneratorClass();
 }

@@ -1,6 +1,7 @@
 package top.spray.core.i18n;
 
 import top.spray.core.util.SprayServiceUtil;
+import top.spray.core.util.SprayUtf8s;
 
 import java.util.*;
 
@@ -27,7 +28,7 @@ public interface Spray_i18n {
         Spray_i18n i18n = I18N.get(clazz.getName());
         if (i18n != null) {
             String bundleName = i18n.getBundleName();
-            if (!bundleName.startsWith(BUNDLE_PREFIX)) {
+            if (! bundleName.startsWith(BUNDLE_PREFIX)) {
                 bundleName = BUNDLE_PREFIX + bundleName;
             }
             ResourceBundle resourceBundle = ResourceBundle.getBundle(

@@ -24,12 +24,14 @@ public interface SprayDataDispatchResultHandler {
     }
 
     boolean canDeal(SprayProcessCoordinatorMeta coordinatorMeta);
-    String computeDataKey(SprayProcessCoordinator coordinator, SprayVariableContainer variables,
+    String computeDataKey(SprayProcessCoordinatorMeta coordinatorMeta, SprayVariableContainer variables,
                           SprayProcessStepExecutor fromExecutor, SprayData data, boolean still,
                           SprayProcessStepMeta nextMeta);
-    void setDispatchResult(SprayProcessCoordinator coordinator, SprayVariableContainer variables,
+    void setDispatchResult(SprayProcessCoordinatorMeta coordinatorMeta, SprayVariableContainer variables,
                            SprayProcessStepExecutor fromExecutor, SprayData data, boolean still,
                            SprayProcessStepMeta nextMeta, String dataKey, SprayDataDispatchResultStatus dataDispatchStatus) ;
-    List<SprayDataDispatchResultStatus> getDispatchResult(SprayProcessCoordinator coordinator, String dataKey);
+    List<SprayDataDispatchResultStatus> getDispatchResult(SprayProcessCoordinatorMeta coordinatorMeta, String dataKey);
+
+    void whenCoordinatorShutdown(SprayProcessCoordinatorMeta coordinatorMeta);
 
 }

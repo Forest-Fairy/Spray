@@ -1,7 +1,6 @@
 package top.spray.core.util;
 
 import cn.hutool.core.io.FileUtil;
-import top.spray.core.i18n.SprayUtf8s;
 
 import java.io.File;
 import java.util.HashSet;

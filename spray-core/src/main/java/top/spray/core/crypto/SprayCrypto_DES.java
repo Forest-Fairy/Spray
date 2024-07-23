@@ -2,7 +2,7 @@ package top.spray.core.crypto;
 
 import cn.hutool.core.lang.Assert;
 import cn.hutool.crypto.symmetric.DES;
-import top.spray.core.i18n.SprayUtf8s;
+import top.spray.core.util.SprayUtf8s;
 
 public class SprayCrypto_DES implements SprayCrypto {
 

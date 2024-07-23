@@ -8,6 +8,7 @@ import top.spray.core.engine.execute.SprayStepActiveType;
 import top.spray.core.engine.meta.SprayBaseMeta;
 import top.spray.core.engine.props.SprayData;
 import top.spray.engine.coordinate.coordinator.SprayProcessCoordinator;
+import top.spray.engine.coordinate.meta.SprayProcessCoordinatorMeta;
 import top.spray.engine.factory.SprayExecutorFactory;
 import top.spray.engine.step.condition.SprayStepExecuteConditionFilter;
 import top.spray.engine.step.handler.filter.SprayStepExecuteConditionHelper;
@@ -45,6 +46,7 @@ public class SprayProcessStepMeta implements SprayBaseMeta<SprayProcessStepMeta>
     private boolean rollbackIfError;
     private boolean ignoreError;
     private boolean isAsync;
+    private boolean isRemoting;
     private int coreThreadCount;
     private int maxThreadCount;
     private int queueCapacity;
@@ -76,6 +78,7 @@ public class SprayProcessStepMeta implements SprayBaseMeta<SprayProcessStepMeta>
         // only effect when rollbackIfError is false
         this.ignoreError = (!this.rollbackIfError) && (metaContainer.getOrElse("ignoreError", false));
         this.isAsync = metaContainer.getOrElse("isAsync", false);
+        this.isRemoting = metaContainer.getOrElse("isRemoting", false);
         this.coreThreadCount = metaContainer.getOrElse("coreThreadCount", 5);
         this.maxThreadCount = Math.max(this.coreThreadCount, metaContainer.getOrElse("maxThreadCount", 10));
         this.queueCapacity = metaContainer.getOrElse("queueCapacity", 20);
@@ -96,9 +99,9 @@ public class SprayProcessStepMeta implements SprayBaseMeta<SprayProcessStepMeta>
         return this.name;
     }
 
-    public String getExecutorNameKey(SprayProcessCoordinator coordinator) {
+    public String getExecutorNameKey(SprayProcessCoordinatorMeta coordinatorMeta) {
         return executorNameKey == null ?
-                (executorNameKey = SprayExecutorFactory.getExecutorNameKey(coordinator, this))
+                (executorNameKey = SprayExecutorFactory.getExecutorNameKey(coordinatorMeta, this))
                 : executorNameKey;
     }
 
@@ -162,6 +165,11 @@ public class SprayProcessStepMeta implements SprayBaseMeta<SprayProcessStepMeta>
         return this.isAsync;
     }
 
+    /** enable remoting execute */
+    public boolean isRemoting() {
+        return this.isRemoting;
+    }
+
     public int coreThreadCount() {
         return coreThreadCount;
     }
@@ -219,5 +227,4 @@ public class SprayProcessStepMeta implements SprayBaseMeta<SprayProcessStepMeta>
     public SprayData getMetaContainer() {
         return metaContainer;
     }
-
 }

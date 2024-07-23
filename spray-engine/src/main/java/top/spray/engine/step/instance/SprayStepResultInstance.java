@@ -6,6 +6,7 @@ import top.spray.core.engine.props.SprayData;
 import top.spray.core.engine.status.SprayStatusType;
 import top.spray.core.engine.status.SprayStatusHolder;
 import top.spray.engine.coordinate.coordinator.SprayProcessCoordinator;
+import top.spray.engine.coordinate.meta.SprayProcessCoordinatorMeta;
 import top.spray.engine.step.executor.SprayProcessStepExecutor;
 import top.spray.core.engine.status.impl.SprayStepStatus;
 import top.spray.engine.step.meta.SprayProcessStepMeta;
@@ -20,10 +21,9 @@ import java.util.concurrent.atomic.LongAdder;
  * the step status instance
  *  - create by an executor with the only instance
  */
-public class SprayStepResultInstance implements SprayMetaDrive<SprayProcessStepMeta> {
-    private final SprayProcessCoordinator coordinator;
-    private final SprayProcessStepExecutor executor;
-    private final SprayProcessStepMeta stepMeta;
+public class SprayStepResultInstance {
+    private final SprayProcessCoordinatorMeta coordinatorMeta;
+    private final SprayProcessStepMeta executorMeta;
     private final LongAdder runningCounter;
     private SprayStatusHolder stepStatus;
     /**
@@ -41,10 +41,9 @@ public class SprayStepResultInstance implements SprayMetaDrive<SprayProcessStepM
     private long startTime;
     private long endTime;
 
-    public SprayStepResultInstance(SprayProcessCoordinator coordinator, SprayProcessStepExecutor executor) {
-        this.coordinator = coordinator;
-        this.executor = executor;
-        this.stepMeta = executor.getMeta();
+    public SprayStepResultInstance(SprayProcessCoordinatorMeta coordinatorMeta, SprayProcessStepMeta executorMeta) {
+        this.coordinatorMeta = coordinatorMeta;
+        this.executorMeta = executorMeta;
         this.runningCounter = new LongAdder();
         init();
     }
@@ -53,20 +52,20 @@ public class SprayStepResultInstance implements SprayMetaDrive<SprayProcessStepM
         this.errorList = new ArrayList<>(0);
         this.inputInfos = new ConcurrentHashMap<>(0);
         this.outputInfos = new ConcurrentHashMap<>(0);
-        this.dataRecordStrategy = executor.getMeta()
+        this.dataRecordStrategy = executorMeta
                 .getString("dataRecordStrategy", "NONE").toUpperCase();
     }
-    public SprayProcessStepExecutor getExecutor() {
-        return this.executor;
+
+    public SprayProcessCoordinatorMeta getCoordinatorMeta() {
+        return this.coordinatorMeta;
     }
 
-    @Override
-    public SprayProcessStepMeta getMeta() {
-        return this.stepMeta;
+    public SprayProcessStepMeta getExecutorMeta() {
+        return this.executorMeta;
     }
 
     public String transactionId() {
-        return coordinator.getMeta().transactionId();
+        return coordinatorMeta.transactionId();
     }
 
 

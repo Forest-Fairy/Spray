@@ -8,11 +8,14 @@ import com.alibaba.fastjson2.*;
 import top.spray.core.engine.props.SprayData;
 
 public class SprayDataUtil {
-    public static String toJson(Object bean) {
-        return toJson(bean, false);
+    public static String toJson(Object obj) {
+        return toJson(obj, false);
     }
-    public static String toJson(Object bean, boolean pretty) {
-        return pretty ? JSON.toJSONString(bean, JSONWriter.Feature.PrettyFormat) : JSON.toJSONString(bean);
+    public static String toJson(Object obj, boolean pretty) {
+        if (obj == null) {
+            return null;
+        }
+        return pretty ? JSON.toJSONString(obj, JSONWriter.Feature.PrettyFormat) : JSON.toJSONString(obj);
     }
     private static <T> boolean isSprayDataClass(Class<T> tClass) {
         return SprayData.class.isAssignableFrom(tClass);
@@ -25,7 +28,7 @@ public class SprayDataUtil {
 
 
     public static SprayData parseToSprayData(String jsonText) {
-        SprayData sprayData = JSON.parseObject(jsonText, SprayData.class);
+        SprayData sprayData = jsonText == null ? null : JSON.parseObject(jsonText, SprayData.class);
         return convertMapToSprayData(sprayData);
     }
     private static SprayData convertMapToSprayData(Map<?, ?> map) {
@@ -63,8 +66,8 @@ public class SprayDataUtil {
     }
 
     public static List<SprayData> parseToSprayDataList(String jsonText) {
-        List<SprayData> sprayData = JSON.parseArray(jsonText, SprayData.class);
-        return sprayData.stream().map(SprayDataUtil::convertMapToSprayData).collect(Collectors.toList());
+        List<SprayData> sprayData = jsonText == null ? null : JSON.parseArray(jsonText, SprayData.class);
+        return sprayData == null ? null : sprayData.stream().map(SprayDataUtil::convertMapToSprayData).collect(Collectors.toList());
     }
 
     public static JSONPath createJsonPath(String jsonPath, JSONPath.Feature... features) {
@@ -76,7 +79,6 @@ public class SprayDataUtil {
     public static Object getByJsonPath(JSONPath jsonPath, Object targetObj) {
         return jsonPath.eval(targetObj);
     }
-
 
 
     public static <T> T convertValue(Object val, Class<? super T> tClass) {

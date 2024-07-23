@@ -21,7 +21,7 @@ public class SprayThreadData extends SprayData {
         return threadData;
     }
 
-    public SprayThreadData() {
+    private SprayThreadData() {
         init();
     }
 
@@ -45,5 +45,14 @@ public class SprayThreadData extends SprayData {
 
     public String getTid() {
         return super.getString("tid");
+    }
+
+    public void removeLocal(SprayThreadData threadData) {
+        if (this.getTransactionId().equals(threadData.getTransactionId())) {
+            THREAD_LOCAL.remove();
+            for (String key : this.keySet()) {
+                this.remove(key);
+            }
+        }
     }
 }

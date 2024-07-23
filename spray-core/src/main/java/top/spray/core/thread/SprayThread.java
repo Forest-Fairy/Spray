@@ -67,6 +67,14 @@ public class SprayThread extends Thread {
             // remove the reference to avoid memory leak
             parentThreadMdcContextMap = null;
         } catch (Exception ignore) {}
-        super.run();
+
+        // to init a thread data for cur thread and remove finally
+        SprayThreadData threadData = SprayThreadData.Get();
+        try {
+            super.run();
+        } finally {
+            // remove thread local reference to avoid memory leak
+            SprayThreadData.Get().removeLocal(threadData);
+        }
     }
 }

@@ -14,7 +14,7 @@
     <description>For adding executors</description>
     <packaging>pom</packaging>
     <modules>
-        <module>spray-executor-basic-package</module>
+        <module>spray-executor-basic-computing</module>
         <module>spray-executor-dbi</module>
     </modules>
 

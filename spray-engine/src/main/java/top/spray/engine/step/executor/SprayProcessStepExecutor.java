@@ -12,7 +12,7 @@ import top.spray.engine.step.meta.SprayProcessStepMeta;
 /**
  * Define the executor of a process node
  */
-public interface SprayProcessStepExecutor extends SprayMetaDrive<SprayProcessStepMeta> {
+public interface SprayProcessStepExecutor extends SprayMetaDrive<SprayProcessStepMeta>, AutoCloseable {
     default String getExecutorNameKey() {
         return getCoordinator().getExecutorNameKey(this);
     }

@@ -1,11 +1,6 @@
 package top.spray.core.config.model;
 
 
-import top.spray.core.config.i18n.SpraySystemConfigurationComment_i18n;
-import top.spray.core.config.i18n.SpraySystemConfigurationName_i18n;
-import top.spray.core.i18n.Spray_i18n;
-import top.spray.core.util.SprayDataUtil;
-
 import java.net.*;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -25,8 +20,8 @@ public class SpraySystemConfiguration {
             this.val = val;
             this.defVal = defVal;
         }
-        public SprayConfigObj<V> build(String i18n) {
-            return new SprayConfigObj<>(i18n, key, val, defVal);
+        public SprayConfigObj<V> build(String i18n, boolean visitable) {
+            return new SprayConfigObj<>(i18n, visitable, key, val, defVal);
         }
     }
 
@@ -40,23 +35,24 @@ public class SpraySystemConfiguration {
                     SpraySystemConfiguration.CONFIG_PREFIX + "jdk.version",
                     System.getProperty("java.specification.version"),
                     null)
-            .build("jdk.version");
+            .build("jdk.version", true);
 
     public static final SprayConfigObj<String> SPRAY_VERSION =
             Builder(
                     SpraySystemConfiguration.CONFIG_PREFIX + "version",
                     null,
                     "24.1.7")
-                    .build("spray.version");
+                    .build("spray.version", true);
 
-    public static final SprayConfigObj<String> SPRAY_PROJECT_DIR =
+    public static final SprayConfigObj<String> PROJECT_DIR =
             Builder(
                     SpraySystemConfiguration.CONFIG_PREFIX + "projectDir",
                     null,
                     Optional.ofNullable(SpraySystemConfiguration.class.getClassLoader().getResource("/"))
                             .map(URL::getPath)
                             .orElse(Paths.get(System.getProperty("user.dir")).toString()))
-                    .build("spray.version");
+                    .build("projectDir", true);
+
     public static final SprayConfigObj<String> MAC_ADDRESS;
     static {
         String macAddress;
@@ -70,7 +66,7 @@ public class SpraySystemConfiguration {
                         SpraySystemConfiguration.CONFIG_PREFIX + "mac",
                         macAddress,
                         "UNKNOWN_MAC_ADDRESS")
-                .build("mac");
+                .build("mac", true);
     }
 
 }

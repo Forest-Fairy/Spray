@@ -1,6 +1,5 @@
 package top.spray.core.engine.meta;
 
-import org.slf4j.Logger;
 
 /**
  * Define the base meta of a spray object

@@ -2,7 +2,7 @@ package top.spray.executor.dbi.jdbc;
 
 import top.spray.core.engine.connection.SprayDataSourceConnection;
 import top.spray.core.engine.props.SprayData;
-import top.spray.core.intelligence.annotation.SprayAutoAnalyse;
+import top.spray.core.intelligence.annotation.SprayClassInfoAutoAnalyse;
 import top.spray.core.intelligence.annotation.SprayVariableSupport;
 import top.spray.engine.step.executor.SprayBaseStepExecutor;
 import top.spray.engine.step.executor.SprayProcessStepExecutor;
@@ -11,7 +11,7 @@ import java.sql.Connection;
 import java.util.Iterator;
 import java.util.Map;
 
-@SprayAutoAnalyse
+@SprayClassInfoAutoAnalyse
 public class SprayExecutor_JdbcReader extends SprayBaseStepExecutor {
     private SprayDataSourceConnection<Connection> connection;
 
