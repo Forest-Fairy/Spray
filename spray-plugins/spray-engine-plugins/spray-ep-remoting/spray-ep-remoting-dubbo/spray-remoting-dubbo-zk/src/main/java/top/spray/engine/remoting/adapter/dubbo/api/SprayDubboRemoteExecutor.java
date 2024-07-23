@@ -13,7 +13,7 @@ import top.spray.engine.step.meta.SprayProcessStepMeta;
 /** this is a executor reference to provider */
 public interface SprayDubboRemoteExecutor extends SprayRemoteStepExecutor {
     @Override
-    default void initOnlyAtCreate() {
+    default boolean initOnlyAtCreate() {
 
     }
 

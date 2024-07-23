@@ -27,9 +27,9 @@ public abstract class SprayBaseStepExecutor implements SprayProcessStepExecutor 
 
 
     @Override
-    public synchronized final void initOnlyAtCreate() {
+    public synchronized final boolean initOnlyAtCreate() {
         if (createTime != 0) {
-            return ;
+            return false;
         }
         this.executorNameKey = this.getExecutorNameKey();
         this.stepResult = new SprayStepResultInstance(this.getCoordinator().getMeta(), this.getMeta());
@@ -46,6 +46,7 @@ public abstract class SprayBaseStepExecutor implements SprayProcessStepExecutor 
             this.pool = null;
         }
         this.initOnlyAtCreate0();
+        return true;
     }
     protected void initOnlyAtCreate0() {}
 

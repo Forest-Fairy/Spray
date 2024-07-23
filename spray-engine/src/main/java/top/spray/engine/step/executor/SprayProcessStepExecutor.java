@@ -16,7 +16,11 @@ public interface SprayProcessStepExecutor extends SprayMetaDrive<SprayProcessSte
     default String getExecutorNameKey() {
         return getCoordinator().getExecutorNameKey(this);
     }
-    void initOnlyAtCreate();
+
+    /**
+     * true if the executor had init or else it had been init.
+     */
+    boolean initOnlyAtCreate();
     long getCreateTime();
 
     /**

@@ -19,17 +19,22 @@ public class SprayExecutorFactory {
     }
     public static SprayProcessStepExecutor create(
             SprayProcessCoordinator coordinator, SprayProcessStepMeta stepMeta, boolean tryRemoting) {
-        SprayClassLoader sprayClassLoader = new SprayClassLoader(
-                stepMeta.jarFiles(), coordinator.getCreatorThreadClassLoader());
         SprayProcessStepExecutor stepExecutor;
+        SprayClassLoader sprayClassLoader;
         if (tryRemoting && SprayEngineConfigurations.executorRemotingSupport() && stepMeta.isRemoting()) {
+            sprayClassLoader = new SprayClassLoader(
+                    stepMeta.remotingJarFiles(), coordinator.getCreatorThreadClassLoader());
             stepExecutor = SprayRemoteAdapterFactory.createRemoteExecutorAdapterForCoordinator(
                     coordinator.getMeta(), stepMeta, sprayClassLoader);
-        } else if (StringUtils.isNotBlank(stepMeta.executorGeneratorClass())) {
-            // create by generator
-            stepExecutor = SprayExecutorGenerator.generate(coordinator.getMeta(), stepMeta, sprayClassLoader);
         } else {
-            stepExecutor = CreateExecutor(stepMeta.executorClass(), coordinator.getMeta(), stepMeta, sprayClassLoader);
+            sprayClassLoader = new SprayClassLoader(
+                    stepMeta.jarFiles(), coordinator.getCreatorThreadClassLoader());
+            if (StringUtils.isNotBlank(stepMeta.executorGeneratorClass())) {
+                // create by generator
+                stepExecutor = SprayExecutorGenerator.generate(coordinator.getMeta(), stepMeta, sprayClassLoader);
+            } else {
+                stepExecutor = CreateExecutor(stepMeta.executorClass(), coordinator.getMeta(), stepMeta, sprayClassLoader);
+            }
         }
         stepExecutor.setMeta(stepMeta);
         stepExecutor.setCoordinator(coordinator);

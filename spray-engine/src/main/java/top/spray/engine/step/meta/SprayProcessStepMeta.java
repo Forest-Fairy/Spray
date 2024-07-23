@@ -47,6 +47,7 @@ public class SprayProcessStepMeta implements SprayBaseMeta<SprayProcessStepMeta>
     private boolean ignoreError;
     private boolean isAsync;
     private boolean isRemoting;
+    private String remotingJarFiles;
     private int coreThreadCount;
     private int maxThreadCount;
     private int queueCapacity;
@@ -79,6 +80,7 @@ public class SprayProcessStepMeta implements SprayBaseMeta<SprayProcessStepMeta>
         this.ignoreError = (!this.rollbackIfError) && (metaContainer.getOrElse("ignoreError", false));
         this.isAsync = metaContainer.getOrElse("isAsync", false);
         this.isRemoting = metaContainer.getOrElse("isRemoting", false);
+        this.remotingJarFiles = metaContainer.getString("remotingJarFiles");
         this.coreThreadCount = metaContainer.getOrElse("coreThreadCount", 5);
         this.maxThreadCount = Math.max(this.coreThreadCount, metaContainer.getOrElse("maxThreadCount", 10));
         this.queueCapacity = metaContainer.getOrElse("queueCapacity", 20);
@@ -168,6 +170,13 @@ public class SprayProcessStepMeta implements SprayBaseMeta<SprayProcessStepMeta>
     /** enable remoting execute */
     public boolean isRemoting() {
         return this.isRemoting;
+    }
+
+    /**
+     * jarFiles for remote executor
+     */
+    public String remotingJarFiles() {
+        return remotingJarFiles;
     }
 
     public int coreThreadCount() {

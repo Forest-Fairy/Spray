@@ -10,9 +10,9 @@ import top.spray.engine.step.executor.SprayProcessStepExecutor;
 import top.spray.engine.step.instance.SprayStepResultInstance;
 import top.spray.engine.step.meta.SprayProcessStepMeta;
 
-public class SprayStepExecutorDubboAdapter implements SprayStepExecutorAdapter {
+public final class SprayStepExecutorDubboAdapter implements SprayStepExecutorAdapter {
     @Override
-    public void initOnlyAtCreate() {
+    public boolean initOnlyAtCreate() {
 
     }
 
