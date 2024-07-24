@@ -17,7 +17,6 @@ import top.spray.engine.step.meta.SprayProcessStepMeta;
  * Define the executor of a process node
  */
 public abstract class SprayBaseStepExecutor implements SprayProcessStepExecutor {
-    protected String executorNameKey;
     private SprayProcessStepMeta stepMeta;
     private SprayProcessCoordinator coordinator;
     private SprayClassLoader classLoader;
@@ -31,7 +30,6 @@ public abstract class SprayBaseStepExecutor implements SprayProcessStepExecutor 
         if (createTime != 0) {
             return false;
         }
-        this.executorNameKey = this.getExecutorNameKey();
         this.stepResult = new SprayStepResultInstance(this.getCoordinator().getMeta(), this.getMeta());
         this.createTime = System.currentTimeMillis();
         if (this.stepMeta.isAsync() && this.getCoordinator().getMeta().asyncSupport()) {
@@ -99,9 +97,9 @@ public abstract class SprayBaseStepExecutor implements SprayProcessStepExecutor 
     @Override
     public final boolean needWait(SprayVariableContainer variables, SprayProcessStepExecutor fromExecutor, SprayData data, boolean still) {
         // if the executor support to storage data in file then try
-        if (this instanceof SprayCacheSupportExecutor storageSupportExecutor) {
-            if (storageSupportExecutor.needCache(variables, fromExecutor, data, still)) {
-                storageSupportExecutor.cache(variables, fromExecutor, data, still);
+        if (this instanceof SprayCacheSupportExecutor cacheSupportExecutor) {
+            if (cacheSupportExecutor.needCache(variables, fromExecutor, data, still)) {
+                cacheSupportExecutor.cache(variables, fromExecutor, data, still);
             }
         }
         return needWait0(variables, fromExecutor, data, still);
@@ -115,7 +113,7 @@ public abstract class SprayBaseStepExecutor implements SprayProcessStepExecutor 
     private synchronized void initBeforeRun(SprayVariableContainer variables, SprayProcessStepExecutor fromExecutor, SprayData data, boolean still) {
         Thread.currentThread().setContextClassLoader(this.getClassLoader());
         MDC.put("transactionId", this.getCoordinator().getMeta().transactionId());
-        MDC.put("executorId", this.executorNameKey);
+        MDC.put("executorId", this.stepMeta.getExecutorNameKey(this.getCoordinator().getMeta()));
         MDC.put("tid", String.valueOf(Thread.currentThread().getId()));
         initBeforeRun0(variables, fromExecutor, data, still);
     }

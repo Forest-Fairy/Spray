@@ -8,11 +8,9 @@ import top.spray.core.engine.status.SprayStatusType;
 import top.spray.core.engine.status.impl.SprayDataDispatchResultStatus;
 import top.spray.core.engine.status.impl.SprayStepStatus;
 import top.spray.core.engine.status.impl.SprayCoordinateStatus;
-import top.spray.core.util.SprayClassLoader;
 import top.spray.engine.coordinate.handler.result.SprayDataDispatchResultHandler;
 import top.spray.engine.exception.SprayExecutorGenerateError;
 import top.spray.engine.factory.SprayExecutorFactory;
-import top.spray.engine.factory.SprayRemoteAdapterFactory;
 import top.spray.engine.prop.SprayVariableContainer;
 import top.spray.engine.step.condition.SprayStepExecuteConditionFilter;
 import top.spray.engine.step.executor.SprayExecutorListener;
@@ -20,9 +18,7 @@ import top.spray.engine.coordinate.meta.SprayProcessCoordinatorMeta;
 import top.spray.engine.step.executor.SprayProcessStepExecutor;
 import top.spray.engine.step.condition.SprayNextStepFilter;
 import top.spray.engine.step.meta.SprayProcessStepMeta;
-import top.spray.engine.util.SprayEngineConfigurations;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -283,24 +279,24 @@ public class SprayDefaultProcessCoordinator implements
 
 
     @Override
-    public void executeNext(SprayProcessStepExecutor nextStepExecutor,
+    public void executeNext(SprayProcessStepExecutor curExecutor,
                             SprayVariableContainer lastVariables,
                             SprayProcessStepExecutor fromExecutor,
                             SprayData data, boolean still) {
         try {
-            int copyMode = nextStepExecutor.varCopyMode();
+            int copyMode = curExecutor.varCopyMode();
             if (copyMode == 0) {
-                nextStepExecutor.execute(lastVariables, fromExecutor, data, still);
+                curExecutor.execute(lastVariables, fromExecutor, data, still);
             } else {
-                nextStepExecutor.execute(
+                curExecutor.execute(
                         executorVariablesNamespace.computeIfAbsent(
-                                lastVariables.nextKey(fromExecutor, nextStepExecutor), key -> copyMode == 1 ?
-                                        SprayVariableContainer.easyCopy(fromExecutor, lastVariables, nextStepExecutor) :
-                                        SprayVariableContainer.deepCopy(fromExecutor, lastVariables, nextStepExecutor)),
+                                lastVariables.nextKey(fromExecutor, curExecutor), key -> copyMode == 1 ?
+                                        SprayVariableContainer.easyCopy(fromExecutor, lastVariables, curExecutor) :
+                                        SprayVariableContainer.deepCopy(fromExecutor, lastVariables, curExecutor)),
                         fromExecutor, data, still);
             }
         } catch (Exception e) {
-            this.setDispatchResult(lastVariables, fromExecutor, data, still, nextStepExecutor.getMeta(), SprayDataDispatchResultStatus.SUCCESS);
+            this.setDispatchResult(lastVariables, fromExecutor, data, still, curExecutor.getMeta(), SprayDataDispatchResultStatus.SUCCESS);
         }
     }
 

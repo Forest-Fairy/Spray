@@ -5,7 +5,6 @@ import top.spray.core.engine.props.SprayData;
 import top.spray.core.engine.status.impl.SprayCoordinateStatus;
 import top.spray.core.engine.status.impl.SprayDataDispatchResultStatus;
 import top.spray.engine.coordinate.meta.SprayProcessCoordinatorMeta;
-import top.spray.engine.factory.SprayExecutorFactory;
 import top.spray.engine.prop.SprayVariableContainer;
 import top.spray.engine.step.executor.SprayProcessStepExecutor;
 import top.spray.engine.step.condition.SprayNextStepFilter;
@@ -47,6 +46,7 @@ public interface SprayProcessCoordinator extends
 
     /** the only way to get the executor */
     SprayProcessStepExecutor getStepExecutor(SprayProcessStepMeta executorMeta);
+
     int createExecutorCount();
 
     /** a method for executor to publish its data */

@@ -1,6 +1,9 @@
 package top.spray.engine.remote.dubbo.api;
 
-public interface SprayDubboReference {
+/**
+ * with this interface to call the remote server to create the dubbo service implement
+ */
+public interface SprayDubboInitReference {
     /**
      * require the remote server to generate a dubbo service with meta json
      */

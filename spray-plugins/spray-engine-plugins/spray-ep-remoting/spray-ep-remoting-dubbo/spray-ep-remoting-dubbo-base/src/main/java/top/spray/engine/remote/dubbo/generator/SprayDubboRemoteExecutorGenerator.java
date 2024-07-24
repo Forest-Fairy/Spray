@@ -1,13 +1,11 @@
 package top.spray.engine.remote.dubbo.generator;
 
-import cn.hutool.core.lang.Pair;
 import com.alibaba.fastjson2.JSON;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.ReferenceConfig;
-import org.apache.dubbo.config.ServiceConfig;
 import top.spray.core.util.SprayClassLoader;
 import top.spray.engine.coordinate.meta.SprayProcessCoordinatorMeta;
-import top.spray.engine.remote.dubbo.api.SprayDubboReference;
+import top.spray.engine.remote.dubbo.api.SprayDubboInitReference;
 import top.spray.engine.remote.dubbo.constants.SprayDubboConfigConst;
 import top.spray.engine.remoting.SprayRemoteStepExecutor;
 import top.spray.engine.remoting.generator.SprayRemoteStepExecutorGenerator;
@@ -25,14 +23,20 @@ public class SprayDubboRemoteExecutorGenerator implements SprayRemoteStepExecuto
     public SprayRemoteStepExecutor generateExecutor(SprayProcessCoordinatorMeta coordinatorMeta,
                                                     SprayProcessStepMeta executorMeta,
                                                     SprayClassLoader sprayClassLoader) {
-        ReferenceConfig<SprayDubboReference> referenceConfig = new ReferenceConfig<>();
-        SprayDubboReference sprayDubboReference = referenceConfig.get();
+        ReferenceConfig<SprayDubboInitReference> referenceConfig = new ReferenceConfig<>();
+        SprayDubboInitReference sprayDubboReference = referenceConfig.get();
         boolean isSuccess = sprayDubboReference.generateExecutor(executorMeta.transactionId(), executorMeta.getExecutorNameKey(coordinatorMeta),
                 JSON.toJSONString(coordinatorMeta), JSON.toJSONString(executorMeta));
         if (!isSuccess) {
             throw new RuntimeException("");
         }
+        // generate a remote executor for coordinator
         return getRemoteExecutor(coordinatorMeta, executorMeta, sprayClassLoader);
+    }
+
+    private SprayRemoteStepExecutor getRemoteExecutor(SprayProcessCoordinatorMeta coordinatorMeta, SprayProcessStepMeta executorMeta, SprayClassLoader sprayClassLoader) {
+
+        return null;
     }
 
 }
