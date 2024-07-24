@@ -1,4 +1,4 @@
-package top.spray.engine.remoting.adapter.dubbo;
+package top.spray.engine.remote.dubbo;
 
 import top.spray.core.engine.props.SprayData;
 import top.spray.core.thread.SprayPoolExecutor;

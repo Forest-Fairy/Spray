@@ -1,4 +1,4 @@
-package top.spray.engine.remoting.adapter.dubbo;
+package top.spray.engine.remote.dubbo;
 
 public enum SprayRemoteInstruction {
     SEND,

@@ -1,13 +1,13 @@
-package top.spray.engine.remoting.adapter.dubbo.constants;
+package top.spray.engine.remote.dubbo.constants;
 
-public enum SprayDubboProtocol {
+public enum SprayDubboProtocolConst {
     DUBBO("dubbo", "dubbo"),
     TRIPLE("triple", "tri"),
     HTTP("http", "http"),
     ;
     private final String name;
     private final String value;
-    SprayDubboProtocol(String name, String value) {
+    SprayDubboProtocolConst(String name, String value) {
         this.name = name;
         this.value = value;
     }
@@ -20,10 +20,10 @@ public enum SprayDubboProtocol {
         return value;
     }
 
-    public static SprayDubboProtocol nameOf(String name) {
+    public static SprayDubboProtocolConst nameOf(String name) {
         if (name != null) {
             name = name.toLowerCase();
-            for (SprayDubboProtocol protocol : SprayDubboProtocol.values()) {
+            for (SprayDubboProtocolConst protocol : SprayDubboProtocolConst.values()) {
                 if (protocol.name.equals(name)) {
                     return protocol;
                 }

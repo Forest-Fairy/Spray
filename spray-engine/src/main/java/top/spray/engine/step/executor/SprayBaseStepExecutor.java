@@ -112,12 +112,14 @@ public abstract class SprayBaseStepExecutor implements SprayProcessStepExecutor 
     }
 
 
-    private synchronized void initBeforeRun() {
+    private synchronized void initBeforeRun(SprayVariableContainer variables, SprayProcessStepExecutor fromExecutor, SprayData data, boolean still) {
+        Thread.currentThread().setContextClassLoader(this.getClassLoader());
         MDC.put("transactionId", this.getCoordinator().getMeta().transactionId());
         MDC.put("executorId", this.executorNameKey);
-        initBeforeRun0();
+        MDC.put("tid", String.valueOf(Thread.currentThread().getId()));
+        initBeforeRun0(variables, fromExecutor, data, still);
     }
-    protected synchronized void initBeforeRun0() {}
+    protected synchronized void initBeforeRun0(SprayVariableContainer variables, SprayProcessStepExecutor fromExecutor, SprayData data, boolean still) {}
 
     /**
      * △! make sure you know what the 'doExecute' method do if you want to overwrite this method !!!
@@ -138,10 +140,9 @@ public abstract class SprayBaseStepExecutor implements SprayProcessStepExecutor 
     }
 
     private void doExecute(SprayVariableContainer variables, SprayProcessStepExecutor fromExecutor, SprayData data, boolean still) {
-        Thread.currentThread().setContextClassLoader(this.getClassLoader());
-        initBeforeRun();
         try {
             this.getStepResult().incrementRunningCount();
+            initBeforeRun(variables, fromExecutor, data, still);
             this._execute(variables, fromExecutor, data, still);
         } catch (Throwable e) {
             throw new SprayExecuteException(this.getMeta(), e);
@@ -173,7 +174,7 @@ public abstract class SprayBaseStepExecutor implements SprayProcessStepExecutor 
     /**
      * blocked until all the before executions done
      */
-    protected void waitUntilBeforeExecutionDone() {
+    protected final void waitUntilBeforeExecutionDone() {
         while (this.runningCount() > 0) {
             try {
                 Thread.sleep(100);
