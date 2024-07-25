@@ -5,11 +5,11 @@ import cn.hutool.cache.impl.TimedCache;
 import org.apache.dubbo.config.annotation.DubboService;
 import top.spray.engine.remote.dubbo.api.SprayDubboCoordinator;
 import top.spray.engine.remote.dubbo.api.SprayDubboExecutor;
-import top.spray.engine.remote.dubbo.api.SprayDubboInitReference;
+import top.spray.engine.remote.dubbo.api.SprayDubboSystemReference;
 import top.spray.engine.remote.dubbo.util.SprayDubboConfigurations;
 
 @DubboService
-public class SprayDubboInitReferenceImpl implements SprayDubboInitReference {
+public class SprayDubboSystemReferenceImpl implements SprayDubboSystemReference {
     private static final int MAX_CACHE_TIME = SprayDubboConfigurations.dubboServiceBeanMaxCacheTime();
     private static final TimedCache<String, SprayDubboCoordinator> COORDINATORS = new TimedCache<>(MAX_CACHE_TIME);
     private static final TimedCache<String, SprayDubboExecutor> EXECUTORS = new TimedCache<>(MAX_CACHE_TIME);

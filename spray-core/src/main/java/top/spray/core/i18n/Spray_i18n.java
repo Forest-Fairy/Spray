@@ -1,5 +1,6 @@
 package top.spray.core.i18n;
 
+import top.spray.core.util.SprayClassLoader;
 import top.spray.core.util.SprayServiceUtil;
 import top.spray.core.util.SprayUtf8s;
 
@@ -26,6 +27,12 @@ public interface Spray_i18n {
         String value = null;
         Map<String, Spray_i18n> I18N = SprayServiceUtil.loadServiceClassNameMapCache(Spray_i18n.class);
         Spray_i18n i18n = I18N.get(clazz.getName());
+        if (i18n == null) {
+            try {
+                Class<?> aClass = SprayClassLoader.getDefault().loadClass(clazz.getName());
+                i18n = (Spray_i18n) aClass.getDeclaredConstructor().newInstance();
+            } catch (Exception ignored) {}
+        }
         if (i18n != null) {
             String bundleName = i18n.getBundleName();
             if (! bundleName.startsWith(BUNDLE_PREFIX)) {

@@ -2,8 +2,8 @@ package top.spray.engine.coordinate.coordinator;
 
 import top.spray.core.engine.execute.SprayMetaDrive;
 import top.spray.core.engine.props.SprayData;
-import top.spray.core.engine.status.impl.SprayCoordinateStatus;
-import top.spray.core.engine.status.impl.SprayDataDispatchResultStatus;
+import top.spray.core.engine.types.coordinate.status.SprayCoordinatorStatus;
+import top.spray.core.engine.types.data.dispatch.result.SprayDataDispatchResultStatus;
 import top.spray.engine.coordinate.meta.SprayProcessCoordinatorMeta;
 import top.spray.engine.prop.SprayVariableContainer;
 import top.spray.engine.step.executor.SprayProcessStepExecutor;
@@ -20,13 +20,13 @@ import java.util.function.Supplier;
  */
 public interface SprayProcessCoordinator extends
         SprayMetaDrive<SprayProcessCoordinatorMeta>,
-        Supplier<SprayCoordinateStatus>, Runnable, AutoCloseable {
+        Supplier<SprayCoordinatorStatus>, Runnable, AutoCloseable {
     @Override
     SprayProcessCoordinatorMeta getMeta();
 
     /** a method for completable future */
     @Override
-    default SprayCoordinateStatus get() {
+    default SprayCoordinatorStatus get() {
         this.run();
         // this method run after the run method so that can get the status status.
         return status();
@@ -36,7 +36,7 @@ public interface SprayProcessCoordinator extends
     void run();
 
     /** the coordinator's status: none-blocked method  */
-    SprayCoordinateStatus status();
+    SprayCoordinatorStatus status();
 
     default String getExecutorNameKey(SprayProcessStepExecutor executor) {
         return executor.getMeta().getExecutorNameKey(this.getMeta());
@@ -50,7 +50,7 @@ public interface SprayProcessCoordinator extends
     int createExecutorCount();
 
     /** a method for executor to publish its data */
-    void dispatch(SprayVariableContainer variables, SprayProcessStepExecutor fromExecutor, SprayNextStepFilter stepFilter, SprayData data, boolean still);
+    void dispatch(SprayVariableContainer variables, SprayNextStepFilter stepFilter, SprayProcessStepExecutor fromExecutor, SprayData data, boolean still);
 
     List<SprayDataDispatchResultStatus> getDispatchResults(String dataKey);
 

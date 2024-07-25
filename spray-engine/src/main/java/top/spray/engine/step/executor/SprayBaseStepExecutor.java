@@ -30,7 +30,9 @@ public abstract class SprayBaseStepExecutor implements SprayProcessStepExecutor 
         if (createTime != 0) {
             return false;
         }
-        this.stepResult = new SprayStepResultInstance(this.getCoordinator().getMeta(), this.getMeta());
+        this.stepResult = new SprayStepResultInstance(
+                this.getCoordinator().getMeta(),
+                this.getMeta(), this.getClassLoader());
         this.createTime = System.currentTimeMillis();
         if (this.stepMeta.isAsync() && this.getCoordinator().getMeta().asyncSupport()) {
             this.pool = new SprayPoolExecutorBuilder(
@@ -91,7 +93,7 @@ public abstract class SprayBaseStepExecutor implements SprayProcessStepExecutor 
         this.publishData(variableContainer, data, still, null);
     }
     protected final void publishData(SprayVariableContainer variableContainer, SprayData data, boolean still, SprayNextStepFilter stepFilter) {
-        this.getCoordinator().dispatch(variableContainer, this, stepFilter, data, still);
+        this.getCoordinator().dispatch(variableContainer, stepFilter, this, data, still);
     }
 
     @Override
@@ -194,6 +196,7 @@ public abstract class SprayBaseStepExecutor implements SprayProcessStepExecutor 
             // TODO Handle with handler
             throw e;
         }
+        this.getClassLoader().close();
         destroy();
     }
     protected void destroy() throws Exception {

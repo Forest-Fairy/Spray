@@ -1,17 +1,16 @@
 package top.spray.engine.step.instance;
 
-import org.apache.commons.lang3.tuple.Pair;
-import top.spray.core.engine.execute.SprayMetaDrive;
 import top.spray.core.engine.props.SprayData;
-import top.spray.core.engine.status.SprayStatusType;
-import top.spray.core.engine.status.SprayStatusHolder;
-import top.spray.engine.coordinate.coordinator.SprayProcessCoordinator;
+import top.spray.core.engine.types.SprayType;
+import top.spray.core.engine.types.SprayTypeHolder;
+import top.spray.core.engine.types.data.execute.record.SprayExecutionRecordType;
+import top.spray.core.util.SprayClassLoader;
 import top.spray.engine.coordinate.meta.SprayProcessCoordinatorMeta;
 import top.spray.engine.step.executor.SprayProcessStepExecutor;
-import top.spray.core.engine.status.impl.SprayStepStatus;
+import top.spray.core.engine.types.step.status.SprayStepStatus;
+import top.spray.engine.step.handler.record.SprayExecutionRecordHandler;
 import top.spray.engine.step.meta.SprayProcessStepMeta;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -24,36 +23,30 @@ import java.util.concurrent.atomic.LongAdder;
 public class SprayStepResultInstance {
     private final SprayProcessCoordinatorMeta coordinatorMeta;
     private final SprayProcessStepMeta executorMeta;
+    private final SprayClassLoader classLoader;
+    private SprayTypeHolder stepStatus;
     private final LongAdder runningCounter;
-    private SprayStatusHolder stepStatus;
-    /**
-     * ['NONE', 'ALL', 'SUCCESS', 'BAD']
-     *  - NONE means not record
-     *  - ALL means record all
-     *  - SUCCESS means record success only
-     *  - BAD means record the error or failed
-     */
-    private String dataRecordStrategy;
-    private List<Pair<Long, Throwable>> errorList;
+    private List<SprayExecutionRecordHandler> executionStrategyHandlers;
     private Map<String, LongAdder> inputInfos;
     private Map<String, LongAdder> outputInfos;
-    private LongAdder dataProcessingCounter;
     private long startTime;
     private long endTime;
 
-    public SprayStepResultInstance(SprayProcessCoordinatorMeta coordinatorMeta, SprayProcessStepMeta executorMeta) {
+    public SprayStepResultInstance(SprayProcessCoordinatorMeta coordinatorMeta,
+                                   SprayProcessStepMeta executorMeta,
+                                   SprayClassLoader classLoader) {
         this.coordinatorMeta = coordinatorMeta;
         this.executorMeta = executorMeta;
+        this.classLoader = classLoader;
         this.runningCounter = new LongAdder();
         init();
     }
     private void init() {
-        this.stepStatus = SprayStatusType.holder(SprayStepStatus.RUNNING);
-        this.errorList = new ArrayList<>(0);
+        this.stepStatus = SprayType.holder(SprayStepStatus.RUNNING);
+        this.startTime = System.currentTimeMillis();
         this.inputInfos = new ConcurrentHashMap<>(0);
         this.outputInfos = new ConcurrentHashMap<>(0);
-        this.dataRecordStrategy = executorMeta
-                .getString("dataRecordStrategy", "NONE").toUpperCase();
+        this.executionStrategyHandlers = SprayExecutionRecordHandler.create(coordinatorMeta, executorMeta);
     }
 
     public SprayProcessCoordinatorMeta getCoordinatorMeta() {
@@ -98,54 +91,63 @@ public class SprayStepResultInstance {
     }
 
     public void setStatus(SprayStepStatus status) {
-        this.stepStatus.setStatus(status);
-    }
-    public SprayStatusType getStatus() {
-        return this.stepStatus;
+        this.stepStatus.set(status);
     }
 
-    public void addError(Throwable error) {
-        this.errorList.add(Pair.of(System.currentTimeMillis(), error));
-    }
+//    public void addError(Throwable error) {
+//        this.errorList.add(Pair.of(System.currentTimeMillis(), error));
+//    }
 
     /**
      * record before the executor being executed with this data
-     * @param status the snapshot of current instance's status
-     * @param fromExecutor dataFromExecutor
+     * @param fromExecutorMeta dataFromExecutor
      * @param data data
      * @param still still
      */
-    public void recordBeforeExecute(SprayStepStatus status, SprayProcessStepExecutor fromExecutor, SprayData data, boolean still) {
-        dataProcessingCounter.increment();
+    public void recordInputBeforeExecution(SprayProcessStepMeta fromExecutorMeta, SprayData data, boolean still) {
+        this.executionStrategyHandlers.forEach(handler -> handler.record(
+                executorMeta, SprayExecutionRecordType.BEFORE_EXECUTE, fromExecutorMeta, data, still, null));
     }
 
     /**
-     * record after the executor being executed
-     * @param status the snapshot of current instance's status
-     * @param fromExecutor dataFromExecutor
+     * record after the executor being executed successfully
+     * @param fromExecutorMeta dataFromExecutor
      * @param data data
      * @param still still
      */
-    public void recordInputAgain(SprayStepStatus status, SprayProcessStepExecutor fromExecutor, SprayData data, boolean still) {
-        dataProcessingCounter.decrement();
+    public void recordInputAfterExecutionSuccess(SprayProcessStepMeta fromExecutorMeta, SprayData data, boolean still) {
+        this.executionStrategyHandlers.forEach(handler -> handler.record(
+                executorMeta, SprayExecutionRecordType.EXECUTE_SUCCESS, fromExecutorMeta, data, still, null));
     }
 
-    public void setStartTime(long startTime) {
-        this.startTime = startTime;
+    /**
+     * record after the executor being executed failed
+     * @param fromExecutorMeta dataFromExecutor
+     * @param data data
+     * @param still still
+     */
+    public void recordInputAfterExecutionFailed(SprayProcessStepMeta fromExecutorMeta, SprayData data, boolean still, Throwable error) {
+        this.executionStrategyHandlers.forEach(handler -> handler.record(
+                executorMeta, SprayExecutionRecordType.EXECUTE_FAILED, fromExecutorMeta, data, still, error));
+    }
+
+    public void endStep() {
+        this.endTime = System.currentTimeMillis();
+    }
+
+
+    public SprayType getStatus() {
+        return this.stepStatus;
     }
     public long getStartTime() {
         return this.startTime;
     }
-    public void setEndTime(long endTime) {
-        this.endTime = endTime;
-    }
     public long getEndTime() {
         return this.endTime;
     }
-
-
     public long duration() {
-        return this.endTime == 0 ? 0 :
+        return this.endTime == 0 ?
+                System.currentTimeMillis() - this.startTime :
                 this.endTime - this.startTime;
     }
 }

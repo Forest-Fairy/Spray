@@ -4,7 +4,7 @@ import cn.hutool.core.util.CharsetUtil;
 import org.apache.commons.lang3.StringUtils;
 import top.spray.core.config.util.SpraySystemConfigurations;
 import top.spray.core.engine.props.SprayData;
-import top.spray.core.engine.status.impl.SprayDataDispatchResultStatus;
+import top.spray.core.engine.types.data.dispatch.result.SprayDataDispatchResultStatus;
 import top.spray.core.util.SprayUtf8s;
 import top.spray.engine.coordinate.meta.SprayProcessCoordinatorMeta;
 import top.spray.engine.exception.SprayDispatchResultHandleException;

@@ -24,10 +24,5 @@ public class SprayNotSupportError extends SprayMetaError {
         public String transactionId() {
             return SprayThreadUtil.getThreadTransactionId();
         }
-
-        @Override
-        public boolean isAsync() {
-            return false;
-        }
     }
 }

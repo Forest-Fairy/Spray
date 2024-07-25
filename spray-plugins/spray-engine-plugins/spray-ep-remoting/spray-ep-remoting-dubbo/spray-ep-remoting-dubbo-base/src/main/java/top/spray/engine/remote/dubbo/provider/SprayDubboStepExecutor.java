@@ -10,6 +10,7 @@ import top.spray.engine.step.executor.SprayProcessStepExecutor;
 public class SprayDubboStepExecutor extends SprayBaseStepExecutor implements SprayDubboExecutor {
 
     private final SprayDubboExecutorReference executorReference;
+
     public SprayDubboStepExecutor(SprayDubboExecutorReference executorReference) {
         this.executorReference = executorReference;
     }

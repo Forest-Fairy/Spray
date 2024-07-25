@@ -5,4 +5,5 @@ import top.spray.engine.remote.dubbo.api.holder.SprayDubboCoordinatorReferenceHo
 
 /** this is a coordinator reference */
 public interface SprayDubboCoordinator extends SprayProcessCoordinator, SprayDubboCoordinatorReferenceHolder {
+
 }

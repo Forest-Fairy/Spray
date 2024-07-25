@@ -6,5 +6,6 @@ public interface SprayDubboExecutorReference {
 
     void execute(String myNameKey, String variablesIdentityDataKey, String fromExecutorNameKey, String data, boolean still);
 
+
 }
 

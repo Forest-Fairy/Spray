@@ -13,6 +13,17 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class SprayClassLoader extends URLClassLoader {
+    private static final SprayClassLoader default_loader;
+    static {
+        URL location = SprayClassLoader.class.getProtectionDomain().getCodeSource().getLocation();
+        URL[] urls;
+        if (location.getPath().contains(".jar")) {
+            urls = new URL[]{location};
+        } else {
+            urls = new URL[0];
+        }
+        default_loader = new SprayClassLoader(urls, ClassLoader.getSystemClassLoader());
+    }
     private Map<String, Class<?>> loadedClassMap = new ConcurrentHashMap<>();
     public SprayClassLoader(String jarFiles) {
         this(jarFiles, Thread.currentThread().getContextClassLoader());
@@ -22,7 +33,6 @@ public class SprayClassLoader extends URLClassLoader {
                 convertFilesToUrls(convertPathsToFiles(jarFiles)),
                 parent, null);
     }
-
     public SprayClassLoader(URL[] urls) {
         this(urls, Thread.currentThread().getContextClassLoader());
     }
@@ -163,7 +173,8 @@ public class SprayClassLoader extends URLClassLoader {
         };
     }
 
-    public void destroy() throws IOException {
+    @Override
+    public void close() throws IOException {
         for (Map.Entry<String, Class<?>> entry : loadedClassMap.entrySet()) {
             try {
                 // invoke a static destroy method
@@ -176,5 +187,9 @@ public class SprayClassLoader extends URLClassLoader {
         loadedClassMap.clear();
         // 从其父类加载器的加载器层次结构中移除该类加载器
         super.close();
+    }
+
+    public static SprayClassLoader getDefault() {
+        return default_loader;
     }
 }

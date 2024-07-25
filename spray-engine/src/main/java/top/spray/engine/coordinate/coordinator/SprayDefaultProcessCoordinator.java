@@ -4,10 +4,11 @@ import top.spray.core.engine.exception.SprayNotSupportError;
 import top.spray.core.engine.execute.SprayListenable;
 import top.spray.core.engine.execute.SprayStepActiveType;
 import top.spray.core.engine.props.SprayData;
-import top.spray.core.engine.status.SprayStatusType;
-import top.spray.core.engine.status.impl.SprayDataDispatchResultStatus;
-import top.spray.core.engine.status.impl.SprayStepStatus;
-import top.spray.core.engine.status.impl.SprayCoordinateStatus;
+import top.spray.core.engine.types.SprayType;
+import top.spray.core.engine.types.data.dispatch.result.SprayDataDispatchResultStatus;
+import top.spray.core.engine.types.step.status.SprayStepStatus;
+import top.spray.core.engine.types.coordinate.status.SprayCoordinatorStatus;
+import top.spray.core.util.SprayClassLoader;
 import top.spray.engine.coordinate.handler.result.SprayDataDispatchResultHandler;
 import top.spray.engine.exception.SprayExecutorGenerateError;
 import top.spray.engine.factory.SprayExecutorFactory;
@@ -128,28 +129,28 @@ public class SprayDefaultProcessCoordinator implements
     }
 
     @Override
-    public final SprayCoordinateStatus status() {
-        return calculateTheResult();
+    public final SprayCoordinatorStatus status() {
+        return resultCalculate();
     }
-    private SprayCoordinateStatus calculateTheResult() {
+    private SprayCoordinatorStatus resultCalculate() {
         for (Map.Entry<String, SprayProcessStepExecutor> stepExecutor : this.cachedExecutorMap.entrySet()) {
             // [STOP, FAILED, DONE, ERROR, PAUSED, RUNNING]
-            SprayStatusType executorStatus = stepExecutor.getValue().getStepResult().getStatus();
+            SprayType executorStatus = stepExecutor.getValue().getStepResult().getStatus();
             if (SprayStepStatus.DONE.equals(executorStatus)) {
                 // find next if cur is done
                 continue;
             }
             if (SprayStepStatus.FAILED.equals(executorStatus) ||
                     SprayStepStatus.ERROR.equals(executorStatus)) {
-                return SprayCoordinateStatus.FAILED;
+                return SprayCoordinatorStatus.FAILED;
             }
             if (SprayStepStatus.STOP.equals(executorStatus)) {
-                return SprayCoordinateStatus.STOP;
+                return SprayCoordinatorStatus.STOP;
             }
             // other means running
-            return SprayCoordinateStatus.RUNNING;
+            return SprayCoordinatorStatus.RUNNING;
         }
-        return SprayCoordinateStatus.SUCCESS;
+        return SprayCoordinatorStatus.SUCCESS;
     }
 
 
@@ -169,8 +170,8 @@ public class SprayDefaultProcessCoordinator implements
     }
 
     @Override
-    public void dispatch(SprayVariableContainer lastVariables, SprayProcessStepExecutor fromExecutor,
-                         SprayNextStepFilter stepFilter, SprayData data, boolean still) {
+    public void dispatch(SprayVariableContainer lastVariables, SprayNextStepFilter stepFilter,
+                         SprayProcessStepExecutor fromExecutor, SprayData data, boolean still) {
         this._dispatchData(fromExecutor.getMeta().nextNodes(), stepFilter, lastVariables, fromExecutor, data, still);
     }
 
@@ -274,7 +275,7 @@ public class SprayDefaultProcessCoordinator implements
     }
 
     private boolean validCoordinatorStatus() {
-        return SprayCoordinateStatus.RUNNING.equals(this.status());
+        return SprayCoordinatorStatus.RUNNING.equals(this.status());
     }
 
 
@@ -303,6 +304,9 @@ public class SprayDefaultProcessCoordinator implements
     @Override
     public void close() throws Exception {
         this.dispatchResultHandler.whenCoordinatorShutdown(this.getMeta());
+        if (this.getCreatorThreadClassLoader() instanceof SprayClassLoader scl) {
+            scl.close();
+        }
         for (Map.Entry<String, SprayProcessStepExecutor> executorEntry : this.cachedExecutorMap.entrySet()) {
             try {
                 executorEntry.getValue().close();

@@ -1,8 +1,8 @@
 package top.spray.engine.remote.dubbo.provider;
 
 import top.spray.core.engine.props.SprayData;
-import top.spray.core.engine.status.impl.SprayCoordinateStatus;
-import top.spray.core.engine.status.impl.SprayDataDispatchResultStatus;
+import top.spray.core.engine.types.coordinate.status.SprayCoordinatorStatus;
+import top.spray.core.engine.types.data.dispatch.result.SprayDataDispatchResultStatus;
 import top.spray.engine.coordinate.coordinator.SprayDefaultProcessCoordinator;
 import top.spray.engine.coordinate.meta.SprayProcessCoordinatorMeta;
 import top.spray.engine.prop.SprayVariableContainer;
@@ -44,7 +44,7 @@ public class SprayDubboProcessCoordinator extends SprayDefaultProcessCoordinator
     }
 
     @Override
-    public SprayCoordinateStatus status() {
+    public SprayCoordinatorStatus status() {
         return null;
     }
 

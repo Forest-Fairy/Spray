@@ -1,17 +1,14 @@
 package top.spray.engine.factory;
 
-import top.spray.core.engine.props.SprayData;
 import top.spray.core.util.SprayServiceUtil;
-import top.spray.engine.step.executor.SprayProcessStepExecutor;
-import top.spray.engine.step.handler.record.SprayRecordStrategyHandler;
+import top.spray.engine.step.handler.record.SprayExecutionRecordHandler;
+import top.spray.engine.step.instance.SprayStepResultInstance;
 
 public class SprayRecordStrategyHandlerFactory {
-    public static SprayRecordStrategyHandler create(SprayProcessStepExecutor stepExecutor, String recordType,
-                                                    SprayProcessStepExecutor fromExecutor, SprayData data, boolean still) {
-        for (SprayRecordStrategyHandler sprayRecordStrategyHandler :
-                SprayServiceUtil.loadServiceClassNameMapCache(SprayRecordStrategyHandler.class).values()) {
-            if (sprayRecordStrategyHandler.canHandle(stepExecutor, recordType, fromExecutor, data, still)) {
-                sprayRecordStrategyHandler.record(stepExecutor, recordType, fromExecutor, data, still);
+    public static SprayExecutionRecordHandler create(SprayStepResultInstance instance) {
+        for (SprayExecutionRecordHandler sprayRecordStrategyHandler :
+                SprayServiceUtil.loadServiceClassNameMapCache(SprayExecutionRecordHandler.class).values()) {
+            if (sprayRecordStrategyHandler.support(instance.getCoordinatorMeta(), instance.getExecutorMeta())) {
                 return sprayRecordStrategyHandler;
             }
         }

@@ -5,7 +5,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.ReferenceConfig;
 import top.spray.core.util.SprayClassLoader;
 import top.spray.engine.coordinate.meta.SprayProcessCoordinatorMeta;
-import top.spray.engine.remote.dubbo.api.SprayDubboInitReference;
+import top.spray.engine.remote.dubbo.api.SprayDubboExecutor;
+import top.spray.engine.remote.dubbo.api.SprayDubboSystemReference;
 import top.spray.engine.remote.dubbo.constants.SprayDubboConfigConst;
 import top.spray.engine.remoting.SprayRemoteStepExecutor;
 import top.spray.engine.remoting.generator.SprayRemoteStepExecutorGenerator;
@@ -23,8 +24,9 @@ public class SprayDubboRemoteExecutorGenerator implements SprayRemoteStepExecuto
     public SprayRemoteStepExecutor generateExecutor(SprayProcessCoordinatorMeta coordinatorMeta,
                                                     SprayProcessStepMeta executorMeta,
                                                     SprayClassLoader sprayClassLoader) {
-        ReferenceConfig<SprayDubboInitReference> referenceConfig = new ReferenceConfig<>();
-        SprayDubboInitReference sprayDubboReference = referenceConfig.get();
+        ReferenceConfig<SprayDubboSystemReference> referenceConfig = new ReferenceConfig<>();
+        // TODO build the reference config
+        SprayDubboSystemReference sprayDubboReference = referenceConfig.get();
         boolean isSuccess = sprayDubboReference.generateExecutor(executorMeta.transactionId(), executorMeta.getExecutorNameKey(coordinatorMeta),
                 JSON.toJSONString(coordinatorMeta), JSON.toJSONString(executorMeta));
         if (!isSuccess) {
@@ -34,7 +36,7 @@ public class SprayDubboRemoteExecutorGenerator implements SprayRemoteStepExecuto
         return getRemoteExecutor(coordinatorMeta, executorMeta, sprayClassLoader);
     }
 
-    private SprayRemoteStepExecutor getRemoteExecutor(SprayProcessCoordinatorMeta coordinatorMeta, SprayProcessStepMeta executorMeta, SprayClassLoader sprayClassLoader) {
+    private SprayDubboExecutor getRemoteExecutor(SprayProcessCoordinatorMeta coordinatorMeta, SprayProcessStepMeta executorMeta, SprayClassLoader sprayClassLoader) {
 
         return null;
     }
