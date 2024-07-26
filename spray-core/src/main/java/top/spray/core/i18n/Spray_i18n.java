@@ -1,5 +1,6 @@
 package top.spray.core.i18n;
 
+import cn.hutool.core.util.StrUtil;
 import top.spray.core.dynamic.loader.SprayClassLoader;
 import top.spray.core.util.SprayServiceUtil;
 import top.spray.core.util.SprayUtf8s;
@@ -8,6 +9,7 @@ import java.util.*;
 
 /**
  * implements it and declare in spi
+ * <h4>spray.i18n.</h4>
  */
 public interface Spray_i18n {
     /**
@@ -23,7 +25,7 @@ public interface Spray_i18n {
     String getBundleName();
 
     String BUNDLE_PREFIX = "spray.i18n.";
-    static String get(Class<? extends Spray_i18n> clazz, String key) {
+    static String get(Class<? extends Spray_i18n> clazz, String key, Object... args) {
         String value = null;
         Map<String, Spray_i18n> I18N = SprayServiceUtil.loadServiceClassNameMapCache(Spray_i18n.class);
         Spray_i18n i18n = I18N.get(clazz.getName());
@@ -52,7 +54,7 @@ public interface Spray_i18n {
                 throw new RuntimeException("can not find resource bundle for " + bundleName);
             }
         }
-        return value == null ? key : value;
+        return value == null ? key : StrUtil.format(value, args);
     }
 
     static void setLocale(Locale locale) {

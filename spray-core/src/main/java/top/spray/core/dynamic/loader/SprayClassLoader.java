@@ -6,6 +6,9 @@ import jdk.internal.loader.Resource;
 import jdk.internal.loader.URLClassPath;
 import jdk.internal.perf.PerfCounter;
 import org.apache.commons.lang3.StringUtils;
+import top.spray.core.dynamic.listener.SprayClassLoaderListener;
+import top.spray.core.dynamic.processor.SprayClassBeforeDefineProcessor;
+import top.spray.core.dynamic.processor.SprayClassPostLoadProcessor;
 
 import java.io.File;
 import java.io.IOException;
@@ -42,7 +45,8 @@ public class SprayClassLoader extends URLClassLoader {
 
     private Map<String, Class<?>> loadedClassMap = new ConcurrentHashMap<>();
 
-    private List<>
+    private List<SprayClassLoaderListener> loaderListeners;
+
 
     public SprayClassLoader(String jarFiles) {
         this(jarFiles, Thread.currentThread().getContextClassLoader());
@@ -75,6 +79,10 @@ public class SprayClassLoader extends URLClassLoader {
         for (URL url : urls) {
             this.addURL(url);
         }
+    }
+
+    public void setLoaderListeners(List<SprayClassLoaderListener> loaderListeners) {
+        this.loaderListeners = loaderListeners;
     }
 
     private static Collection<File> convertPathsToFiles(String paths) {
@@ -196,6 +204,9 @@ public class SprayClassLoader extends URLClassLoader {
 
     @Override
     public void close() throws IOException {
+        if (this.loaderListeners != null) {
+            this.loaderListeners.forEach(listener -> listener.onClassLoaderClose(this));
+        }
         for (Map.Entry<String, Class<?>> entry : loadedClassMap.entrySet()) {
             try {
                 // invoke a static destroy method
@@ -294,22 +305,26 @@ public class SprayClassLoader extends URLClassLoader {
         }
         // Now read the class bytes and define the class
         java.nio.ByteBuffer bb = res.getByteBuffer();
+
+        Class<?> clazz;
         if (bb != null) {
             // Use (direct) ByteBuffer:
             CodeSigner[] signers = res.getCodeSigners();
             CodeSource cs = new CodeSource(url, signers);
             PerfCounter.getReadClassBytesTime().addElapsedTimeFrom(t0);
-
-            return defineClass(name, bb, cs);
+            clazz = defineClass(name, bb, cs);
         } else {
             byte[] b = res.getBytes();
             // must read certificates AFTER reading bytes.
             CodeSigner[] signers = res.getCodeSigners();
             CodeSource cs = new CodeSource(url, signers);
             PerfCounter.getReadClassBytesTime().addElapsedTimeFrom(t0);
-
-            return defineClass(name, b, 0, b.length, cs);
+            clazz = defineClass(name, b, 0, b.length, cs);
         }
+        if (this.loaderListeners != null) {
+            this.loaderListeners.forEach(listener -> listener.onClassDefined(this, clazz));
+        }
+        return clazz;
     }
     /*
      * Retrieve the package using the specified package name.

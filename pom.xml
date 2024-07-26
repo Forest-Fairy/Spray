@@ -11,7 +11,8 @@
         <module>spray-engine</module>
         <module>spray-core</module>
 		<module>spray-plugins</module>
-	</modules>
+        <module>spray-demo</module>
+    </modules>
 	<packaging>pom</packaging>
 	<description>Spray is a source-open data-integration platform that supports running with dataflow both in stream mode and batch mode in a job, and supports remote node running.</description>
 	<properties>
