@@ -1,7 +1,7 @@
 package top.spray.engine.factory;
 
 import org.apache.commons.lang3.StringUtils;
-import top.spray.core.util.SprayClassLoader;
+import top.spray.core.dynamic.loader.SprayClassLoader;
 import top.spray.engine.coordinate.coordinator.SprayProcessCoordinator;
 import top.spray.engine.coordinate.meta.SprayProcessCoordinatorMeta;
 import top.spray.engine.exception.SprayExecutorInitException;

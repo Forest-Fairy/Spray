@@ -1,1 +1,1 @@
-top.spray.engine.remote.dubbo.generator.SprayDubboRemoteExecutorGenerator
+top.spray.engine.plugins.remote.dubbo.consumer.source.SprayDubboRemoteExecutorGenerator

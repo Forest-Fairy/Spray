@@ -14,8 +14,8 @@
     <description>For adding plugins</description>
     <packaging>pom</packaging>
     <modules>
+        <module>spray-plugins-base</module>
         <module>spray-engine-plugins</module>
-        <module>spray-executor-plugins</module>
     </modules>
 
     <properties>
@@ -25,6 +25,20 @@
             <groupId>top.spray</groupId>
             <artifactId>spray-engine</artifactId>
         </dependency>
+        <dependency>
+            <groupId>top.spray</groupId>
+            <artifactId>spray-plugins-base</artifactId>
+        </dependency>
     </dependencies>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>top.spray</groupId>
+                <artifactId>spray-plugins-base</artifactId>
+                <version>${revision}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
 </project>

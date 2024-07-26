@@ -4,9 +4,8 @@ import top.spray.core.engine.props.SprayData;
 import top.spray.core.engine.types.SprayType;
 import top.spray.core.engine.types.SprayTypeHolder;
 import top.spray.core.engine.types.data.execute.record.SprayExecutionRecordType;
-import top.spray.core.util.SprayClassLoader;
+import top.spray.core.dynamic.loader.SprayClassLoader;
 import top.spray.engine.coordinate.meta.SprayProcessCoordinatorMeta;
-import top.spray.engine.step.executor.SprayProcessStepExecutor;
 import top.spray.core.engine.types.step.status.SprayStepStatus;
 import top.spray.engine.step.handler.record.SprayExecutionRecordHandler;
 import top.spray.engine.step.meta.SprayProcessStepMeta;
@@ -106,7 +105,7 @@ public class SprayStepResultInstance {
      */
     public void recordInputBeforeExecution(SprayProcessStepMeta fromExecutorMeta, SprayData data, boolean still) {
         this.executionStrategyHandlers.forEach(handler -> handler.record(
-                executorMeta, SprayExecutionRecordType.BEFORE_EXECUTE, fromExecutorMeta, data, still, null));
+                executorMeta, SprayExecutionRecordType.RECORD_BEFORE_EXECUTE, fromExecutorMeta, data, still, null));
     }
 
     /**
@@ -117,7 +116,7 @@ public class SprayStepResultInstance {
      */
     public void recordInputAfterExecutionSuccess(SprayProcessStepMeta fromExecutorMeta, SprayData data, boolean still) {
         this.executionStrategyHandlers.forEach(handler -> handler.record(
-                executorMeta, SprayExecutionRecordType.EXECUTE_SUCCESS, fromExecutorMeta, data, still, null));
+                executorMeta, SprayExecutionRecordType.RECORD_EXECUTE_SUCCESS, fromExecutorMeta, data, still, null));
     }
 
     /**
@@ -128,7 +127,7 @@ public class SprayStepResultInstance {
      */
     public void recordInputAfterExecutionFailed(SprayProcessStepMeta fromExecutorMeta, SprayData data, boolean still, Throwable error) {
         this.executionStrategyHandlers.forEach(handler -> handler.record(
-                executorMeta, SprayExecutionRecordType.EXECUTE_FAILED, fromExecutorMeta, data, still, error));
+                executorMeta, SprayExecutionRecordType.RECORD_EXECUTE_FAILED, fromExecutorMeta, data, still, error));
     }
 
     public void endStep() {

@@ -3,7 +3,7 @@ package top.spray.engine.step.executor;
 import top.spray.core.engine.execute.SprayMetaDrive;
 import top.spray.core.engine.props.SprayData;
 import top.spray.core.thread.SprayPoolExecutor;
-import top.spray.core.util.SprayClassLoader;
+import top.spray.core.dynamic.loader.SprayClassLoader;
 import top.spray.engine.coordinate.coordinator.SprayProcessCoordinator;
 import top.spray.engine.prop.SprayVariableContainer;
 import top.spray.engine.step.instance.SprayStepResultInstance;

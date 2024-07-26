@@ -16,7 +16,7 @@
 	<description>Spray is a source-open data-integration platform that supports running with dataflow both in stream mode and batch mode in a job, and supports remote node running.</description>
 	<properties>
 		<java.version>17</java.version>
-		<spray.version>1.0.0</spray.version>
+		<spray.version>0.1.1</spray.version>
 		<revision>${spray.version}</revision>
 		<maven.compiler.source>17</maven.compiler.source>
 		<maven.compiler.target>17</maven.compiler.target>

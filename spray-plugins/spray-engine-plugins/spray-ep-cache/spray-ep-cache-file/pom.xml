@@ -6,7 +6,7 @@
     <parent>
         <groupId>top.spray</groupId>
         <artifactId>spray-ep-cache</artifactId>
-        <version>1.0.0</version>
+        <version>${revision}</version>
     </parent>
 
     <artifactId>spray-ep-cache-file</artifactId>

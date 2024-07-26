@@ -3,9 +3,26 @@ package top.spray.core.engine.types.coordinate.status;
 import top.spray.core.engine.types.SprayType;
 import top.spray.core.engine.types.coordinate.SprayTypeCoordinateDescription_i18n;
 import top.spray.core.engine.types.coordinate.SprayTypeCoordinateTypeName_i18n;
+import top.spray.core.engine.types.data.dispatch.result.SprayDataDispatchResultStatus;
 import top.spray.core.i18n.Spray_i18n;
 
+import java.util.List;
+
 public class SprayCoordinatorStatus implements SprayType {
+    private static final List<SprayCoordinatorStatus> values = List.of(
+            SprayCoordinatorStatus.ERROR,
+            SprayCoordinatorStatus.FAILED,
+            SprayCoordinatorStatus.RUNNING,
+            SprayCoordinatorStatus.STOP,
+            SprayCoordinatorStatus.SUCCESS
+    );
+    public static List<SprayCoordinatorStatus> values() {
+        return values;
+    }
+    public static SprayCoordinatorStatus get(int code) {
+        return SprayType.get(values, code);
+    }
+
     /** stop by human. need stop reason */
     public static final SprayCoordinatorStatus STOP = new SprayCoordinatorStatus(
             2, "coordinator.status.manual_stop");

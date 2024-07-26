@@ -1,6 +1,6 @@
 package top.spray.core.i18n;
 
-import top.spray.core.util.SprayClassLoader;
+import top.spray.core.dynamic.loader.SprayClassLoader;
 import top.spray.core.util.SprayServiceUtil;
 import top.spray.core.util.SprayUtf8s;
 

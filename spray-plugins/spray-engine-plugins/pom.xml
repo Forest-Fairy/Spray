@@ -16,6 +16,7 @@
     <modules>
         <module>spray-ep-cache</module>
         <module>spray-ep-remoting</module>
+        <module>spray-ep-executors</module>
     </modules>
 
     <properties>
@@ -25,7 +26,6 @@
         <dependency>
             <groupId>top.spray</groupId>
             <artifactId>spray-engine</artifactId>
-            <version>1.0.0</version>
         </dependency>
     </dependencies>
 

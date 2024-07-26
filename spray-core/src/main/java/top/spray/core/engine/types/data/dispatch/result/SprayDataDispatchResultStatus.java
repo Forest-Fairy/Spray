@@ -21,7 +21,7 @@ public class SprayDataDispatchResultStatus implements SprayType {
         return values;
     }
     public static SprayDataDispatchResultStatus get(int code) {
-        return SprayType.get(SprayDataDispatchResultStatus.values(), code);
+        return SprayType.get(values, code);
     }
 
 

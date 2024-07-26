@@ -8,10 +8,12 @@ import top.spray.core.engine.types.SprayType;
 import top.spray.core.engine.types.data.dispatch.result.SprayDataDispatchResultStatus;
 import top.spray.core.engine.types.step.status.SprayStepStatus;
 import top.spray.core.engine.types.coordinate.status.SprayCoordinatorStatus;
-import top.spray.core.util.SprayClassLoader;
+import top.spray.core.dynamic.loader.SprayClassLoader;
 import top.spray.engine.coordinate.handler.result.SprayDataDispatchResultHandler;
 import top.spray.engine.exception.SprayExecutorGenerateError;
 import top.spray.engine.factory.SprayExecutorFactory;
+import top.spray.engine.prop.SprayCoordinatorVariableContainer;
+import top.spray.engine.prop.SprayExecutorVariableContainer;
 import top.spray.engine.prop.SprayVariableContainer;
 import top.spray.engine.step.condition.SprayStepExecuteConditionFilter;
 import top.spray.engine.step.executor.SprayExecutorListener;
@@ -44,7 +46,7 @@ public class SprayDefaultProcessCoordinator implements
         this.executorVariablesNamespace = new ConcurrentHashMap<>();
         this.coordinatorMeta = coordinatorMeta;
         this.listeners = new ArrayList<>();
-        this.defaultVariables = SprayVariableContainer.create(this);
+        this.defaultVariables = SprayCoordinatorVariableContainer.create(this);
         this.defaultDataList = new ArrayList<>();
         this.creatorThreadClassLoader = Thread.currentThread().getContextClassLoader();
         this.dispatchResultHandler = SprayDataDispatchResultHandler.get(coordinatorMeta);
@@ -292,8 +294,8 @@ public class SprayDefaultProcessCoordinator implements
                 curExecutor.execute(
                         executorVariablesNamespace.computeIfAbsent(
                                 lastVariables.nextKey(fromExecutor, curExecutor), key -> copyMode == 1 ?
-                                        SprayVariableContainer.easyCopy(fromExecutor, lastVariables, curExecutor) :
-                                        SprayVariableContainer.deepCopy(fromExecutor, lastVariables, curExecutor)),
+                                        SprayExecutorVariableContainer.easyCopy(fromExecutor, lastVariables, curExecutor) :
+                                        SprayExecutorVariableContainer.deepCopy(fromExecutor, lastVariables, curExecutor)),
                         fromExecutor, data, still);
             }
         } catch (Exception e) {
