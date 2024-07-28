@@ -43,6 +43,7 @@ public class SprayDubboProcessCoordinator implements SprayDubboCoordinator {
         this.coordinatorMeta = coordinatorMeta;
         this.baseService = SprayDubboBaseService.get(this);
         this.realExecutors = new ConcurrentHashMap<>(1);
+        this.variablesContainerMap = new ConcurrentHashMap<>(1);
         this.creatorThreadClassLoader = Thread.currentThread().getContextClassLoader();
     }
 
