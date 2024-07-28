@@ -1,5 +1,6 @@
 package top.spray.engine.coordinate.coordinator;
 
+import top.spray.core.engine.execute.SprayClosable;
 import top.spray.core.engine.execute.SprayMetaDrive;
 import top.spray.core.engine.props.SprayData;
 import top.spray.core.engine.types.coordinate.status.SprayCoordinatorStatus;
@@ -8,7 +9,6 @@ import top.spray.engine.coordinate.meta.SprayProcessCoordinatorMeta;
 import top.spray.engine.prop.SprayVariableContainer;
 import top.spray.engine.step.executor.SprayProcessStepExecutor;
 import top.spray.engine.step.condition.SprayNextStepFilter;
-import top.spray.engine.step.meta.SprayProcessStepMeta;
 
 import java.util.List;
 import java.util.Map;
@@ -20,7 +20,8 @@ import java.util.function.Supplier;
  */
 public interface SprayProcessCoordinator extends
         SprayMetaDrive<SprayProcessCoordinatorMeta>,
-        Supplier<SprayCoordinatorStatus>, Runnable, AutoCloseable {
+        Supplier<SprayCoordinatorStatus>, Runnable,
+        SprayClosable {
     @Override
     SprayProcessCoordinatorMeta getMeta();
 
@@ -44,13 +45,16 @@ public interface SprayProcessCoordinator extends
 
     ClassLoader getCreatorThreadClassLoader();
 
+    /** the only way to get variablesContainer */
+    SprayVariableContainer getVariablesContainer(String identityDataKey);
+
     /** the only way to get the executor */
-    SprayProcessStepExecutor getStepExecutor(SprayProcessStepMeta executorMeta);
+    SprayProcessStepExecutor getStepExecutor(String executorNameKey);
 
     int createExecutorCount();
 
     /** a method for executor to publish its data */
-    void dispatch(SprayVariableContainer variables, SprayNextStepFilter stepFilter, SprayProcessStepExecutor fromExecutor, SprayData data, boolean still);
+    void dispatch(String variablesIdentityDataKey, SprayNextStepFilter stepFilter, SprayProcessStepExecutor fromExecutor, SprayData data, boolean still);
 
     List<SprayDataDispatchResultStatus> getDispatchResults(String dataKey);
 

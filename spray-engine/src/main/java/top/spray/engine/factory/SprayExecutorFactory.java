@@ -21,7 +21,8 @@ public class SprayExecutorFactory {
             SprayProcessCoordinator coordinator, SprayProcessStepMeta stepMeta, boolean tryRemoting) {
         SprayProcessStepExecutor stepExecutor;
         SprayClassLoader sprayClassLoader;
-        if (tryRemoting && SprayEngineConfigurations.executorRemotingSupport() && stepMeta.isRemoting()) {
+        if (tryRemoting && SprayEngineConfigurations.executorRemotingSupport() &&
+                coordinator.getMeta().remoteSupport() && stepMeta.isRemoting()) {
             sprayClassLoader = new SprayClassLoader(
                     stepMeta.remotingJarFiles(), coordinator.getCreatorThreadClassLoader());
             stepExecutor = SprayRemoteAdapterFactory.createRemoteExecutorAdapterForCoordinator(

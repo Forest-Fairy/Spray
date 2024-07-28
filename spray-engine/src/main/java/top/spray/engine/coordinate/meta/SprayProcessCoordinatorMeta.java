@@ -5,18 +5,17 @@ import top.spray.core.engine.props.SprayData;
 import top.spray.engine.step.meta.SprayProcessStepMeta;
 
 import java.util.List;
-import java.util.Map;
 
 public interface SprayProcessCoordinatorMeta extends SprayBaseMeta<SprayProcessCoordinatorMeta> {
     String getId();
     String getName();
     String transactionId();
     boolean asyncSupport();
+    boolean remoteSupport();
+    /** the url for remote executor to call, it will be auto replaced if blank when it is in-need */
+    String url();
 
     String dataDispatchResultHandler();
-
-    /** the execute host if the process is remote task */
-    String getCoordinatorHost();
 
     /** the default variables for the process */
     SprayData getDefaultProcessData();

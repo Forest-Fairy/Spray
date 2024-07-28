@@ -93,7 +93,7 @@ public abstract class SprayBaseStepExecutor implements SprayProcessStepExecutor 
         this.publishData(variableContainer, data, still, null);
     }
     protected final void publishData(SprayVariableContainer variableContainer, SprayData data, boolean still, SprayNextStepFilter stepFilter) {
-        this.getCoordinator().dispatch(variableContainer, stepFilter, this, data, still);
+        this.getCoordinator().dispatch(variableContainer.identityDataKey(), stepFilter, this, data, still);
     }
 
     @Override
@@ -196,7 +196,7 @@ public abstract class SprayBaseStepExecutor implements SprayProcessStepExecutor 
             // TODO Handle with handler
             throw e;
         }
-        this.getClassLoader().close();
+        this.getClassLoader().closeInRuntime();
         destroy();
     }
     protected void destroy() throws Exception {

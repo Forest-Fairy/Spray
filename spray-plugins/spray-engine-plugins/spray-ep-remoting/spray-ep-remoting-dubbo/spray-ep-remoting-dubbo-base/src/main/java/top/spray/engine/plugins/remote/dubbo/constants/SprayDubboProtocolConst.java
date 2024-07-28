@@ -32,4 +32,16 @@ public enum SprayDubboProtocolConst {
         return null;
     }
 
+    public static SprayDubboProtocolConst parseWithUrl(String url) {
+        if (url != null) {
+            url = url.toLowerCase();
+            for (SprayDubboProtocolConst protocol : SprayDubboProtocolConst.values()) {
+                if (url.startsWith(protocol.value)) {
+                    return protocol;
+                }
+            }
+        }
+        return null;
+    }
+
 }

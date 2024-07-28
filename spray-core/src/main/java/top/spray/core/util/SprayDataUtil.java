@@ -2,6 +2,7 @@ package top.spray.core.util;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import com.alibaba.fastjson2.*;
@@ -121,6 +122,29 @@ public class SprayDataUtil {
             }
         }
         return (T) tClass.cast(result);
+    }
+
+    public static <T> T computeIfAbsent(Map<String, T> map, String key, T val) {
+        T t = map.get(key);
+        if (t == null) {
+            synchronized (map) {
+                if ((t = map.get(key)) == null) {
+                    map.put(key, t = val);
+                }
+            }
+        }
+        return t;
+    }
+    public static <T> T computeIfAbsent(Map<String, T> map, String key, Supplier<T> supplier) {
+        T t = map.get(key);
+        if (t == null) {
+            synchronized (map) {
+                if ((t = map.get(key)) == null) {
+                    map.put(key, t = supplier.get());
+                }
+            }
+        }
+        return t;
     }
 
 }

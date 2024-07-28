@@ -1,5 +1,6 @@
 package top.spray.engine.step.executor;
 
+import top.spray.core.engine.execute.SprayClosable;
 import top.spray.core.engine.execute.SprayMetaDrive;
 import top.spray.core.engine.props.SprayData;
 import top.spray.core.thread.SprayPoolExecutor;
@@ -12,7 +13,7 @@ import top.spray.engine.step.meta.SprayProcessStepMeta;
 /**
  * Define the executor of a process node
  */
-public interface SprayProcessStepExecutor extends SprayMetaDrive<SprayProcessStepMeta>, AutoCloseable {
+public interface SprayProcessStepExecutor extends SprayMetaDrive<SprayProcessStepMeta>, SprayClosable {
     default String getExecutorNameKey() {
         return getCoordinator().getExecutorNameKey(this);
     }

@@ -104,7 +104,16 @@ public class SprayDefaultProcessCoordinator implements
     }
 
     @Override
-    public final SprayProcessStepExecutor getStepExecutor(SprayProcessStepMeta executorMeta) {
+    public SprayVariableContainer getVariablesContainer(String identityDataKey) {
+        return this.executorVariablesNamespace.get(identityDataKey);
+    }
+
+    @Override
+    public final SprayProcessStepExecutor getStepExecutor(String executorNameKey) {
+        return this.cachedExecutorMap.get(executorNameKey);
+    }
+
+    private SprayProcessStepExecutor createStepExecutor(SprayProcessStepMeta executorMeta) {
         String executorNameKey = executorMeta.getExecutorNameKey(this.getMeta());
         SprayProcessStepExecutor executor = this.cachedExecutorMap.get(executorNameKey);
         if (executor == null) {
@@ -172,9 +181,9 @@ public class SprayDefaultProcessCoordinator implements
     }
 
     @Override
-    public void dispatch(SprayVariableContainer lastVariables, SprayNextStepFilter stepFilter,
+    public void dispatch(String variablesIdentityDataKey, SprayNextStepFilter stepFilter,
                          SprayProcessStepExecutor fromExecutor, SprayData data, boolean still) {
-        this._dispatchData(fromExecutor.getMeta().nextNodes(), stepFilter, lastVariables, fromExecutor, data, still);
+        this._dispatchData(fromExecutor.getMeta().nextNodes(), stepFilter, this.executorVariablesNamespace.get(variablesIdentityDataKey), fromExecutor, data, still);
     }
 
 
@@ -245,6 +254,9 @@ public class SprayDefaultProcessCoordinator implements
     }
 
     private void _dispatchData(List<SprayProcessStepMeta> nodes, SprayNextStepFilter stepFilter, SprayVariableContainer lastVariables, SprayProcessStepExecutor fromExecutor, SprayData data, boolean still) {
+        if (lastVariables == null) {
+            lastVariables = defaultVariables;
+        }
         if (nodes == null || nodes.isEmpty()) {
             this.setDispatchResult(lastVariables, fromExecutor, data, still, null, SprayDataDispatchResultStatus.ABANDONED);
             return;
@@ -257,7 +269,7 @@ public class SprayDefaultProcessCoordinator implements
                 continue;
             }
             // get or create executor
-            SprayProcessStepExecutor nextExecutor = this.getStepExecutor(nodeMeta);
+            SprayProcessStepExecutor nextExecutor = this.createStepExecutor(nodeMeta);
             if (needWait(nextExecutor, lastVariables, fromExecutor, data, still)) {
                 // the executor need to wait
                 return;
@@ -303,18 +315,19 @@ public class SprayDefaultProcessCoordinator implements
         }
     }
 
+
     @Override
-    public void close() throws Exception {
+    public void closeInRuntime() {
         this.dispatchResultHandler.whenCoordinatorShutdown(this.getMeta());
         if (this.getCreatorThreadClassLoader() instanceof SprayClassLoader scl) {
-            scl.close();
+            scl.closeInRuntime();
         }
         for (Map.Entry<String, SprayProcessStepExecutor> executorEntry : this.cachedExecutorMap.entrySet()) {
             try {
                 executorEntry.getValue().close();
             } catch (Exception e) {
                 // TODO handle exception with its handler
-                throw e;
+                throw new RuntimeException(e);
             }
         }
     }

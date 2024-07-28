@@ -9,6 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 import top.spray.core.dynamic.listener.SprayClassLoaderListener;
 import top.spray.core.dynamic.processor.SprayClassBeforeDefineProcessor;
 import top.spray.core.dynamic.processor.SprayClassPostLoadProcessor;
+import top.spray.core.engine.execute.SprayClosable;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,7 +24,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
-public class SprayClassLoader extends URLClassLoader {
+public class SprayClassLoader extends URLClassLoader implements SprayClosable {
     private static final SprayClassLoader default_loader;
     static {
         URL location = SprayClassLoader.class.getProtectionDomain().getCodeSource().getLocation();
@@ -203,7 +204,7 @@ public class SprayClassLoader extends URLClassLoader {
     }
 
     @Override
-    public void close() throws IOException {
+    public void closeInRuntime() {
         if (this.loaderListeners != null) {
             this.loaderListeners.forEach(listener -> listener.onClassLoaderClose(this));
         }
@@ -218,7 +219,11 @@ public class SprayClassLoader extends URLClassLoader {
         }
         loadedClassMap.clear();
         // 从其父类加载器的加载器层次结构中移除该类加载器
-        super.close();
+        try {
+            super.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static SprayClassLoader getDefault() {
