@@ -236,4 +236,8 @@ public class SprayProcessStepMeta implements SprayBaseMeta<SprayProcessStepMeta>
     public SprayData getMetaContainer() {
         return metaContainer;
     }
+
+    public String toJson() {
+        return this.metaContainer.toJson();
+    }
 }

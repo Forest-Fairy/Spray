@@ -39,24 +39,13 @@ public interface SprayProcessCoordinator extends
     /** the coordinator's status: none-blocked method  */
     SprayCoordinatorStatus status();
 
-    default String getExecutorNameKey(SprayProcessStepExecutor executor) {
-        return executor.getMeta().getExecutorNameKey(this.getMeta());
-    }
-
     ClassLoader getCreatorThreadClassLoader();
-
-    /** the only way to get variablesContainer */
-    SprayVariableContainer getVariablesContainer(String identityDataKey);
-
-    /** the only way to get the executor */
-    SprayProcessStepExecutor getStepExecutor(String executorNameKey);
 
     int createExecutorCount();
 
     /** a method for executor to publish its data */
     void dispatch(String variablesIdentityDataKey, SprayNextStepFilter stepFilter, SprayProcessStepExecutor fromExecutor, SprayData data, boolean still);
 
-    List<SprayDataDispatchResultStatus> getDispatchResults(String dataKey);
 
     /**
      * unit method for executing
@@ -64,8 +53,11 @@ public interface SprayProcessCoordinator extends
     void executeNext(SprayProcessStepExecutor nextStepExecutor, SprayVariableContainer lastVariables, SprayProcessStepExecutor fromExecutor, SprayData data, boolean still);
 
 
-    /** all the executor in coordinator */
-    Map<String, SprayProcessStepExecutor> getCachedExecutorMap();
+    /** the only way to get variablesContainer */
+    SprayVariableContainer getVariablesContainer(String identityDataKey);
+
+    /** the only way to get the executor */
+    SprayProcessStepExecutor getStepExecutor(String executorNameKey);
 
     /** all the recorded input data of the executor in coordinator */
     Set<String> getInputDataKeys(String executorNameKey);
@@ -73,4 +65,6 @@ public interface SprayProcessCoordinator extends
     /** all the recorded output data of the executor in coordinator */
     Set<String> getOutputDataKeys(String executorNameKey);
 
+    /** data dispatch results track */
+    List<SprayDataDispatchResultStatus> getDispatchResults(String dataKey);
 }

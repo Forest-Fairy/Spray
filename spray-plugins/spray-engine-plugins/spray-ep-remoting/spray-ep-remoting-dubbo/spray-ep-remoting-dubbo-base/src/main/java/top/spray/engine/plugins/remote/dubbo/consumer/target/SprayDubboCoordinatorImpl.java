@@ -1,4 +1,4 @@
-package top.spray.engine.plugins.remote.dubbo.provider.target;
+package top.spray.engine.plugins.remote.dubbo.consumer.target;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.rpc.RpcContext;
@@ -6,10 +6,10 @@ import top.spray.core.engine.props.SprayData;
 import top.spray.core.engine.types.coordinate.status.SprayCoordinatorStatus;
 import top.spray.core.engine.types.data.dispatch.result.SprayDataDispatchResultStatus;
 import top.spray.engine.coordinate.meta.SprayProcessCoordinatorMeta;
+import top.spray.engine.plugins.remote.dubbo.api.target.SprayDubboBaseService;
 import top.spray.engine.plugins.remote.dubbo.api.target.SprayDubboVariablesContainer;
+import top.spray.engine.plugins.remote.dubbo.api.target.reference.SprayDubboExecutorReference;
 import top.spray.engine.plugins.remote.dubbo.constants.SprayDubboProtocolConst;
-import top.spray.engine.plugins.remote.dubbo.consumer.target.SprayDubboVariablesContainerImpl;
-import top.spray.engine.plugins.remote.dubbo.provider.SprayBaseService;
 import top.spray.engine.plugins.remote.dubbo.util.SprayDubboDataUtil;
 import top.spray.engine.prop.SprayVariableContainer;
 import top.spray.engine.plugins.remote.dubbo.api.target.SprayDubboCoordinator;
@@ -22,30 +22,53 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
-public class SprayDubboProcessCoordinator implements SprayDubboCoordinator {
+public class SprayDubboCoordinatorImpl implements SprayDubboCoordinator {
     private final String url;
     private final String protocol;
-    private final SprayBaseService baseService;
+    private final SprayDubboBaseService baseService;
     private final SprayProcessCoordinatorMeta coordinatorMeta;
-    private final Map<String, SprayProcessStepExecutor> realExecutors;
+    private final Map<String, SprayProcessStepMeta> stepMetas;
+    private final Map<String, SprayProcessStepExecutor> executors;
     private final Map<String, SprayDubboVariablesContainer> variablesContainerMap;
     private final ClassLoader creatorThreadClassLoader;
 
-    public SprayDubboProcessCoordinator(
+    public SprayDubboCoordinatorImpl(
             SprayProcessCoordinatorMeta coordinatorMeta, int port) {
-        this.url = StringUtils.isNotBlank(coordinatorMeta.url()) ? coordinatorMeta.url() :
-                RpcContext.getServerContext().getUrl().getAddress();
-        SprayDubboProtocolConst p = SprayDubboProtocolConst.parseWithUrl(this.url);
-        this.protocol = p == null ? SprayDubboProtocolConst.DUBBO.getValue() : p.getValue();
+        if (StringUtils.isNotBlank(coordinatorMeta.url())) {
+            this.url = coordinatorMeta.url();
+            this.protocol = SprayDubboProtocolConst.parseWithUrl(this.url).getValue();
+        } else {
+            String host = RpcContext.getServerContext().getUrl().getHost();
+            this.url = String.format("%s://%s:%d", SprayDubboProtocolConst.DUBBO.getValue(), host, port);
+            this.protocol = SprayDubboProtocolConst.DUBBO.getValue();
+        }
         this.coordinatorMeta = coordinatorMeta;
         this.baseService = SprayDubboBaseService.get(this);
-        this.realExecutors = new ConcurrentHashMap<>(1);
+        this.stepMetas = new ConcurrentHashMap<>(1);
+        this.executors = new ConcurrentHashMap<>(1);
         this.variablesContainerMap = new ConcurrentHashMap<>(1);
         this.creatorThreadClassLoader = Thread.currentThread().getContextClassLoader();
+        initMeta();
     }
+
+    private void initMeta() {
+        recordMeta(this.coordinatorMeta.getStartNodes());
+    }
+
+    private void recordMeta(List<SprayProcessStepMeta> nodes) {
+        if (nodes == null || nodes.isEmpty()) {
+            return;
+        }
+        nodes.forEach(nodeMeta -> {
+            if (this.stepMetas.put(nodeMeta.getExecutorNameKey(this.coordinatorMeta), nodeMeta) == null) {
+                // put next if it is first time to be recorded
+                recordMeta(nodeMeta.nextNodes());
+            }
+        });
+    }
+
 
     @Override
     public String url() {
@@ -79,7 +102,7 @@ public class SprayDubboProcessCoordinator implements SprayDubboCoordinator {
 
     @Override
     public SprayCoordinatorStatus status() {
-        return SprayCoordinatorStatus.get(coordinatorReference.getCoordinatorStatus(this.coordinatorMeta.transactionId()));
+        return SprayCoordinatorStatus.get(baseService.getCoordinatorStatus(this.coordinatorMeta.transactionId()));
     }
 
     @Override
@@ -134,17 +157,12 @@ public class SprayDubboProcessCoordinator implements SprayDubboCoordinator {
 
     @Override
     public List<SprayDataDispatchResultStatus> getDispatchResults(String dataKey) {
-        return null;
+        throw new SprayDubboOperationNotSupportException();
     }
 
     @Override
     public void executeNext(SprayProcessStepExecutor nextStepExecutor, SprayVariableContainer lastVariables, SprayProcessStepExecutor fromExecutor, SprayData data, boolean still) {
-
-    }
-
-    @Override
-    public Map<String, SprayProcessStepExecutor> getCachedExecutorMap() {
-        return null;
+        throw new SprayDubboOperationNotSupportException();
     }
 
     @Override
@@ -159,12 +177,24 @@ public class SprayDubboProcessCoordinator implements SprayDubboCoordinator {
 
     @Override
     public void registerExecutor(String executorNameKey, SprayProcessStepExecutor executor) {
-        this.realExecutors.put(executorNameKey, executor);
+        this.executors.put(executorNameKey, executor);
     }
 
     @Override
     public SprayProcessStepExecutor getStepExecutor(String executorNameKey) {
-        return this.realExecutors.get(executorNameKey);
+        SprayProcessStepExecutor executor = this.executors.get(executorNameKey);
+        if (executor == null) {
+            synchronized (this.executors) {
+                if ((executor = this.executors.get(executorNameKey)) == null) {
+                    if (this.baseService.ensureProviderCreated(this.coordinatorMeta.transactionId(), executorNameKey)) {
+                        executor = new SprayDubboSrcExecutorFacade(
+                                SprayDubboExecutorReference.createSrcReference(
+                                        coordinatorMeta, this.stepMetas.get(executorNameKey)))
+                    }
+                }
+            }
+        }
+        return executor;
     }
 
     @Override

@@ -103,16 +103,6 @@ public class SprayDefaultProcessCoordinator implements
         return this.creatorThreadClassLoader;
     }
 
-    @Override
-    public SprayVariableContainer getVariablesContainer(String identityDataKey) {
-        return this.executorVariablesNamespace.get(identityDataKey);
-    }
-
-    @Override
-    public final SprayProcessStepExecutor getStepExecutor(String executorNameKey) {
-        return this.cachedExecutorMap.get(executorNameKey);
-    }
-
     private SprayProcessStepExecutor createStepExecutor(SprayProcessStepMeta executorMeta) {
         String executorNameKey = executorMeta.getExecutorNameKey(this.getMeta());
         SprayProcessStepExecutor executor = this.cachedExecutorMap.get(executorNameKey);
@@ -206,26 +196,6 @@ public class SprayDefaultProcessCoordinator implements
         return dataKey;
     }
 
-    @Override
-    public Map<String, SprayProcessStepExecutor> getCachedExecutorMap() {
-        return cachedExecutorMap;
-    }
-
-    @Override
-    public Set<String> getInputDataKeys(String executorNameKey) {
-        return inputDataKeys.computeIfAbsent(executorNameKey, k-> new LinkedHashSet<>());
-    }
-
-    @Override
-    public Set<String> getOutputDataKeys(String executorNameKey) {
-        return outputDataKeys.computeIfAbsent(executorNameKey, k-> new LinkedHashSet<>());
-    }
-
-    @Override
-    public List<SprayDataDispatchResultStatus> getDispatchResults(String dataKey) {
-        return this.dispatchResultHandler.getDispatchResult(this.getMeta(), dataKey);
-    }
-
     private boolean validateBeforeCreate(SprayVariableContainer lastVariables, SprayProcessStepExecutor fromExecutor, SprayNextStepFilter stepFilter, SprayData data, boolean still, SprayProcessStepMeta nodeMeta) {
         boolean create = true;
         if (!SprayStepActiveType.ACTIVE.equals(nodeMeta.stepActiveType())) {
@@ -316,6 +286,31 @@ public class SprayDefaultProcessCoordinator implements
     }
 
 
+
+    @Override
+    public SprayVariableContainer getVariablesContainer(String identityDataKey) {
+        return this.executorVariablesNamespace.get(identityDataKey);
+    }
+
+    @Override
+    public final SprayProcessStepExecutor getStepExecutor(String executorNameKey) {
+        return this.cachedExecutorMap.get(executorNameKey);
+    }
+
+    @Override
+    public Set<String> getInputDataKeys(String executorNameKey) {
+        return inputDataKeys.computeIfAbsent(executorNameKey, k-> new LinkedHashSet<>());
+    }
+
+    @Override
+    public Set<String> getOutputDataKeys(String executorNameKey) {
+        return outputDataKeys.computeIfAbsent(executorNameKey, k-> new LinkedHashSet<>());
+    }
+
+    @Override
+    public List<SprayDataDispatchResultStatus> getDispatchResults(String dataKey) {
+        return this.dispatchResultHandler.getDispatchResult(this.getMeta(), dataKey);
+    }
     @Override
     public void closeInRuntime() {
         this.dispatchResultHandler.whenCoordinatorShutdown(this.getMeta());

@@ -8,4 +8,6 @@ public interface SprayDubboCoordinatorReference {
     /** a method for executor to publish its data */
     void dispatch(String transactionId, String filteredNodeKeys, String variablesIdentityDataKey, String fromExecutorNameKey, byte[] bytes, boolean still);
 
+    boolean ensureProviderCreated(String transactionId, String executorNameKey);
+
 }

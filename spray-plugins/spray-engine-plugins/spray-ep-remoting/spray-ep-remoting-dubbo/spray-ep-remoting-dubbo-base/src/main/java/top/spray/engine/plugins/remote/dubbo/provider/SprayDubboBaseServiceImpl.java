@@ -1,42 +1,37 @@
 package top.spray.engine.plugins.remote.dubbo.provider;
 
-import cn.hutool.cache.CacheListener;
-import cn.hutool.cache.impl.TimedCache;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 import top.spray.core.engine.props.SprayData;
 import top.spray.engine.coordinate.coordinator.SprayProcessCoordinator;
-import top.spray.engine.plugins.remote.dubbo.api.source.reference.SprayDubboCoordinatorReference;
-import top.spray.engine.plugins.remote.dubbo.api.source.reference.SprayDubboVariablesReference;
+import top.spray.engine.plugins.remote.dubbo.api.target.SprayDubboBaseService;
 import top.spray.engine.plugins.remote.dubbo.api.target.SprayDubboCoordinator;
-import top.spray.engine.plugins.remote.dubbo.api.target.reference.SprayDubboExecutorFactoryReference;
+import top.spray.engine.plugins.remote.dubbo.api.target.reference.SprayDubboExecutorReference;
 import top.spray.engine.plugins.remote.dubbo.factory.SprayDubboAdapterFactory;
 import top.spray.engine.plugins.remote.dubbo.factory.SprayDubboCoordinatorFactory;
 import top.spray.engine.plugins.remote.dubbo.factory.SprayDubboReferenceFactory;
-import top.spray.engine.plugins.remote.dubbo.util.SprayDubboConfigurations;
 import top.spray.engine.plugins.remote.dubbo.util.SprayDubboDataUtil;
 import top.spray.engine.prop.SprayVariableContainer;
 import top.spray.engine.step.executor.SprayProcessStepExecutor;
 
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 @DubboService
-public class SprayBaseService implements
-        SprayDubboExecutorFactoryReference,
-        SprayDubboCoordinatorReference,
-        SprayDubboVariablesReference {
-    private static final int MAX_CACHE_TIME = SprayDubboConfigurations.dubboServiceBeanMaxCacheTime();
-    private static final TimedCache<String, SprayDubboCoordinator> Coordinators =
-            new TimedCache<>(MAX_CACHE_TIME);
-    static {
-        Coordinators.setListener(new CacheListener<String, SprayDubboCoordinator>() {
-            @Override
-            public void onRemove(String transactionId, SprayDubboCoordinator coordinator) {
-                // TODO deal with executor to remove
-                coordinator.closeInRuntime();
-            }
-        });
-    }
+public class SprayDubboBaseServiceImpl implements SprayDubboBaseService {
+    private static final Map<String, SprayDubboCoordinator> Coordinators = new ConcurrentHashMap<>();
+//    private static final TimedCache<String, SprayDubboCoordinator> Coordinators =
+//            new TimedCache<>(SprayDubboConfigurations.dubboServiceBeanMaxCacheTime());
+//    static {
+//        Coordinators.setListener(new CacheListener<String, SprayDubboCoordinator>() {
+//            @Override
+//            public void onRemove(String transactionId, SprayDubboCoordinator coordinator) {
+//                // TODO deal with executor to remove
+//                coordinator.closeInRuntime();
+//            }
+//        });
+//    }
 
     @Override
     public boolean generateExecutor(int dubboServicePort, String transactionId, String executorNameKey, String coordinatorMeta, String executorMeta) {
@@ -63,7 +58,7 @@ public class SprayBaseService implements
             if (!Coordinators.containsKey(transactionId)) {
                 throw new IllegalArgumentException("no such transaction process");
             }
-            Coordinators.remove(transactionId);
+            Coordinators.remove(transactionId).closeInRuntime();
             return true;
         } catch (Exception e) {
             // handle with ex
@@ -94,6 +89,14 @@ public class SprayBaseService implements
                 executor,
                 SprayDubboDataUtil.resolveData(coordinator.getMeta(), executor.getMeta(), bytes),
                 still);
+    }
+    @Override
+    public boolean ensureProviderCreated(String transactionId, String executorNameKey) {
+        if (! SprayDubboExecutorReference.hasProvider(transactionId, executorNameKey)) {
+            SprayProcessCoordinator coordinator = SprayDubboReferenceFactory.getCoordinator(transactionId);
+            SprayDubboExecutorReference.createSrcProvider(executorNameKey, coordinator, coordinator.getStepExecutor(executorNameKey));
+        }
+        return true;
     }
 
     @Override

@@ -15,7 +15,7 @@ import top.spray.engine.step.meta.SprayProcessStepMeta;
  */
 public interface SprayProcessStepExecutor extends SprayMetaDrive<SprayProcessStepMeta>, SprayClosable {
     default String getExecutorNameKey() {
-        return getCoordinator().getExecutorNameKey(this);
+        return getMeta().getExecutorNameKey(getCoordinator().getMeta());
     }
 
     /**

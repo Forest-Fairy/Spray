@@ -2,10 +2,10 @@ package top.spray.engine.plugins.remote.dubbo.consumer.source;
 
 import com.alibaba.fastjson2.JSON;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.dubbo.config.ReferenceConfig;
 import top.spray.core.dynamic.loader.SprayClassLoader;
 import top.spray.engine.coordinate.meta.SprayProcessCoordinatorMeta;
-import top.spray.engine.plugins.remote.dubbo.api.target.reference.SprayDubboExecutorFactoryReference;
+import top.spray.engine.plugins.remote.dubbo.api.target.SprayDubboBaseService;
+import top.spray.engine.plugins.remote.dubbo.api.target.reference.SprayDubboExecutorReference;
 import top.spray.engine.plugins.remote.dubbo.constants.SprayDubboConfigConst;
 import top.spray.engine.plugins.remote.dubbo.api.source.SprayDubboExecutor;
 import top.spray.engine.plugins.remote.dubbo.util.SprayDubboConfigurations;
@@ -24,12 +24,11 @@ public class SprayDubboRemoteExecutorGenerator implements SprayRemoteStepExecuto
     @Override
     public SprayRemoteStepExecutor generateExecutor(SprayProcessCoordinatorMeta coordinatorMeta,
                                                     SprayProcessStepMeta executorMeta,
-                                                    SprayClassLoader sprayClassLoader) {
-        ReferenceConfig<SprayDubboExecutorFactoryReference> referenceConfig = new ReferenceConfig<>();
-        // TODO build the reference config
-        SprayDubboExecutorFactoryReference sprayDubboReference = referenceConfig.get();
+                                                    SprayClassLoader classLoader) {
+        Thread.currentThread().setContextClassLoader(classLoader);
+        SprayDubboBaseService sprayDubboReference = SprayDubboBaseService.get(executorMeta);
         boolean isSuccess = sprayDubboReference.generateExecutor(
-                SprayDubboConfigurations.dubboServicePort(),
+                SprayDubboConfigurations.dubboServiceProviderPort(),
                 executorMeta.transactionId(),
                 executorMeta.getExecutorNameKey(coordinatorMeta),
                 JSON.toJSONString(coordinatorMeta), JSON.toJSONString(executorMeta));
@@ -37,12 +36,11 @@ public class SprayDubboRemoteExecutorGenerator implements SprayRemoteStepExecuto
             throw new RuntimeException("");
         }
         // generate a remote executor for coordinator
-        return getRemoteExecutor(coordinatorMeta, executorMeta, sprayClassLoader);
+        return getRemoteExecutor(coordinatorMeta, executorMeta, classLoader);
     }
 
     private SprayDubboExecutor getRemoteExecutor(SprayProcessCoordinatorMeta coordinatorMeta, SprayProcessStepMeta executorMeta, SprayClassLoader sprayClassLoader) {
-
-        return null;
+        return new SprayDubboTargetExecutorFacade(SprayDubboExecutorReference.createTargetReference(coordinatorMeta, executorMeta, spray));
     }
 
 }

@@ -1,7 +1,6 @@
 package top.spray.engine.plugins.remote.dubbo.consumer.source;
 
 import top.spray.core.engine.props.SprayData;
-import top.spray.core.util.SprayUtf8s;
 import top.spray.engine.plugins.remote.dubbo.api.source.holder.SprayDubboExecutorReferenceHolder;
 import top.spray.engine.plugins.remote.dubbo.util.SprayDubboDataUtil;
 import top.spray.engine.prop.SprayVariableContainer;
@@ -10,11 +9,11 @@ import top.spray.engine.plugins.remote.dubbo.api.target.reference.SprayDubboExec
 import top.spray.engine.step.executor.SprayBaseStepExecutor;
 import top.spray.engine.step.executor.SprayProcessStepExecutor;
 
-public class SprayDubboStepExecutor extends SprayBaseStepExecutor implements SprayDubboExecutor, SprayDubboExecutorReferenceHolder {
+public class SprayDubboTargetExecutorFacade extends SprayBaseStepExecutor implements SprayDubboExecutor, SprayDubboExecutorReferenceHolder {
 
     private final SprayDubboExecutorReference executorReference;
 
-    public SprayDubboStepExecutor(SprayDubboExecutorReference executorReference) {
+    public SprayDubboTargetExecutorFacade(SprayDubboExecutorReference executorReference) {
         this.executorReference = executorReference;
     }
 
