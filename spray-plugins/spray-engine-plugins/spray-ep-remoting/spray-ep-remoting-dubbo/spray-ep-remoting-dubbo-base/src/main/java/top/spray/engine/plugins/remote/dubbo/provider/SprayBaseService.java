@@ -6,7 +6,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 import top.spray.core.engine.props.SprayData;
 import top.spray.engine.coordinate.coordinator.SprayProcessCoordinator;
-import top.spray.engine.plugins.remote.dubbo.api.source.SprayDubboExecutor;
 import top.spray.engine.plugins.remote.dubbo.api.source.reference.SprayDubboCoordinatorReference;
 import top.spray.engine.plugins.remote.dubbo.api.source.reference.SprayDubboVariablesReference;
 import top.spray.engine.plugins.remote.dubbo.api.target.SprayDubboCoordinator;
@@ -17,9 +16,7 @@ import top.spray.engine.plugins.remote.dubbo.factory.SprayDubboReferenceFactory;
 import top.spray.engine.plugins.remote.dubbo.util.SprayDubboConfigurations;
 import top.spray.engine.plugins.remote.dubbo.util.SprayDubboDataUtil;
 import top.spray.engine.prop.SprayVariableContainer;
-import top.spray.engine.step.condition.SprayNextStepFilter;
 import top.spray.engine.step.executor.SprayProcessStepExecutor;
-import top.spray.engine.step.meta.SprayProcessStepMeta;
 
 import java.util.Set;
 
@@ -42,12 +39,12 @@ public class SprayBaseService implements
     }
 
     @Override
-    public boolean generateExecutor(String transactionId, String executorNameKey, String coordinatorMeta, String executorMeta) {
+    public boolean generateExecutor(int dubboServicePort, String transactionId, String executorNameKey, String coordinatorMeta, String executorMeta) {
         SprayDubboCoordinator coordinator = Coordinators.get(transactionId);
         if (coordinator == null) {
             synchronized (Coordinators) {
                 if ((coordinator = Coordinators.get(transactionId)) == null) {
-                    coordinator = SprayDubboCoordinatorFactory.createSprayDubboCoordinator(transactionId, coordinatorMeta);
+                    coordinator = SprayDubboCoordinatorFactory.createSprayDubboCoordinator(dubboServicePort, transactionId, coordinatorMeta);
                 }
             }
         }

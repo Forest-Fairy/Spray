@@ -8,6 +8,7 @@ import top.spray.engine.coordinate.meta.SprayProcessCoordinatorMeta;
 import top.spray.engine.plugins.remote.dubbo.api.target.reference.SprayDubboExecutorFactoryReference;
 import top.spray.engine.plugins.remote.dubbo.constants.SprayDubboConfigConst;
 import top.spray.engine.plugins.remote.dubbo.api.source.SprayDubboExecutor;
+import top.spray.engine.plugins.remote.dubbo.util.SprayDubboConfigurations;
 import top.spray.engine.remoting.SprayRemoteStepExecutor;
 import top.spray.engine.remoting.generator.SprayRemoteStepExecutorGenerator;
 import top.spray.engine.step.meta.SprayProcessStepMeta;
@@ -27,7 +28,10 @@ public class SprayDubboRemoteExecutorGenerator implements SprayRemoteStepExecuto
         ReferenceConfig<SprayDubboExecutorFactoryReference> referenceConfig = new ReferenceConfig<>();
         // TODO build the reference config
         SprayDubboExecutorFactoryReference sprayDubboReference = referenceConfig.get();
-        boolean isSuccess = sprayDubboReference.generateExecutor(executorMeta.transactionId(), executorMeta.getExecutorNameKey(coordinatorMeta),
+        boolean isSuccess = sprayDubboReference.generateExecutor(
+                SprayDubboConfigurations.dubboServicePort(),
+                executorMeta.transactionId(),
+                executorMeta.getExecutorNameKey(coordinatorMeta),
                 JSON.toJSONString(coordinatorMeta), JSON.toJSONString(executorMeta));
         if (!isSuccess) {
             throw new RuntimeException("");

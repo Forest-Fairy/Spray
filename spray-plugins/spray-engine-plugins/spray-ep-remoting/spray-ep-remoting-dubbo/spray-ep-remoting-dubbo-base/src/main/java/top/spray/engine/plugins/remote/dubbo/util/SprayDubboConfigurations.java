@@ -4,6 +4,11 @@ import top.spray.core.config.model.SprayConfigObj;
 import top.spray.core.config.model.SpraySystemConfiguration;
 
 public class SprayDubboConfigurations {
+    private static final SprayConfigObj<Integer> DUBBO_SERVICE_PORT =
+            SpraySystemConfiguration.Builder(
+                    "dubbo.protocol.port",
+                    null, 20881)
+                    .build("dubbo.protocol.port", true);
     private static final SprayConfigObj<Integer> DUBBO_SERVICE_BEAN_MAX_CACHE_TIME =
             SpraySystemConfiguration.Builder(
                     SpraySystemConfiguration.CONFIG_PREFIX + "dubbo.bean.cache.time.max",
@@ -12,6 +17,9 @@ public class SprayDubboConfigurations {
 
     public static int dubboServiceBeanMaxCacheTime() {
         return DUBBO_SERVICE_BEAN_MAX_CACHE_TIME.getValue();
+    }
+    public static int dubboServicePort() {
+        return DUBBO_SERVICE_PORT.getValue();
     }
 
 }

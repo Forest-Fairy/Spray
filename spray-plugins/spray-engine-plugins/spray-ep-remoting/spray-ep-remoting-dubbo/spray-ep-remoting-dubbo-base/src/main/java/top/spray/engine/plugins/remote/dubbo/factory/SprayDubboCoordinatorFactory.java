@@ -5,7 +5,7 @@ import top.spray.engine.plugins.remote.dubbo.provider.target.SprayDubboProcessCo
 
 public class SprayDubboCoordinatorFactory {
     public static SprayDubboCoordinator createSprayDubboCoordinator(
-            String transactionId, String coordinatorMeta) {
+            int dubboServicePort, String transactionId, String coordinatorMeta) {
         return new SprayDubboProcessCoordinator();
     }
 }

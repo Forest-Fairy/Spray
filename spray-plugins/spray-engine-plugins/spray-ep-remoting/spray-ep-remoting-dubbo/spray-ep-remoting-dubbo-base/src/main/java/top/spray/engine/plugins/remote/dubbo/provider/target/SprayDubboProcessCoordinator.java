@@ -35,7 +35,7 @@ public class SprayDubboProcessCoordinator implements SprayDubboCoordinator {
     private final ClassLoader creatorThreadClassLoader;
 
     public SprayDubboProcessCoordinator(
-            SprayProcessCoordinatorMeta coordinatorMeta) {
+            SprayProcessCoordinatorMeta coordinatorMeta, int port) {
         this.url = StringUtils.isNotBlank(coordinatorMeta.url()) ? coordinatorMeta.url() :
                 RpcContext.getServerContext().getUrl().getAddress();
         SprayDubboProtocolConst p = SprayDubboProtocolConst.parseWithUrl(this.url);
