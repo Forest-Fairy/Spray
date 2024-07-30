@@ -47,12 +47,39 @@ public class SprayThreadData extends SprayData {
         return super.getString("tid");
     }
 
-    public void removeLocal(SprayThreadData threadData) {
-        if (this.getTransactionId().equals(threadData.getTransactionId())) {
-            THREAD_LOCAL.remove();
-            for (String key : this.keySet()) {
-                this.remove(key);
-            }
+//    public void removeLocal(SprayThreadData threadData) {
+//        if (this.getTransactionId().equals(threadData.getTransactionId())) {
+//            THREAD_LOCAL.remove();
+//            for (String key : this.keySet()) {
+//                this.remove(key);
+//            }
+//        }
+//    }
+
+    public static void remove() {
+
+    }
+
+    static {
+        new SprayThreadDataListener();
+    }
+    private static class SprayThreadDataListener implements SprayThreadListener {
+        public SprayThreadDataListener() {
+            SprayThreadListener.register(this);
+        }
+
+        @Override
+        public void startInThread(SprayThread thread) {
+        }
+
+        @Override
+        public void stopInThread(SprayThread thread) {
+            SprayThreadData.
+        }
+
+        @Override
+        public void stopOutThread(SprayThread thread) {
+
         }
     }
 }
