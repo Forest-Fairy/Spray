@@ -1,20 +1,26 @@
 package top.spray.engine.step.executor;
 
 import top.spray.core.engine.execute.SprayClosable;
+import top.spray.core.engine.execute.SprayListenable;
 import top.spray.core.engine.execute.SprayMetaDrive;
 import top.spray.core.thread.SprayPoolExecutor;
 import top.spray.core.dynamic.loader.SprayClassLoader;
 import top.spray.engine.coordinate.coordinator.SprayProcessCoordinator;
-import top.spray.engine.design.event.model.SprayEvent;
-import top.spray.engine.design.event.model.SprayEventConsumer;
-import top.spray.engine.step.design.worker.SprayStepEventReceiver;
+import top.spray.engine.event.model.SprayEvent;
+import top.spray.engine.event.model.SprayEventReceiver;
+import top.spray.engine.event.handler.SprayExecuteEventHandler;
 import top.spray.engine.step.instance.SprayStepResultInstance;
 import top.spray.engine.step.meta.SprayProcessStepMeta;
+
+import java.util.List;
 
 /**
  * Define the executor of a process node
  */
-public interface SprayProcessStepExecutor extends SprayMetaDrive<SprayProcessStepMeta>, SprayEventConsumer, SprayClosable {
+public interface SprayProcessStepExecutor extends
+        SprayMetaDrive<SprayProcessStepMeta>,
+        SprayEventReceiver,
+        SprayListenable<SprayProcessStepExecutor, SprayExecuteEventHandler>, SprayClosable {
     default String getExecutorNameKey() {
         return getMeta().getExecutorNameKey(getCoordinator().getMeta());
     }
@@ -55,13 +61,22 @@ public interface SprayProcessStepExecutor extends SprayMetaDrive<SprayProcessSte
 //     */
 //    void execute(SprayVariableContainer variables, SprayProcessStepExecutor fromExecutor, SprayData data, boolean still);
 
+
+    @Override
+    SprayProcessStepExecutor addListener(SprayExecuteEventHandler listeners);
+
+    @Override
+    List<SprayExecuteEventHandler> getListeners();
+
     boolean canEventPassBy(SprayEvent event);
 
     @Override
     void receive(SprayEvent event);
 
     @Override
-    void consume() throws InterruptedException;
+    default void stop() {
+        this.closeInRuntime();
+    }
 
     /**
      * @return

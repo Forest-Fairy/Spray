@@ -1,7 +1,8 @@
-package top.spray.engine.design.event.model.execute.step;
+package top.spray.engine.event.model.execute.step;
 
 import top.spray.core.engine.props.SprayData;
-import top.spray.engine.design.event.model.SprayBaseEvent;
+import top.spray.engine.coordinate.coordinator.SprayProcessCoordinator;
+import top.spray.engine.event.model.SprayBaseEvent;
 import top.spray.engine.prop.SprayVariableContainer;
 
 public class SprayReceiveDataEvent extends SprayBaseEvent {
@@ -11,8 +12,8 @@ public class SprayReceiveDataEvent extends SprayBaseEvent {
     private final SprayData data;
     private final boolean still;
 
-    public SprayReceiveDataEvent(SprayVariableContainer lastVariables, String fromExecutorNameKey, SprayData data, boolean still) {
-        super(NAME, System.currentTimeMillis());
+    public SprayReceiveDataEvent(SprayProcessCoordinator coordinator, SprayVariableContainer lastVariables, String fromExecutorNameKey, SprayData data, boolean still) {
+        super(coordinator, NAME, System.currentTimeMillis());
         this.lastVariables = lastVariables;
         this.fromExecutorNameKey = fromExecutorNameKey;
         this.data = data;

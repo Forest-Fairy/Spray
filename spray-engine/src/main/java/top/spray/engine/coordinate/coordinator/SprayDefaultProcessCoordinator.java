@@ -1,5 +1,6 @@
 package top.spray.engine.coordinate.coordinator;
 
+import cn.hutool.core.collection.CollUtil;
 import top.spray.core.engine.exception.SprayNotSupportError;
 import top.spray.core.engine.execute.SprayListenable;
 import top.spray.core.engine.execute.SprayStepActiveType;
@@ -10,27 +11,30 @@ import top.spray.core.engine.types.step.status.SprayStepStatus;
 import top.spray.core.engine.types.coordinate.status.SprayCoordinatorStatus;
 import top.spray.core.dynamic.loader.SprayClassLoader;
 import top.spray.engine.coordinate.handler.result.SprayDataDispatchResultHandler;
+import top.spray.engine.event.model.SprayEvent;
+import top.spray.engine.event.model.coordinate.SprayUnknownEvent;
+import top.spray.engine.event.util.SpraySubscribes;
 import top.spray.engine.exception.SprayExecutorGenerateError;
 import top.spray.engine.factory.SprayExecutorFactory;
 import top.spray.engine.prop.SprayCoordinatorVariableContainer;
 import top.spray.engine.prop.SprayExecutorVariableContainer;
 import top.spray.engine.prop.SprayVariableContainer;
 import top.spray.engine.step.condition.SprayStepExecuteConditionFilter;
-import top.spray.engine.design.event.model.execute.step.SprayReceiveDataEvent;
-import top.spray.engine.step.executor.SprayCoordinatorEventListener;
+import top.spray.engine.event.model.execute.step.SprayReceiveDataEvent;
+import top.spray.engine.event.handler.SprayCoordinatorEventHandler;
 import top.spray.engine.coordinate.meta.SprayProcessCoordinatorMeta;
 import top.spray.engine.step.executor.SprayProcessStepExecutor;
 import top.spray.engine.step.condition.SprayNextStepFilter;
 import top.spray.engine.step.meta.SprayProcessStepMeta;
 
+import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.*;
 
 public class SprayDefaultProcessCoordinator implements
-        SprayProcessCoordinator,
-        SprayListenable<SprayCoordinatorEventListener> {
+        SprayProcessCoordinator, SprayListenable<SprayDefaultProcessCoordinator, SprayCoordinatorEventHandler>{
     private final SprayProcessCoordinatorMeta coordinatorMeta;
-    private final List<SprayCoordinatorEventListener> listeners;
+    private final List<SprayCoordinatorEventHandler> handlers;
     private final SprayVariableContainer defaultVariables;
     private final List<SprayData> defaultDataList;
     private final SprayDataDispatchResultHandler dispatchResultHandler;
@@ -40,19 +44,22 @@ public class SprayDefaultProcessCoordinator implements
     private final Map<String, SprayVariableContainer> executorVariablesNamespace;
     private final Map<String, Set<String>> inputDataKeys;
     private final Map<String, Set<String>> outputDataKeys;
+    /** event methods belong the coordinator */
+    private final Map<String, List<Method>> coordinateEventMethods;
     private boolean executeOnlyOnce = true;
 
     public SprayDefaultProcessCoordinator(SprayProcessCoordinatorMeta coordinatorMeta) {
         this.cachedExecutorMap = new ConcurrentHashMap<>();
         this.executorVariablesNamespace = new ConcurrentHashMap<>();
         this.coordinatorMeta = coordinatorMeta;
-        this.listeners = new ArrayList<>();
+        this.handlers = new ArrayList<>();
         this.defaultVariables = SprayCoordinatorVariableContainer.create(this);
         this.defaultDataList = new ArrayList<>();
         this.creatorThreadClassLoader = Thread.currentThread().getContextClassLoader();
         this.dispatchResultHandler = SprayDataDispatchResultHandler.get(coordinatorMeta);
         this.inputDataKeys = new ConcurrentHashMap<>();
         this.outputDataKeys = new ConcurrentHashMap<>();
+        this.coordinateEventMethods = new HashMap<>();
         init();
     }
 
@@ -71,6 +78,7 @@ public class SprayDefaultProcessCoordinator implements
         if (this.coordinatorMeta.getDefaultDataList() != null) {
             this.defaultDataList.addAll(this.coordinatorMeta.getDefaultDataList());
         }
+        SpraySubscribes.readSubscribeMethodsOnClass(this.coordinateEventMethods, this.getClass());
     }
 
     private void initExecutors() {
@@ -100,7 +108,7 @@ public class SprayDefaultProcessCoordinator implements
 
 
     @Override
-    public final SprayDefaultProcessCoordinator addListener(SprayCoordinatorEventListener listener) {
+    public final SprayDefaultProcessCoordinator addListener(SprayCoordinatorEventHandler listener) {
         this.listeners.add(listener);
         return this;
     }
@@ -112,8 +120,8 @@ public class SprayDefaultProcessCoordinator implements
 
 
     @Override
-    public final List<SprayCoordinatorEventListener> getListeners() {
-        return this.listeners;
+    public final List<SprayCoordinatorEventHandler> getListeners() {
+        return this.handlers;
     }
 
     @Override
@@ -167,11 +175,11 @@ public class SprayDefaultProcessCoordinator implements
         }
     }
 
-    @Override
-    public void publishData(String variablesIdentityDataKey, SprayNextStepFilter stepFilter,
-                            SprayProcessStepExecutor fromExecutor, SprayData data, boolean still) {
-        this._dispatchData(fromExecutor.getMeta().nextNodes(), stepFilter, this.executorVariablesNamespace.get(variablesIdentityDataKey), fromExecutor, data, still);
-    }
+//    @Override
+//    public void publishData(String variablesIdentityDataKey, SprayNextStepFilter stepFilter,
+//                            SprayProcessStepExecutor fromExecutor, SprayData data, boolean still) {
+//        this._dispatchData(fromExecutor.getMeta().nextNodes(), stepFilter, this.executorVariablesNamespace.get(variablesIdentityDataKey), fromExecutor, data, still);
+//    }
 
 
     protected void setDispatchResult(SprayVariableContainer variables, SprayProcessStepExecutor fromExecutor,
@@ -310,4 +318,22 @@ public class SprayDefaultProcessCoordinator implements
             }
         }
     }
+
+    @Override
+    public void receive(SprayEvent event) {
+        handleWith(event);
+    }
+
+    private void handleWith(SprayEvent event) {
+        List<Method> handleMethods = this.coordinateEventMethods.get(event.getEventName());
+        if (CollUtil.isEmpty(handleMethods)) {
+            handleUnknownEvent(new SprayUnknownEvent(event));
+        }
+    }
+    protected void handleUnknownEvent(SprayUnknownEvent unknownEvent) {
+        // TODO get unknown event handlers
+        this.getListeners().stream().filter(listener -> listener.support(unknownEvent))
+                .forEach(listener -> listener.handle(unknownEvent, this));
+    }
+
 }

@@ -1,9 +1,9 @@
-package top.spray.engine.design.event.util;
+package top.spray.engine.event.util;
 
 
 import top.spray.core.thread.SprayThread;
 import top.spray.core.thread.SprayThreadListener;
-import top.spray.engine.design.event.model.SprayEvent;
+import top.spray.engine.event.model.SprayEvent;
 
 public final class SprayEvents {
 

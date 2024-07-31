@@ -1,8 +1,7 @@
-package top.spray.engine.design.event.util;
+package top.spray.engine.event.util;
 
 import org.apache.commons.lang3.StringUtils;
-import top.spray.engine.design.event.model.SprayEventConsumer;
-import top.spray.engine.design.event.model.SprayEvent;
+import top.spray.engine.event.model.SprayEvent;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -14,7 +13,7 @@ import java.util.Map;
 public final class SpraySubscribes {
     private SpraySubscribes() {}
 
-    public static void readSubscribeMethodsOnClass(Map<String, List<Method>> subscribes, Class<? extends SprayEventConsumer> cz) {
+    public static void readSubscribeMethodsOnClass(Map<String, List<Method>> subscribes, Class<?> cz) {
         for (Method method : cz.getDeclaredMethods()) {
             String subscribeEvents = null;
             try {

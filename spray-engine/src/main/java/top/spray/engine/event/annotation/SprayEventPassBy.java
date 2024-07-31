@@ -1,6 +1,6 @@
-package top.spray.engine.design.event.annotation;
+package top.spray.engine.event.annotation;
 
-import top.spray.engine.design.event.constant.SprayEventPassByStrategy;
+import top.spray.engine.event.constant.SprayEventPassByStrategy;
 
 import java.lang.annotation.*;
 

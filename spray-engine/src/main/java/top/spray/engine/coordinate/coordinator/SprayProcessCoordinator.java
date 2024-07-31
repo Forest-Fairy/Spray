@@ -1,14 +1,17 @@
 package top.spray.engine.coordinate.coordinator;
 
 import top.spray.core.engine.execute.SprayClosable;
+import top.spray.core.engine.execute.SprayListenable;
 import top.spray.core.engine.execute.SprayMetaDrive;
 import top.spray.core.engine.props.SprayData;
 import top.spray.core.engine.types.coordinate.status.SprayCoordinatorStatus;
 import top.spray.core.engine.types.data.dispatch.result.SprayDataDispatchResultStatus;
 import top.spray.engine.coordinate.meta.SprayProcessCoordinatorMeta;
+import top.spray.engine.event.handler.SprayCoordinatorEventHandler;
+import top.spray.engine.event.model.SprayEvent;
+import top.spray.engine.event.model.SprayEventReceiver;
 import top.spray.engine.prop.SprayVariableContainer;
 import top.spray.engine.step.executor.SprayProcessStepExecutor;
-import top.spray.engine.step.condition.SprayNextStepFilter;
 
 import java.util.List;
 import java.util.Set;
@@ -20,7 +23,7 @@ import java.util.function.Supplier;
 public interface SprayProcessCoordinator extends
         SprayMetaDrive<SprayProcessCoordinatorMeta>,
         Supplier<SprayCoordinatorStatus>, Runnable,
-        SprayClosable {
+        SprayEventReceiver, SprayListenable<SprayProcessCoordinator, SprayCoordinatorEventHandler>, SprayClosable {
     @Override
     SprayProcessCoordinatorMeta getMeta();
 
@@ -42,8 +45,18 @@ public interface SprayProcessCoordinator extends
 
     int executorCount();
 
-    /** a method for executor to publish its data */
-    void publishData(String variablesIdentityDataKey, SprayNextStepFilter stepFilter, SprayProcessStepExecutor fromExecutor, SprayData data, boolean still);
+
+    @Override
+    SprayProcessCoordinator addListener(SprayCoordinatorEventHandler listeners);
+
+    @Override
+    List<SprayCoordinatorEventHandler> getListeners();
+
+    @Override
+    void receive(SprayEvent event);
+
+    //    /** a method for executor to publish its data */
+//    void publishData(String variablesIdentityDataKey, SprayNextStepFilter stepFilter, SprayProcessStepExecutor fromExecutor, SprayData data, boolean still);
 
 
     /**

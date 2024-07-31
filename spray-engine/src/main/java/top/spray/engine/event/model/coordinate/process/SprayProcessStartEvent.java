@@ -1,9 +1,9 @@
-package top.spray.engine.design.event.model.coordinate.process;
+package top.spray.engine.event.model.coordinate.process;
 
 import top.spray.engine.coordinate.coordinator.SprayProcessCoordinator;
-import top.spray.engine.design.event.model.coordinate.SprayCoordinateEvent;
+import top.spray.engine.event.model.SprayBaseEvent;
 
-public class SprayProcessStartEvent extends SprayCoordinateEvent {
+public class SprayProcessStartEvent extends SprayBaseEvent {
     public static final String NAME = "process_init";
 
     public SprayProcessStartEvent(SprayProcessCoordinator coordinator) {

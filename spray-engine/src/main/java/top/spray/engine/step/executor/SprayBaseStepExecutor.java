@@ -5,14 +5,14 @@ import org.slf4j.MDC;
 import top.spray.core.engine.props.SprayData;
 import top.spray.core.thread.SprayPoolExecutor;
 import top.spray.core.thread.SprayThread;
-import top.spray.engine.design.event.annotation.SpraySubscribe;
-import top.spray.engine.design.event.constant.SprayEventPassByStrategy;
-import top.spray.engine.design.event.model.SprayEvent;
-import top.spray.engine.design.event.model.coordinate.process.SprayProcessStartEvent;
-import top.spray.engine.design.event.model.coordinate.process.SprayProcessStopEvent;
-import top.spray.engine.design.event.util.SprayEvents;
-import top.spray.engine.design.event.util.SpraySubscribes;
-import top.spray.engine.design.worker.SprayEventWorker;
+import top.spray.engine.event.annotation.SpraySubscribe;
+import top.spray.engine.event.constant.SprayEventPassByStrategy;
+import top.spray.engine.event.model.SprayConsumeErrorEvent;
+import top.spray.engine.event.model.SprayEvent;
+import top.spray.engine.event.model.coordinate.process.SprayProcessStopEvent;
+import top.spray.engine.event.handler.SprayExecuteEventHandler;
+import top.spray.engine.event.model.execute.error.SprayExecutorThreadInterruptedEvent;
+import top.spray.engine.event.util.SpraySubscribes;
 import top.spray.engine.thread.SprayPoolExecutorBuilder;
 import top.spray.core.dynamic.loader.SprayClassLoader;
 import top.spray.engine.coordinate.coordinator.SprayProcessCoordinator;
@@ -40,6 +40,7 @@ public class SprayBaseStepExecutor implements SprayProcessStepExecutor {
     private SprayPoolExecutor pool;
     private SprayEventPassByStrategy eventPassByStrategy;
     private Map<String, List<Method>> subscribedMethods;
+    private List<SprayExecuteEventHandler> listeners;
     private volatile int cur;
     private volatile int next;
     private SprayEvent[] events;
@@ -79,7 +80,9 @@ public class SprayBaseStepExecutor implements SprayProcessStepExecutor {
         SpraySubscribes.readSubscribeMethodsOnClass(this.subscribedMethods, this.getClass());
         this.events = new SprayEvent[this.stepMeta.maxConcurrentReceiving()];
         this.initOnlyAtCreate0();
-        this.consumeThread = new SprayThread(new SprayEventWorker(this));
+        this.consumeThread = new SprayThread(() -> {
+            while (this.consume());
+        });
         this.consumeThread.start();
         return true;
     }
@@ -122,6 +125,17 @@ public class SprayBaseStepExecutor implements SprayProcessStepExecutor {
 
     public final SprayStepResultInstance getStepResult() {
         return this.stepResult;
+    }
+
+    @Override
+    public SprayProcessStepExecutor addListener(SprayExecuteEventHandler listeners) {
+        this.getListeners().add(listeners);
+        return this;
+    }
+
+    @Override
+    public List<SprayExecuteEventHandler> getListeners() {
+        return this.listeners;
     }
 
     @Override
@@ -189,7 +203,7 @@ public class SprayBaseStepExecutor implements SprayProcessStepExecutor {
         }
     }
 
-    private synchronized void initBeforeConsume(SprayEvent event) {
+    private synchronized void beforeConsume(SprayEvent event) {
         Thread.currentThread().setContextClassLoader(this.getClassLoader());
         MDC.put("transactionId", this.getCoordinator().getMeta().transactionId());
         MDC.put("executorId", this.stepMeta.getExecutorNameKey(this.getCoordinator().getMeta()));
@@ -198,49 +212,78 @@ public class SprayBaseStepExecutor implements SprayProcessStepExecutor {
     }
     protected synchronized void initBeforeRun0(SprayEvent event) {}
 
-    @Override
-    public final synchronized void consume() throws InterruptedException {
+    private boolean consume() {
         if (events[cur] == null) {
             // let out cpu
             Thread.yield();
-            while (events[cur] == null) {
-                Thread.sleep(100);
+            try {
+                while (events[cur] == null) {
+                    Thread.sleep(100);
+                }
+            } catch (InterruptedException interruptedException) {
+                // TODO handle ex
             }
         }
-        try {
-            this.getStepResult().incrementConsumingCount();
-            this.initBeforeConsume(events[cur]);
-            consume(events[cur]);
-        } finally {
-            this.getStepResult().decrementConsumingCount();
-            events[cur] = null;
-            cur++;
-            if (cur > events.length) {
-                cur = 0;
-            }
+        this.getStepResult().incrementConsumingCount();
+        consume(events[cur]);
+        this.getStepResult().decrementConsumingCount();
+        events[cur] = null;
+        cur++;
+        if (cur > events.length) {
+            cur = 0;
         }
+//        try {
+//            if (events[cur] == null) {
+//                // let out cpu
+//                Thread.yield();
+//                while (events[cur] == null) {
+//                    Thread.sleep(100);
+//                }
+//            }
+//            this.getStepResult().incrementConsumingCount();
+//            this.initBeforeConsume(events[cur]);
+//            consume(events[cur]);
+//            this.getStepResult().decrementConsumingCount();
+//            events[cur] = null;
+//            cur++;
+//            if (cur > events.length) {
+//                cur = 0;
+//            }
+//        } catch (Throwable throwable) {
+//            // it should not happen
+//            // TODO handle ex
+//                this.getCoordinator().receive(new SprayExecutorThreadInterruptedEvent(
+//                        this.getCoordinator().getMeta().transactionId(),
+//                        this.getExecutorNameKey(), throwable));
+//        }
     }
 
     private void consume(SprayEvent event) {
-        if (SprayProcessStartEvent.NAME.equals(event.getEventName()) ||
-                SprayProcessStopEvent.NAME.equals(event.getEventTime())) {
-            // ignored
-            return ;
-        }
-        List<Method> subscribeMethods = this.subscribedMethods.get(event.getEventName());
-        if (subscribeMethods != null) {
-            SprayEvents.set(event);
-            if (this.getThreadPoll() != null) {
-                this.getThreadPoll().execute(() -> {
-                    // set inside thread
-                    SprayEvents.set(event);
-                    invokeEvent(event, subscribeMethods);
-                });
-            } else {
-                invokeEvent(event, subscribeMethods);
-            }
-        }
+        this.beforeConsume(events[cur]);
+        this.getListeners().stream().filter(l -> l.support(event))
+                .forEach(l -> l.handle(event, this));
+        this.afterConsume(events[cur]);
     }
+//    private void consume(SprayEvent event) {
+//        if (SprayProcessStartEvent.NAME.equals(event.getEventName()) ||
+//                SprayProcessStopEvent.NAME.equals(event.getEventTime())) {
+//            // ignored
+//            return ;
+//        }
+//        List<Method> subscribeMethods = this.subscribedMethods.get(event.getEventName());
+//        if (subscribeMethods != null) {
+//            SprayEvents.set(event);
+//            if (this.getThreadPoll() != null) {
+//                this.getThreadPoll().execute(() -> {
+//                    // set inside thread
+//                    SprayEvents.set(event);
+//                    invokeEvent(event, subscribeMethods);
+//                });
+//            } else {
+//                invokeEvent(event, subscribeMethods);
+//            }
+//        }
+//    }
 
     private void invokeEvent(SprayEvent event, List<Method> subscribeMethods) {
         for (Method method : subscribeMethods) {
@@ -252,8 +295,7 @@ public class SprayBaseStepExecutor implements SprayProcessStepExecutor {
                 }
             } catch (Exception e) {
                 // TODO handle ex
-                this.getCoordinator().handleErrorEvent(
-                        this.getMeta(), method, events[cur], e);
+                this.getCoordinator().receive(new SprayConsumeErrorEvent(this, method, event));
             }
         }
     }
@@ -288,7 +330,8 @@ public class SprayBaseStepExecutor implements SprayProcessStepExecutor {
             // TODO Handle with handler
             throw e;
         }
-        this.getClassLoader().closeInRuntime();
+        this.classLoader.closeInRuntime();
+        this.consumeThread.interrupt();
         destroy();
     }
     protected void destroy() {}

@@ -1,4 +1,4 @@
-package top.spray.engine.design.event.annotation;
+package top.spray.engine.event.annotation;
 
 import java.lang.annotation.*;
 

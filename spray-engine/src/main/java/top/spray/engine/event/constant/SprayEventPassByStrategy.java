@@ -1,4 +1,4 @@
-package top.spray.engine.design.event.constant;
+package top.spray.engine.event.constant;
 
 import java.lang.annotation.Annotation;
 
