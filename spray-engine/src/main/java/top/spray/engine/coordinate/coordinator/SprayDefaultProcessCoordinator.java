@@ -16,7 +16,8 @@ import top.spray.engine.prop.SprayCoordinatorVariableContainer;
 import top.spray.engine.prop.SprayExecutorVariableContainer;
 import top.spray.engine.prop.SprayVariableContainer;
 import top.spray.engine.step.condition.SprayStepExecuteConditionFilter;
-import top.spray.engine.step.executor.SprayExecutorListener;
+import top.spray.engine.design.event.model.execute.step.SprayReceiveDataEvent;
+import top.spray.engine.step.executor.SprayCoordinatorEventListener;
 import top.spray.engine.coordinate.meta.SprayProcessCoordinatorMeta;
 import top.spray.engine.step.executor.SprayProcessStepExecutor;
 import top.spray.engine.step.condition.SprayNextStepFilter;
@@ -27,9 +28,9 @@ import java.util.concurrent.*;
 
 public class SprayDefaultProcessCoordinator implements
         SprayProcessCoordinator,
-        SprayListenable<SprayExecutorListener> {
+        SprayListenable<SprayCoordinatorEventListener> {
     private final SprayProcessCoordinatorMeta coordinatorMeta;
-    private final List<SprayExecutorListener> listeners;
+    private final List<SprayCoordinatorEventListener> listeners;
     private final SprayVariableContainer defaultVariables;
     private final List<SprayData> defaultDataList;
     private final SprayDataDispatchResultHandler dispatchResultHandler;
@@ -57,21 +58,13 @@ public class SprayDefaultProcessCoordinator implements
 
     private void init() {
         // don't let the coordinator run twice so that we could clear the default data list when we run
-//        while (this.counter.sum() > 0) {
-//            Thread.yield();
-//            try {
-//                Thread.sleep(1000);
-//            } catch (InterruptedException e) {
-//                throw new RuntimeException(new Exception(
-//                        "failed to init the coordinator for current thread was interrupted", e));
-//            }
-//        }
         if (!executeOnlyOnce) {
             throw new SprayNotSupportError(this.coordinatorMeta,
                     new IllegalAccessError("the coordinator can only be run once"));
         }
         executeOnlyOnce = false;
         initVar();
+        initExecutors();
     }
 
     private void initVar() {
@@ -80,10 +73,35 @@ public class SprayDefaultProcessCoordinator implements
         }
     }
 
+    private void initExecutors() {
+        createExecutors(this.getMeta().getStartNodes());
+    }
+    private void createExecutors(List<SprayProcessStepMeta> nodes) {
+        nodes.forEach(node -> {
+            String executorNameKey = node.getExecutorNameKey(this.getMeta());
+            if (this.cachedExecutorMap.get(executorNameKey) == null) {
+                this.cachedExecutorMap.put(executorNameKey, createStepExecutor(node));
+            }
+            if (node.nextNodes() != null && !node.nextNodes().isEmpty()) {
+                createExecutors(node.nextNodes());
+            }
+        });
+    }
+
+    private SprayProcessStepExecutor createStepExecutor(SprayProcessStepMeta executorMeta) {
+        try {
+            // all executors' classloader should be created with the same classloader
+            // which create the coordinator
+            return SprayExecutorFactory.create(this, executorMeta, true);
+        } catch (Throwable e) {
+            throw new SprayExecutorGenerateError(this.getMeta(), executorMeta, e);
+        }
+    }
+
 
     @Override
-    public final SprayDefaultProcessCoordinator addListener(SprayExecutorListener... listeners) {
-        this.listeners.addAll(Arrays.asList(listeners));
+    public final SprayDefaultProcessCoordinator addListener(SprayCoordinatorEventListener listener) {
+        this.listeners.add(listener);
         return this;
     }
 
@@ -94,7 +112,7 @@ public class SprayDefaultProcessCoordinator implements
 
 
     @Override
-    public final List<SprayExecutorListener> getListeners() {
+    public final List<SprayCoordinatorEventListener> getListeners() {
         return this.listeners;
     }
 
@@ -103,29 +121,8 @@ public class SprayDefaultProcessCoordinator implements
         return this.creatorThreadClassLoader;
     }
 
-    private SprayProcessStepExecutor createStepExecutor(SprayProcessStepMeta executorMeta) {
-        String executorNameKey = executorMeta.getExecutorNameKey(this.getMeta());
-        SprayProcessStepExecutor executor = this.cachedExecutorMap.get(executorNameKey);
-        if (executor == null) {
-            synchronized (this.cachedExecutorMap) {
-                executor = this.cachedExecutorMap.get(executorNameKey);
-                if (executor == null) {
-                    try {
-                        // all executors' classloader should be created with the same classloader
-                        // which create the coordinator
-                        executor = SprayExecutorFactory.create(this, executorMeta, true);
-                    } catch (Throwable e) {
-                        throw new SprayExecutorGenerateError(this.getMeta(), executorMeta, e);
-                    }
-                    this.cachedExecutorMap.put(executorNameKey, executor);
-                }
-            }
-        }
-        return executor;
-    }
-
     @Override
-    public final int createExecutorCount() {
+    public final int executorCount() {
         return this.cachedExecutorMap.size();
     }
 
@@ -171,8 +168,8 @@ public class SprayDefaultProcessCoordinator implements
     }
 
     @Override
-    public void dispatch(String variablesIdentityDataKey, SprayNextStepFilter stepFilter,
-                         SprayProcessStepExecutor fromExecutor, SprayData data, boolean still) {
+    public void publishData(String variablesIdentityDataKey, SprayNextStepFilter stepFilter,
+                            SprayProcessStepExecutor fromExecutor, SprayData data, boolean still) {
         this._dispatchData(fromExecutor.getMeta().nextNodes(), stepFilter, this.executorVariablesNamespace.get(variablesIdentityDataKey), fromExecutor, data, still);
     }
 
@@ -238,25 +235,12 @@ public class SprayDefaultProcessCoordinator implements
             if (! validateBeforeCreate(lastVariables, fromExecutor, stepFilter, data, still, nodeMeta)) {
                 continue;
             }
-            // get or create executor
-            SprayProcessStepExecutor nextExecutor = this.createStepExecutor(nodeMeta);
-            if (needWait(nextExecutor, lastVariables, fromExecutor, data, still)) {
-                // the executor need to wait
-                return;
-            }
             // run it
-            this.executeNext(nextExecutor,
-                    lastVariables, fromExecutor, data, still);
+            this.send(nodeMeta.getExecutorNameKey(this.getMeta()), lastVariables,
+                    fromExecutor.getExecutorNameKey(), data, still);
         }
     }
 
-    private boolean needWait(SprayProcessStepExecutor nextExecutor, SprayVariableContainer lastVariables, SprayProcessStepExecutor fromExecutor, SprayData data, boolean still) {
-        ClassLoader loader = Thread.currentThread().getContextClassLoader();
-        Thread.currentThread().setContextClassLoader(nextExecutor.getClassLoader());
-        boolean needWait = nextExecutor.needWait(lastVariables, fromExecutor, data, still);
-        Thread.currentThread().setContextClassLoader(loader);
-        return needWait;
-    }
 
     private boolean validCoordinatorStatus() {
         return SprayCoordinatorStatus.RUNNING.equals(this.status());
@@ -264,21 +248,21 @@ public class SprayDefaultProcessCoordinator implements
 
 
     @Override
-    public void executeNext(SprayProcessStepExecutor curExecutor,
-                            SprayVariableContainer lastVariables,
-                            SprayProcessStepExecutor fromExecutor,
-                            SprayData data, boolean still) {
+    public void send(String curExecutorNameKey, SprayVariableContainer lastVariables,
+                     String fromExecutorNameKey, SprayData data, boolean still) {
+        SprayProcessStepExecutor fromExecutor = this.getStepExecutor(fromExecutorNameKey);
+        SprayProcessStepExecutor curExecutor = this.getStepExecutor(curExecutorNameKey);
         try {
             int copyMode = curExecutor.varCopyMode();
-            if (copyMode == 0) {
-                curExecutor.execute(lastVariables, fromExecutor, data, still);
+            if (copyMode != 0) {
+                curExecutor.receive(new SprayReceiveDataEvent(lastVariables, fromExecutorNameKey, data, still));
             } else {
-                curExecutor.execute(
+                curExecutor.receive(new SprayReceiveDataEvent(
                         executorVariablesNamespace.computeIfAbsent(
                                 lastVariables.nextKey(fromExecutor, curExecutor), key -> copyMode == 1 ?
                                         SprayExecutorVariableContainer.easyCopy(fromExecutor, lastVariables, curExecutor) :
                                         SprayExecutorVariableContainer.deepCopy(fromExecutor, lastVariables, curExecutor)),
-                        fromExecutor, data, still);
+                        fromExecutorNameKey, data, still));
             }
         } catch (Exception e) {
             this.setDispatchResult(lastVariables, fromExecutor, data, still, curExecutor.getMeta(), SprayDataDispatchResultStatus.SUCCESS);
@@ -294,7 +278,7 @@ public class SprayDefaultProcessCoordinator implements
 
     @Override
     public final SprayProcessStepExecutor getStepExecutor(String executorNameKey) {
-        return this.cachedExecutorMap.get(executorNameKey);
+        return executorNameKey == null ? null : this.cachedExecutorMap.get(executorNameKey);
     }
 
     @Override

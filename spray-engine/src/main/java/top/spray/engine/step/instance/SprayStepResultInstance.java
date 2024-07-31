@@ -64,10 +64,10 @@ public class SprayStepResultInstance {
     public long runningCount() {
         return this.runningCounter.sum();
     }
-    public void incrementRunningCount() {
+    public void incrementConsumingCount() {
         this.runningCounter.increment();
     }
-    public void decrementRunningCount() {
+    public void decrementConsumingCount() {
         this.runningCounter.decrement();
     }
 

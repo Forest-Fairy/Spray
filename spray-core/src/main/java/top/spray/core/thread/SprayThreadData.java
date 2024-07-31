@@ -57,10 +57,16 @@ public class SprayThreadData extends SprayData {
 //    }
 
     public static void remove() {
-
+        SprayThreadData data = THREAD_LOCAL.get();
+        if (data != null) {
+            data.keySet().forEach(data::remove);
+            THREAD_LOCAL.remove();
+        }
     }
 
+
     static {
+        // register one if this class has been used
         new SprayThreadDataListener();
     }
     private static class SprayThreadDataListener implements SprayThreadListener {
@@ -69,17 +75,9 @@ public class SprayThreadData extends SprayData {
         }
 
         @Override
-        public void startInThread(SprayThread thread) {
+        public void stopInsideThread(SprayThread thread) {
+            SprayThreadData.remove();
         }
 
-        @Override
-        public void stopInThread(SprayThread thread) {
-            SprayThreadData.
-        }
-
-        @Override
-        public void stopOutThread(SprayThread thread) {
-
-        }
     }
 }

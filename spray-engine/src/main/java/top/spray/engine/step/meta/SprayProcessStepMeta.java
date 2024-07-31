@@ -1,6 +1,7 @@
 package top.spray.engine.step.meta;
 
 
+import org.apache.commons.lang3.StringUtils;
 import top.spray.core.engine.exception.SprayMetaError;
 import top.spray.core.engine.exception.SprayNotSupportError;
 import top.spray.core.engine.execute.SprayExecutorType;
@@ -53,8 +54,11 @@ public class SprayProcessStepMeta implements SprayBaseMeta<SprayProcessStepMeta>
     private int queueCapacity;
     private int threadAliveTime;
     private TimeUnit threadAliveTimeUnit;
+    private int maxConcurrentReceiving;
     private int varCopy;
     private Collection<SprayStepExecuteConditionFilter> executeConditionFilters;
+    private String blackEvents;
+    private String whiteEvents;
 
     public SprayProcessStepMeta(SprayData metaContainer) {
         this.metaContainer = metaContainer.unmodifiable();
@@ -86,6 +90,9 @@ public class SprayProcessStepMeta implements SprayBaseMeta<SprayProcessStepMeta>
         this.queueCapacity = metaContainer.getOrElse("queueCapacity", 20);
         this.threadAliveTime = metaContainer.getOrElse("threadAliveTime", 30);
         this.threadAliveTimeUnit = TimeUnit.valueOf(metaContainer.getOrElse("threadAliveTimeUnit", "SECONDS"));
+        this.maxConcurrentReceiving = metaContainer.getOrElse("maxConcurrentReceiving", 5);
+        this.blackEvents = metaContainer.getString("blackEventPassBy");
+        this.whiteEvents = metaContainer.getString("whiteEventPassBy");
         this.varCopy = metaContainer.getOrElse("varCopy", 0);
         this.executeConditionFilters = SprayStepExecuteConditionHelper.createFilters(this.metaContainer);
     }
@@ -197,6 +204,18 @@ public class SprayProcessStepMeta implements SprayBaseMeta<SprayProcessStepMeta>
 
     public TimeUnit threadAliveTimeUnit() {
         return threadAliveTimeUnit;
+    }
+
+    public int maxConcurrentReceiving() {
+        return maxConcurrentReceiving;
+    }
+
+    public String getBlackEvents() {
+        return this.blackEvents;
+    }
+
+    public String getWhiteEvents() {
+        return this.whiteEvents;
     }
 
     /**

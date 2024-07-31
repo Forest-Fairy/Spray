@@ -56,9 +56,9 @@ public class SprayThread extends Thread {
             this.setContextClassLoader(Thread.currentThread().getContextClassLoader());
         } catch (Exception ignore) {}
         // the super will execute run method with new thread
-        SprayThreadListener.StartOutThread(this);
+        SprayThreadListener.StartOutsideThread(this);
         super.start();
-        SprayThreadListener.StopOutThread(this);
+        SprayThreadListener.StopOutsideThread(this);
     }
 
     @Override
@@ -69,11 +69,11 @@ public class SprayThread extends Thread {
             // remove the reference to avoid memory leak
             parentThreadMdcContextMap = null;
         } catch (Exception ignore) {}
-        SprayThreadListener.StartInThread(this);
+        SprayThreadListener.StartInsideThread(this);
         try {
             super.run();
         } finally {
-            SprayThreadListener.StopInThread(this);
+            SprayThreadListener.StopInsideThread(this);
         }
     }
 }

@@ -1,4 +1,4 @@
-package top.spray.engine.step.design.annotation;
+package top.spray.engine.design.event.annotation;
 
 import java.lang.annotation.*;
 
@@ -6,5 +6,5 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface SpraySubscribe {
-    String[] value();
+    String value();
 }

@@ -2,18 +2,19 @@ package top.spray.engine.step.executor;
 
 import top.spray.core.engine.execute.SprayClosable;
 import top.spray.core.engine.execute.SprayMetaDrive;
-import top.spray.core.engine.props.SprayData;
 import top.spray.core.thread.SprayPoolExecutor;
 import top.spray.core.dynamic.loader.SprayClassLoader;
 import top.spray.engine.coordinate.coordinator.SprayProcessCoordinator;
-import top.spray.engine.prop.SprayVariableContainer;
+import top.spray.engine.design.event.model.SprayEvent;
+import top.spray.engine.design.event.model.SprayEventConsumer;
+import top.spray.engine.step.design.worker.SprayStepEventReceiver;
 import top.spray.engine.step.instance.SprayStepResultInstance;
 import top.spray.engine.step.meta.SprayProcessStepMeta;
 
 /**
  * Define the executor of a process node
  */
-public interface SprayProcessStepExecutor extends SprayMetaDrive<SprayProcessStepMeta>, SprayClosable {
+public interface SprayProcessStepExecutor extends SprayMetaDrive<SprayProcessStepMeta>, SprayEventConsumer, SprayClosable {
     default String getExecutorNameKey() {
         return getMeta().getExecutorNameKey(getCoordinator().getMeta());
     }
@@ -38,21 +39,29 @@ public interface SprayProcessStepExecutor extends SprayMetaDrive<SprayProcessSte
     void setClassLoader(SprayClassLoader classLoader);
     SprayStepResultInstance getStepResult();
 
-    /**
-     * true if the executor need to run with batch data or other reason <br>
-     * executor can collect data by overwrite this method <br>
-     * @return false by default, that also means the executor can run with stream data
-     */
-    boolean needWait(SprayVariableContainer variables, SprayProcessStepExecutor fromExecutor, SprayData data, boolean still);
+//    /**
+//     * true if the executor need to run with batch data or other reason <br>
+//     * executor can collect data by overwrite this method <br>
+//     * @return false by default, that also means the executor can run with stream data
+//     */
+//    boolean needWait(SprayVariableContainer variables, SprayProcessStepExecutor fromExecutor, SprayData data, boolean still);
+//
+//    /**
+//     * an execution method which won't throw exception
+//     * @param variables the variables belong to current executor
+//     * @param fromExecutor the last executor
+//     * @param data data published by the last executor
+//     * @param still does it still have data to publish
+//     */
+//    void execute(SprayVariableContainer variables, SprayProcessStepExecutor fromExecutor, SprayData data, boolean still);
 
-    /**
-     * an execution method which won't throw exception
-     * @param variables the variables belong to current executor
-     * @param fromExecutor the last executor
-     * @param data data published by the last executor
-     * @param still does it still have data to publish
-     */
-    void execute(SprayVariableContainer variables, SprayProcessStepExecutor fromExecutor, SprayData data, boolean still);
+    boolean canEventPassBy(SprayEvent event);
+
+    @Override
+    void receive(SprayEvent event);
+
+    @Override
+    void consume() throws InterruptedException;
 
     /**
      * @return

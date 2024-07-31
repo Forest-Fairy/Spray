@@ -7,51 +7,51 @@ import java.util.Set;
 
 public interface SprayThreadListener {
     Set<SprayThreadListener> Listeners = new HashSet<>();
-    static void StartOutThread(SprayThread thread) {
+    static void StartOutsideThread(SprayThread thread) {
         for (SprayThreadListener listener : SprayServiceUtil.loadServiceClassNameMapCache(SprayThreadListener.class).values()) {
             try {
-                listener.startOutThread(thread);
+                listener.startOutsideThread(thread);
             } catch (Exception ignored) {}
         }
         for (SprayThreadListener listener : Listeners) {
             try {
-            listener.startOutThread(thread);
+            listener.startOutsideThread(thread);
         } catch (Exception ignored) {}
         }
     }
-    static void StartInThread(SprayThread thread) {
+    static void StartInsideThread(SprayThread thread) {
         for (SprayThreadListener listener : SprayServiceUtil.loadServiceClassNameMapCache(SprayThreadListener.class).values()) {
             try {
-                listener.startInThread(thread);
+                listener.startInsideThread(thread);
             } catch (Exception ignored) {}
         }
         for (SprayThreadListener listener : Listeners) {
             try {
-                listener.startInThread(thread);
+                listener.startInsideThread(thread);
             } catch (Exception ignored) {}
         }
     }
-    static void StopInThread(SprayThread thread) {
+    static void StopInsideThread(SprayThread thread) {
         for (SprayThreadListener listener : SprayServiceUtil.loadServiceClassNameMapCache(SprayThreadListener.class).values()) {
             try {
-                listener.stopInThread(thread);
+                listener.stopInsideThread(thread);
             } catch (Exception ignored) {}
         }
         for (SprayThreadListener listener : Listeners) {
             try {
-                listener.stopInThread(thread);
+                listener.stopInsideThread(thread);
             } catch (Exception ignored) {}
         }
     }
-    static void StopOutThread(SprayThread thread) {
+    static void StopOutsideThread(SprayThread thread) {
         for (SprayThreadListener listener : SprayServiceUtil.loadServiceClassNameMapCache(SprayThreadListener.class).values()) {
             try {
-                listener.stopOutThread(thread);
+                listener.stopOutsideThread(thread);
             } catch (Exception ignored) {}
         }
         for (SprayThreadListener listener : Listeners) {
             try {
-                listener.stopOutThread(thread);
+                listener.stopOutsideThread(thread);
             } catch (Exception ignored) {}
         }
     }
@@ -61,8 +61,8 @@ public interface SprayThreadListener {
         Listeners.add(listener);
     }
 
-    default void startOutThread(SprayThread thread) {}
-    default void startInThread(SprayThread thread) {}
-    default void stopInThread(SprayThread thread) {}
-    default void stopOutThread(SprayThread thread) {}
+    default void startOutsideThread(SprayThread thread) {}
+    default void startInsideThread(SprayThread thread) {}
+    default void stopInsideThread(SprayThread thread) {}
+    default void stopOutsideThread(SprayThread thread) {}
 }

@@ -11,7 +11,6 @@ import top.spray.engine.step.executor.SprayProcessStepExecutor;
 import top.spray.engine.step.condition.SprayNextStepFilter;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
 
@@ -41,16 +40,16 @@ public interface SprayProcessCoordinator extends
 
     ClassLoader getCreatorThreadClassLoader();
 
-    int createExecutorCount();
+    int executorCount();
 
     /** a method for executor to publish its data */
-    void dispatch(String variablesIdentityDataKey, SprayNextStepFilter stepFilter, SprayProcessStepExecutor fromExecutor, SprayData data, boolean still);
+    void publishData(String variablesIdentityDataKey, SprayNextStepFilter stepFilter, SprayProcessStepExecutor fromExecutor, SprayData data, boolean still);
 
 
     /**
      * unit method for executing
      */
-    void executeNext(SprayProcessStepExecutor nextStepExecutor, SprayVariableContainer lastVariables, SprayProcessStepExecutor fromExecutor, SprayData data, boolean still);
+    void send(String curExecutorNameKey, SprayVariableContainer lastVariables, String fromExecutorNameKey, SprayData data, boolean still);
 
 
     /** the only way to get variablesContainer */

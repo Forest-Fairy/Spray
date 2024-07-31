@@ -1,4 +1,6 @@
-package top.spray.engine.step.design.annotation;
+package top.spray.engine.design.event.annotation;
+
+import top.spray.engine.design.event.constant.SprayEventPassByStrategy;
 
 import java.lang.annotation.*;
 
@@ -9,6 +11,6 @@ import java.lang.annotation.*;
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-public @interface SprayDataPassByStrategy {
-    boolean value();
+public @interface SprayEventPassBy {
+    SprayEventPassByStrategy value();
 }

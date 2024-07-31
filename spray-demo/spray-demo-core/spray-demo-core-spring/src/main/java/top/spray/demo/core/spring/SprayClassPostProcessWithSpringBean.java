@@ -1,6 +1,10 @@
 package top.spray.demo.core.spring;
 
+import cn.hutool.extra.spring.SpringUtil;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -13,10 +17,9 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class SprayClassPostProcessWithSpringBean implements SprayClassLoaderListener {
-    private static final DefaultListableBeanFactory defaultListableBeanFactory;
+    private static final BeanDefinitionRegistry BEAN_DEFINITION_REGISTRY;
     static {
-        ApplicationContext applicationContext = new ClassPathXmlApplicationContext("applicationContext.xml");
-        defaultListableBeanFactory = (DefaultListableBeanFactory) applicationContext.getAutowireCapableBeanFactory();
+        BEAN_DEFINITION_REGISTRY = SpringUtil.getBean(BeanDefinitionRegistry.class);
     }
 
     private static final Map<SprayClassLoader, List<String>> loaded_beans = new ConcurrentHashMap<>();
@@ -26,14 +29,14 @@ public class SprayClassPostProcessWithSpringBean implements SprayClassLoaderList
         BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(clazz);
         String beanName = SpringClassUtil.transformName(clazz.getName());
         loaded_beans.computeIfAbsent(classLoader, (key) -> new ArrayList<>()).add(beanName);
-        defaultListableBeanFactory.registerBeanDefinition(beanName, beanDefinitionBuilder.getBeanDefinition());
+        BEAN_DEFINITION_REGISTRY.registerBeanDefinition(beanName, beanDefinitionBuilder.getBeanDefinition());
     }
 
     @Override
     public void onClassLoaderClose(SprayClassLoader classLoader) {
         List<String> beans = loaded_beans.get(classLoader);
         if (beans != null) {
-            beans.forEach(defaultListableBeanFactory::removeBeanDefinition);
+            beans.forEach(BEAN_DEFINITION_REGISTRY::removeBeanDefinition);
             loaded_beans.remove(classLoader);
         }
     }

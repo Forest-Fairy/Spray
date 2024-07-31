@@ -137,12 +137,12 @@ public class SprayDubboCoordinatorImpl implements SprayDubboCoordinator {
 
 
     @Override
-    public int createExecutorCount() {
+    public int executorCount() {
         return baseService.createExecutorCount(this.coordinatorMeta.transactionId());
     }
 
     @Override
-    public void dispatch(String identityDataKey, SprayNextStepFilter stepFilter, SprayProcessStepExecutor fromExecutor, SprayData data, boolean still) {
+    public void publishData(String identityDataKey, SprayNextStepFilter stepFilter, SprayProcessStepExecutor fromExecutor, SprayData data, boolean still) {
         String filteredNameKeys = stepFilter == null ? null :
                 fromExecutor.getMeta().nextNodes().stream()
                         .filter(nodeMeta ->
@@ -161,7 +161,7 @@ public class SprayDubboCoordinatorImpl implements SprayDubboCoordinator {
     }
 
     @Override
-    public void executeNext(SprayProcessStepExecutor nextStepExecutor, SprayVariableContainer lastVariables, SprayProcessStepExecutor fromExecutor, SprayData data, boolean still) {
+    public void sendDataPublishEvent(SprayProcessStepExecutor nextStepExecutor, SprayVariableContainer lastVariables, SprayProcessStepExecutor fromExecutor, SprayData data, boolean still) {
         throw new SprayDubboOperationNotSupportException();
     }
 

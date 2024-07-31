@@ -73,7 +73,7 @@ public class SprayDubboBaseServiceImpl implements SprayDubboBaseService {
 
     @Override
     public int createExecutorCount(String transactionId) {
-        return SprayDubboReferenceFactory.getCoordinator(transactionId).createExecutorCount();
+        return SprayDubboReferenceFactory.getCoordinator(transactionId).executorCount();
     }
 
     @Override
@@ -82,7 +82,7 @@ public class SprayDubboBaseServiceImpl implements SprayDubboBaseService {
         SprayProcessStepExecutor executor = coordinator.getStepExecutor(fromExecutorNameKey);
         Set<String> filteredKeys = StringUtils.isBlank(filteredNodeKeys) ?
                 Set.of() : Set.of(filteredNodeKeys.split(","));
-        coordinator.dispatch(
+        coordinator.publishData(
                 variablesIdentityDataKey,
                 (current, data, still1, nextStepMeta) -> !filteredKeys
                         .contains(nextStepMeta.getExecutorNameKey(coordinator.getMeta())),
