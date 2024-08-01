@@ -12,7 +12,7 @@ import top.spray.engine.plugins.remote.dubbo.factory.SprayDubboCoordinatorFactor
 import top.spray.engine.plugins.remote.dubbo.factory.SprayDubboReferenceFactory;
 import top.spray.engine.plugins.remote.dubbo.util.SprayDubboDataUtil;
 import top.spray.engine.prop.SprayVariableContainer;
-import top.spray.engine.step.executor.SprayProcessStepExecutor;
+import top.spray.engine.step.executor.SprayExecutorDefinition;
 
 import java.util.Map;
 import java.util.Set;
@@ -79,7 +79,7 @@ public class SprayDubboBaseServiceImpl implements SprayDubboBaseService {
     @Override
     public void dispatch(String transactionId, String filteredNodeKeys, String variablesIdentityDataKey, String fromExecutorNameKey, byte[] bytes, boolean still) {
         SprayProcessCoordinator coordinator = SprayDubboReferenceFactory.getCoordinator(transactionId);
-        SprayProcessStepExecutor executor = coordinator.getStepExecutor(fromExecutorNameKey);
+        SprayExecutorDefinition executor = coordinator.getStepExecutor(fromExecutorNameKey);
         Set<String> filteredKeys = StringUtils.isBlank(filteredNodeKeys) ?
                 Set.of() : Set.of(filteredNodeKeys.split(","));
         coordinator.publishData(

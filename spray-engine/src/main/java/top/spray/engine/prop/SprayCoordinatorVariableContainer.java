@@ -3,7 +3,7 @@ package top.spray.engine.prop;
 import top.spray.core.engine.props.SprayData;
 import top.spray.core.util.SprayDataUtil;
 import top.spray.engine.coordinate.coordinator.SprayProcessCoordinator;
-import top.spray.engine.step.executor.SprayProcessStepExecutor;
+import top.spray.engine.step.executor.SprayExecutorDefinition;
 
 public class SprayCoordinatorVariableContainer implements SprayVariableContainer {
     private final String creator;
@@ -34,7 +34,7 @@ public class SprayCoordinatorVariableContainer implements SprayVariableContainer
     }
 
     @Override
-    public String nextKey(SprayProcessStepExecutor lastExecutor, SprayProcessStepExecutor curExecutor) {
+    public String nextKey(SprayExecutorDefinition lastExecutor, SprayExecutorDefinition curExecutor) {
         return SprayVariableContainer.generateKey(lastExecutor, this, curExecutor);
     }
 

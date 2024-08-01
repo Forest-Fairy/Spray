@@ -17,7 +17,7 @@ public class SprayTypeHolder implements SprayType {
         this.set(statusType);
     }
     public void set(SprayType type) {
-        if (actualType.getClass() != type.getClass()) {
+        if (actualType.getClass().isInstance(type)) {
             throw new IllegalArgumentException("can not set status with the different type");
         }
         this.code = type.getCode();
@@ -48,9 +48,9 @@ public class SprayTypeHolder implements SprayType {
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof SprayTypeHolder holder) {
-            return SprayType.equal(this.actualType, holder.actualType);
+            return SprayType.isEqual(this.actualType, holder.actualType);
         } else if (obj instanceof SprayType type) {
-            return SprayType.equal(this.actualType, type);
+            return SprayType.isEqual(this.actualType, type);
         } else {
             return false;
         }

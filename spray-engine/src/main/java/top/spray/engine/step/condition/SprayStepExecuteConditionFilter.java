@@ -1,7 +1,7 @@
 package top.spray.engine.step.condition;
 
 import top.spray.core.engine.props.SprayData;
-import top.spray.engine.step.executor.SprayProcessStepExecutor;
+import top.spray.engine.step.executor.SprayExecutorDefinition;
 import top.spray.engine.step.meta.SprayProcessStepMeta;
 
 /**
@@ -17,6 +17,6 @@ public interface SprayStepExecuteConditionFilter {
      * @param stepMetaForExecuting target step's meta
      * @return false means pass
      */
-    boolean executableForMe(SprayProcessStepExecutor fromExecutor, SprayData data, boolean still, SprayProcessStepMeta stepMetaForExecuting);
+    boolean executableForMe(SprayExecutorDefinition fromExecutor, SprayData data, boolean still, SprayProcessStepMeta stepMetaForExecuting);
 
 }

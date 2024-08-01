@@ -1,5 +1,7 @@
-package top.spray.engine.event.model;
+package top.spray.engine.event.handler;
 
+
+import top.spray.engine.event.model.SprayEvent;
 
 public interface SprayEventReceiver {
 

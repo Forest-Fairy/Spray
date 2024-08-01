@@ -2,7 +2,6 @@ package top.spray.engine.step.executor;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.MDC;
-import top.spray.core.engine.props.SprayData;
 import top.spray.core.thread.SprayPoolExecutor;
 import top.spray.core.thread.SprayThread;
 import top.spray.engine.event.annotation.SpraySubscribe;
@@ -10,15 +9,12 @@ import top.spray.engine.event.constant.SprayEventPassByStrategy;
 import top.spray.engine.event.model.SprayConsumeErrorEvent;
 import top.spray.engine.event.model.SprayEvent;
 import top.spray.engine.event.model.coordinate.process.SprayProcessStopEvent;
-import top.spray.engine.event.handler.SprayExecuteEventHandler;
-import top.spray.engine.event.model.execute.error.SprayExecutorThreadInterruptedEvent;
+import top.spray.engine.event.util.SprayEvents;
 import top.spray.engine.event.util.SpraySubscribes;
 import top.spray.engine.thread.SprayPoolExecutorBuilder;
 import top.spray.core.dynamic.loader.SprayClassLoader;
 import top.spray.engine.coordinate.coordinator.SprayProcessCoordinator;
 import top.spray.engine.exception.SprayExecuteException;
-import top.spray.engine.prop.SprayVariableContainer;
-import top.spray.engine.step.condition.SprayNextStepFilter;
 import top.spray.engine.step.instance.SprayStepResultInstance;
 import top.spray.engine.step.meta.SprayProcessStepMeta;
 
@@ -31,35 +27,38 @@ import java.util.Set;
 /**
  * Define the executor of a process node
  */
-public class SprayBaseStepExecutor implements SprayProcessStepExecutor {
+public class SprayDefaultStepExecutorDefinition implements SprayExecutorDefinition {
     private SprayProcessStepMeta stepMeta;
     private SprayProcessCoordinator coordinator;
     private SprayClassLoader classLoader;
     private SprayStepResultInstance stepResult;
     private long createTime;
-    private SprayPoolExecutor pool;
+    private SprayPoolExecutor threadPool;
+    private Object executor;
     private SprayEventPassByStrategy eventPassByStrategy;
     private Map<String, List<Method>> subscribedMethods;
-    private List<SprayExecuteEventHandler> listeners;
-    private volatile int cur;
-    private volatile int next;
-    private SprayEvent[] events;
-    private SprayThread consumeThread;
+
     private Set<String> blackEvents;
     private Set<String> whiteEvents;
 
 
+    private volatile int cur;
+    private volatile int next;
+    private SprayEvent[] events;
+    private SprayThread consumeThread;
+
+
     @Override
-    public synchronized final boolean initOnlyAtCreate() {
+    public synchronized void init() {
         if (createTime != 0) {
-            return false;
+            return;
         }
         this.stepResult = new SprayStepResultInstance(
                 this.getCoordinator().getMeta(),
                 this.getMeta(), this.getClassLoader());
         this.createTime = System.currentTimeMillis();
         if (this.stepMeta.isAsync() && this.getCoordinator().getMeta().asyncSupport()) {
-            this.pool = new SprayPoolExecutorBuilder(
+            this.threadPool = new SprayPoolExecutorBuilder(
                     this.stepMeta.coreThreadCount(),
                     this.stepMeta.maxThreadCount(),
                     this.stepMeta.threadAliveTime(),
@@ -67,7 +66,7 @@ public class SprayBaseStepExecutor implements SprayProcessStepExecutor {
                     SprayPoolExecutor.newDefaultFactory(),
                     this.stepMeta.queueCapacity()).build();
         } else {
-            this.pool = null;
+            this.threadPool = null;
         }
         this.eventPassByStrategy = SprayEventPassByStrategy.StrategyOf(this.getClass());
         this.blackEvents = StringUtils.isBlank(this.getMeta().getBlackEvents()) ? null :
@@ -81,17 +80,15 @@ public class SprayBaseStepExecutor implements SprayProcessStepExecutor {
         this.events = new SprayEvent[this.stepMeta.maxConcurrentReceiving()];
         this.initOnlyAtCreate0();
         this.consumeThread = new SprayThread(() -> {
-            while (this.consume());
+            try {
+                while (this.consume());
+            } catch (Throwable error) {
+                this.getCoordinator().receive(new SprayExecuteErrorEvent(this.getCoordinator(), this, error));
+            }
         });
         this.consumeThread.start();
-        return true;
     }
     protected void initOnlyAtCreate0() {}
-
-    @Override
-    public final long runningCount() {
-        return this.getStepResult().runningCount();
-    }
 
     @Override
     public final long getCreateTime() {
@@ -127,28 +124,6 @@ public class SprayBaseStepExecutor implements SprayProcessStepExecutor {
         return this.stepResult;
     }
 
-    @Override
-    public SprayProcessStepExecutor addListener(SprayExecuteEventHandler listeners) {
-        this.getListeners().add(listeners);
-        return this;
-    }
-
-    @Override
-    public List<SprayExecuteEventHandler> getListeners() {
-        return this.listeners;
-    }
-
-    @Override
-    public int varCopyMode() {
-        return this.stepMeta.varCopyMode();
-    }
-
-
-    @Override
-    public SprayPoolExecutor getThreadPoll() {
-        return this.pool;
-    }
-
 
     @Override
     public boolean canEventPassBy(SprayEvent event) {
@@ -169,13 +144,6 @@ public class SprayBaseStepExecutor implements SprayProcessStepExecutor {
                 }
             }
         }
-    }
-
-    protected final void publishData(SprayVariableContainer variableContainer, SprayData data, boolean still) {
-        this.publishData(variableContainer, data, still, null);
-    }
-    protected final void publishData(SprayVariableContainer variableContainer, SprayData data, boolean still, SprayNextStepFilter stepFilter) {
-        this.getCoordinator().publishData(variableContainer.identityDataKey(), stepFilter, this, data, still);
     }
 
     @Override
@@ -212,7 +180,7 @@ public class SprayBaseStepExecutor implements SprayProcessStepExecutor {
     }
     protected synchronized void initBeforeRun0(SprayEvent event) {}
 
-    private boolean consume() {
+    private synchronized boolean consume() {
         if (events[cur] == null) {
             // let out cpu
             Thread.yield();
@@ -258,32 +226,30 @@ public class SprayBaseStepExecutor implements SprayProcessStepExecutor {
 //        }
     }
 
-    private void consume(SprayEvent event) {
-        this.beforeConsume(events[cur]);
-        this.getListeners().stream().filter(l -> l.support(event))
-                .forEach(l -> l.handle(event, this));
-        this.afterConsume(events[cur]);
-    }
 //    private void consume(SprayEvent event) {
-//        if (SprayProcessStartEvent.NAME.equals(event.getEventName()) ||
-//                SprayProcessStopEvent.NAME.equals(event.getEventTime())) {
-//            // ignored
-//            return ;
-//        }
-//        List<Method> subscribeMethods = this.subscribedMethods.get(event.getEventName());
-//        if (subscribeMethods != null) {
-//            SprayEvents.set(event);
-//            if (this.getThreadPoll() != null) {
-//                this.getThreadPoll().execute(() -> {
-//                    // set inside thread
-//                    SprayEvents.set(event);
-//                    invokeEvent(event, subscribeMethods);
-//                });
-//            } else {
-//                invokeEvent(event, subscribeMethods);
-//            }
-//        }
+//        this.beforeConsume(events[cur]);
+//        this.getListeners().stream().filter(l -> l.support(event))
+//                .forEach(l -> l.handle(event, this));
+//        this.afterConsume(events[cur]);
 //    }
+
+    private void consume(SprayEvent event) {
+        List<Method> subscribeMethods = this.subscribedMethods.get(event.getEventName());
+        if (subscribeMethods != null && !subscribeMethods.isEmpty()) {
+            Thread.currentThread().setContextClassLoader(this.classLoader);
+            SprayEvents.set(event);
+            if (this.threadPool != null) {
+                this.threadPool.execute(() -> {
+                    // set inside thread
+                    Thread.currentThread().setContextClassLoader(this.classLoader);
+                    SprayEvents.set(event);
+                    invokeEvent(event, subscribeMethods);
+                });
+            } else {
+                invokeEvent(event, subscribeMethods);
+            }
+        }
+    }
 
     private void invokeEvent(SprayEvent event, List<Method> subscribeMethods) {
         for (Method method : subscribeMethods) {
@@ -325,7 +291,7 @@ public class SprayBaseStepExecutor implements SprayProcessStepExecutor {
     public final void closeInRuntime() {
         waitUntilBeforeExecutionDone();
         try {
-            this.getThreadPoll().shutdown();
+            this.threadPool.shutdown();
         } catch (Exception e) {
             // TODO Handle with handler
             throw e;

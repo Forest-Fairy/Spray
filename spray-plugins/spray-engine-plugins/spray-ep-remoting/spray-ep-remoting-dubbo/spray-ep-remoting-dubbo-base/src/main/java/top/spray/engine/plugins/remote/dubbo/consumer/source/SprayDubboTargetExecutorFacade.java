@@ -6,10 +6,10 @@ import top.spray.engine.plugins.remote.dubbo.util.SprayDubboDataUtil;
 import top.spray.engine.prop.SprayVariableContainer;
 import top.spray.engine.plugins.remote.dubbo.api.source.SprayDubboExecutor;
 import top.spray.engine.plugins.remote.dubbo.api.target.reference.SprayDubboExecutorReference;
-import top.spray.engine.step.executor.SprayBaseStepExecutor;
-import top.spray.engine.step.executor.SprayProcessStepExecutor;
+import top.spray.engine.step.executor.SprayDefaultStepExecutorDefinition;
+import top.spray.engine.step.executor.SprayExecutorDefinition;
 
-public class SprayDubboTargetExecutorFacade extends SprayBaseStepExecutor implements SprayDubboExecutor, SprayDubboExecutorReferenceHolder {
+public class SprayDubboTargetExecutorFacade extends SprayDefaultStepExecutorDefinition implements SprayDubboExecutor, SprayDubboExecutorReferenceHolder {
 
     private final SprayDubboExecutorReference executorReference;
 
@@ -23,7 +23,7 @@ public class SprayDubboTargetExecutorFacade extends SprayBaseStepExecutor implem
     }
 
     @Override
-    protected boolean needWait0(SprayVariableContainer variables, SprayProcessStepExecutor fromExecutor, SprayData data, boolean still) {
+    protected boolean needWait0(SprayVariableContainer variables, SprayExecutorDefinition fromExecutor, SprayData data, boolean still) {
         return executorReference.needWait(this.getExecutorNameKey(),
                 variables.identityDataKey(),
                 fromExecutor == null ? null : fromExecutor.getExecutorNameKey(),
@@ -34,7 +34,7 @@ public class SprayDubboTargetExecutorFacade extends SprayBaseStepExecutor implem
 
 
     @Override
-    protected void _execute(SprayVariableContainer variables, SprayProcessStepExecutor fromExecutor, SprayData data, boolean still) {
+    protected void _execute(SprayVariableContainer variables, SprayExecutorDefinition fromExecutor, SprayData data, boolean still) {
         executorReference.execute(this.getExecutorNameKey(),
                 variables.identityDataKey(),
                 fromExecutor == null ? null : fromExecutor.getExecutorNameKey(),

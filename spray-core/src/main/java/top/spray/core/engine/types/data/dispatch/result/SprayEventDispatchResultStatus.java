@@ -1,62 +1,61 @@
 package top.spray.core.engine.types.data.dispatch.result;
 
 import top.spray.core.engine.types.SprayType;
-import top.spray.core.engine.types.coordinate.SprayTypeCoordinateTypeName_i18n;
 import top.spray.core.engine.types.data.dispatch.SprayDataDispatchDescription_i18n;
 import top.spray.core.engine.types.data.dispatch.SprayDataDispatchTypeName_i18n;
 import top.spray.core.i18n.Spray_i18n;
 
 import java.util.List;
 
-public class SprayDataDispatchResultStatus implements SprayType {
-    private static final List<SprayDataDispatchResultStatus> values = List.of(
-            SprayDataDispatchResultStatus.SUCCESS,
-            SprayDataDispatchResultStatus.ABANDONED,
-            SprayDataDispatchResultStatus.SKIPPED,
-            SprayDataDispatchResultStatus.FILTERED,
-            SprayDataDispatchResultStatus.FAILED,
-            SprayDataDispatchResultStatus.ERRORED
+public class SprayEventDispatchResultStatus implements SprayType {
+    private static final List<SprayEventDispatchResultStatus> values = List.of(
+            SprayEventDispatchResultStatus.SUCCESS,
+            SprayEventDispatchResultStatus.ABANDONED,
+            SprayEventDispatchResultStatus.SKIPPED,
+            SprayEventDispatchResultStatus.FILTERED,
+            SprayEventDispatchResultStatus.FAILED,
+            SprayEventDispatchResultStatus.ERRORED
     );
-    public static List<SprayDataDispatchResultStatus> values() {
+    public static List<SprayEventDispatchResultStatus> values() {
         return values;
     }
-    public static SprayDataDispatchResultStatus get(int code) {
+    public static SprayEventDispatchResultStatus get(int code) {
         return SprayType.get(values, code);
     }
 
 
     /** successfully execute with step */
-    public static final SprayDataDispatchResultStatus SUCCESS = new SprayDataDispatchResultStatus(
+    public static final SprayEventDispatchResultStatus SUCCESS = new SprayEventDispatchResultStatus(
             1, "result.status.success");
 
 
     /** the data is abandoned because there is no next step for executing */
-    public static final SprayDataDispatchResultStatus ABANDONED = new SprayDataDispatchResultStatus(
+    public static final SprayEventDispatchResultStatus ABANDONED = new SprayEventDispatchResultStatus(
             0, "result.status.abandoned");
 
 
     /** skipped by node config */
-    public static final SprayDataDispatchResultStatus SKIPPED = new SprayDataDispatchResultStatus(
+    public static final SprayEventDispatchResultStatus SKIPPED = new SprayEventDispatchResultStatus(
             -1, "result.status.skipped");
 
 
     /** filtered by filter */
-    public static final SprayDataDispatchResultStatus FILTERED = new SprayDataDispatchResultStatus(
+    public static final SprayEventDispatchResultStatus FILTERED = new SprayEventDispatchResultStatus(
             -2, "result.status.filtered");
 
 
     /** exception occur. need fail message */
-    public static final SprayDataDispatchResultStatus FAILED = new SprayDataDispatchResultStatus(
+    public static final SprayEventDispatchResultStatus FAILED = new SprayEventDispatchResultStatus(
             -3, "result.status.failed");
 
 
     /** the transaction stop but data status is not SUCCESS or FAILED */
-    public static final SprayDataDispatchResultStatus ERRORED = new SprayDataDispatchResultStatus(
+    public static final SprayEventDispatchResultStatus ERRORED = new SprayEventDispatchResultStatus(
             -4, "result.status.errored");
 
     private final int code;
     private final String i18n;
-    SprayDataDispatchResultStatus(int code, String i18n) {
+    SprayEventDispatchResultStatus(int code, String i18n) {
         this.code = code;
         this.i18n = i18n;
     }
@@ -80,11 +79,11 @@ public class SprayDataDispatchResultStatus implements SprayType {
 
     @Override
     public boolean isSameClass(Class<? extends SprayType> clazz) {
-        return SprayDataDispatchResultStatus.class.isAssignableFrom(clazz);
+        return SprayEventDispatchResultStatus.class.isAssignableFrom(clazz);
     }
 
     @Override
     public boolean equals(Object obj) {
-        return SprayType.equal(this, obj);
+        return SprayType.isEqual(this, obj);
     }
 }

@@ -1,7 +1,7 @@
 package top.spray.engine.prop;
 
 import top.spray.core.engine.props.SprayData;
-import top.spray.engine.step.executor.SprayProcessStepExecutor;
+import top.spray.engine.step.executor.SprayExecutorDefinition;
 
 public interface SprayVariableContainer {
     String creator() ;
@@ -10,7 +10,7 @@ public interface SprayVariableContainer {
 
     String identityDataKey() ;
 
-    String nextKey(SprayProcessStepExecutor lastExecutor, SprayProcessStepExecutor curExecutor);
+    String nextKey(SprayExecutorDefinition lastExecutor, SprayExecutorDefinition curExecutor);
 
     SprayVariableContainer banKey(String key) ;
 
@@ -46,7 +46,7 @@ public interface SprayVariableContainer {
 
 
     String SEPARATOR = "_";
-    static String generateKey(SprayProcessStepExecutor fromExecutor, SprayVariableContainer last, SprayProcessStepExecutor executor) {
+    static String generateKey(SprayExecutorDefinition fromExecutor, SprayVariableContainer last, SprayExecutorDefinition executor) {
         if (fromExecutor == null) {
             // the first execute of the process, last is the process default variables
             return String.format("%s"+SEPARATOR+"%s(%s)", last.identityDataKey(),

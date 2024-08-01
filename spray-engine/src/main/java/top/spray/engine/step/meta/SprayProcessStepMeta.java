@@ -1,14 +1,12 @@
 package top.spray.engine.step.meta;
 
 
-import org.apache.commons.lang3.StringUtils;
 import top.spray.core.engine.exception.SprayMetaError;
 import top.spray.core.engine.exception.SprayNotSupportError;
 import top.spray.core.engine.execute.SprayExecutorType;
 import top.spray.core.engine.execute.SprayStepActiveType;
 import top.spray.core.engine.meta.SprayBaseMeta;
 import top.spray.core.engine.props.SprayData;
-import top.spray.engine.coordinate.coordinator.SprayProcessCoordinator;
 import top.spray.engine.coordinate.meta.SprayProcessCoordinatorMeta;
 import top.spray.engine.factory.SprayExecutorFactory;
 import top.spray.engine.step.condition.SprayStepExecuteConditionFilter;
@@ -31,7 +29,7 @@ public class SprayProcessStepMeta implements SprayBaseMeta<SprayProcessStepMeta>
     private String executorNameKey;
     private SprayExecutorType executorType;
     private List<SprayProcessStepMeta> nextNodes;
-    private String executorGeneratorClass;
+    private String executorFactoryClass;
     private String executorClass;
     private String jarFiles;
 
@@ -74,7 +72,7 @@ public class SprayProcessStepMeta implements SprayBaseMeta<SprayProcessStepMeta>
         this.name = metaContainer.getNoneNull("stepName", String.class);
         this.executorType = SprayExecutorType.valueOf(metaContainer.getOrElse("executorType", "COMPUTE"));
         this.nextNodes = metaContainer.getList("nextNodes", SprayProcessStepMeta.class);
-        this.executorGeneratorClass = metaContainer.getOrElse("executorGeneratorClass", "");
+        this.executorFactoryClass = metaContainer.getOrElse("executorFactoryClass", "");
         this.executorClass = metaContainer.getNoneNull("executorClass", String.class);
         this.jarFiles = metaContainer.getString("jarFiles");
         this.stepActiveType = SprayStepActiveType.valueOf(metaContainer.getOrElse("activeType", "ACTIVE").toUpperCase());
@@ -110,7 +108,7 @@ public class SprayProcessStepMeta implements SprayBaseMeta<SprayProcessStepMeta>
 
     public String getExecutorNameKey(SprayProcessCoordinatorMeta coordinatorMeta) {
         return executorNameKey == null ?
-                (executorNameKey = SprayExecutorFactory.getExecutorNameKey(coordinatorMeta, this))
+                (executorNameKey = String.format("%s-%s[%s]", coordinatorMeta.transactionId(), this.getName(), this.getId()))
                 : executorNameKey;
     }
 
@@ -135,8 +133,8 @@ public class SprayProcessStepMeta implements SprayBaseMeta<SprayProcessStepMeta>
     /**
      * the generator class must implement the interface SprayExecutorGenerator
      */
-    public String executorGeneratorClass() {
-        return this.executorGeneratorClass;
+    public String executorFactoryClass() {
+        return this.executorFactoryClass;
     }
     public String executorClass() {
         return this.executorClass;

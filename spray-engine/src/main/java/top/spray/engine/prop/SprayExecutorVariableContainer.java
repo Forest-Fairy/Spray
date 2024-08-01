@@ -2,7 +2,7 @@ package top.spray.engine.prop;
 
 import top.spray.core.engine.props.SprayData;
 import top.spray.core.util.SprayDataUtil;
-import top.spray.engine.step.executor.SprayProcessStepExecutor;
+import top.spray.engine.step.executor.SprayExecutorDefinition;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -44,7 +44,7 @@ public class SprayExecutorVariableContainer implements SprayVariableContainer {
     }
 
     @Override
-    public String nextKey(SprayProcessStepExecutor lastExecutor, SprayProcessStepExecutor curExecutor) {
+    public String nextKey(SprayExecutorDefinition lastExecutor, SprayExecutorDefinition curExecutor) {
         return SprayVariableContainer.generateKey(lastExecutor, this, curExecutor);
     }
 
@@ -183,14 +183,14 @@ public class SprayExecutorVariableContainer implements SprayVariableContainer {
         }
         return null;
     }
-    public static SprayExecutorVariableContainer easyCopy(SprayProcessStepExecutor lastExecutor, SprayVariableContainer last, SprayProcessStepExecutor executor) {
+    public static SprayExecutorVariableContainer easyCopy(SprayExecutorDefinition lastExecutor, SprayVariableContainer last, SprayExecutorDefinition executor) {
         return new SprayExecutorVariableContainer(last,
                 executor.getExecutorNameKey(),
                 System.currentTimeMillis(),
                 last.copyInto(null),
                 SprayVariableContainer.generateKey(lastExecutor, last, executor));
     }
-    public static SprayExecutorVariableContainer deepCopy(SprayProcessStepExecutor lastExecutor, SprayVariableContainer last, SprayProcessStepExecutor executor) {
+    public static SprayExecutorVariableContainer deepCopy(SprayExecutorDefinition lastExecutor, SprayVariableContainer last, SprayExecutorDefinition executor) {
         return new SprayExecutorVariableContainer(last,
                 executor.getExecutorNameKey(),
                 System.currentTimeMillis(),

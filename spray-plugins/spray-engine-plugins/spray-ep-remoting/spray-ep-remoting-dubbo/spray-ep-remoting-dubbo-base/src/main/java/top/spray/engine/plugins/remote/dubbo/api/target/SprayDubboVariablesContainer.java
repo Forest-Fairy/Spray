@@ -2,10 +2,9 @@ package top.spray.engine.plugins.remote.dubbo.api.target;
 
 import top.spray.core.engine.props.SprayData;
 import top.spray.core.util.SprayDataUtil;
-import top.spray.engine.plugins.remote.dubbo.api.source.reference.SprayDubboVariablesReference;
 import top.spray.engine.plugins.remote.dubbo.api.target.holder.SprayDubboVariablesReferenceHolder;
 import top.spray.engine.prop.SprayVariableContainer;
-import top.spray.engine.step.executor.SprayProcessStepExecutor;
+import top.spray.engine.step.executor.SprayExecutorDefinition;
 
 /** this is a coordinator reference */
 public interface SprayDubboVariablesContainer extends SprayDubboVariablesReferenceHolder, SprayVariableContainer {
@@ -13,7 +12,7 @@ public interface SprayDubboVariablesContainer extends SprayDubboVariablesReferen
     String transactionId();
 
     @Override
-    default String nextKey(SprayProcessStepExecutor lastExecutor, SprayProcessStepExecutor curExecutor) {
+    default String nextKey(SprayExecutorDefinition lastExecutor, SprayExecutorDefinition curExecutor) {
         throw new Un;
     }
 

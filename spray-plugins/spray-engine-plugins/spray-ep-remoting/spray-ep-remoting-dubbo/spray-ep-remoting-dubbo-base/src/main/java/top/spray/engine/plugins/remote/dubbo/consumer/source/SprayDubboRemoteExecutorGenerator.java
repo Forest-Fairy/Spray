@@ -9,7 +9,7 @@ import top.spray.engine.plugins.remote.dubbo.api.target.reference.SprayDubboExec
 import top.spray.engine.plugins.remote.dubbo.constants.SprayDubboConfigConst;
 import top.spray.engine.plugins.remote.dubbo.api.source.SprayDubboExecutor;
 import top.spray.engine.plugins.remote.dubbo.util.SprayDubboConfigurations;
-import top.spray.engine.remoting.SprayRemoteStepExecutor;
+import top.spray.engine.remoting.SprayRemoteStepExecutorDefinition;
 import top.spray.engine.remoting.generator.SprayRemoteStepExecutorGenerator;
 import top.spray.engine.step.meta.SprayProcessStepMeta;
 
@@ -22,9 +22,9 @@ public class SprayDubboRemoteExecutorGenerator implements SprayRemoteStepExecuto
     }
 
     @Override
-    public SprayRemoteStepExecutor generateExecutor(SprayProcessCoordinatorMeta coordinatorMeta,
-                                                    SprayProcessStepMeta executorMeta,
-                                                    SprayClassLoader classLoader) {
+    public SprayRemoteStepExecutorDefinition generateExecutor(SprayProcessCoordinatorMeta coordinatorMeta,
+                                                              SprayProcessStepMeta executorMeta,
+                                                              SprayClassLoader classLoader) {
         Thread.currentThread().setContextClassLoader(classLoader);
         SprayDubboBaseService sprayDubboReference = SprayDubboBaseService.get(executorMeta);
         boolean isSuccess = sprayDubboReference.generateExecutor(

@@ -3,7 +3,6 @@ package top.spray.core.engine.types.coordinate.status;
 import top.spray.core.engine.types.SprayType;
 import top.spray.core.engine.types.coordinate.SprayTypeCoordinateDescription_i18n;
 import top.spray.core.engine.types.coordinate.SprayTypeCoordinateTypeName_i18n;
-import top.spray.core.engine.types.data.dispatch.result.SprayDataDispatchResultStatus;
 import top.spray.core.i18n.Spray_i18n;
 
 import java.util.List;
@@ -71,6 +70,6 @@ public class SprayCoordinatorStatus implements SprayType {
 
     @Override
     public boolean equals(Object obj) {
-        return SprayType.equal(this, obj);
+        return SprayType.isEqual(this, obj);
     }
 }

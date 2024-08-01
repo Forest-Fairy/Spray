@@ -1,16 +1,15 @@
 package top.spray.engine.plugins.remote.dubbo.provider.source;
 
 import top.spray.engine.coordinate.coordinator.SprayProcessCoordinator;
-import top.spray.engine.plugins.remote.dubbo.api.target.SprayDubboCoordinator;
 import top.spray.engine.plugins.remote.dubbo.api.target.reference.SprayDubboExecutorReference;
 import top.spray.engine.plugins.remote.dubbo.util.SprayDubboDataUtil;
-import top.spray.engine.step.executor.SprayProcessStepExecutor;
+import top.spray.engine.step.executor.SprayExecutorDefinition;
 
 
 public class SprayDubboExecutorSrcReference implements SprayDubboExecutorReference {
     private final SprayProcessCoordinator coordinator;
-    private final SprayProcessStepExecutor realExecutor;
-    public SprayDubboExecutorSrcReference(SprayProcessCoordinator coordinator, SprayProcessStepExecutor realExecutor) {
+    private final SprayExecutorDefinition realExecutor;
+    public SprayDubboExecutorSrcReference(SprayProcessCoordinator coordinator, SprayExecutorDefinition realExecutor) {
         this.coordinator = coordinator;
         this.realExecutor = realExecutor;
     }

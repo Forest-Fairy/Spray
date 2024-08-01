@@ -3,13 +3,13 @@ package top.spray.engine.remoting.generator;
 import top.spray.core.dynamic.loader.SprayClassLoader;
 import top.spray.core.util.SprayServiceUtil;
 import top.spray.engine.coordinate.meta.SprayProcessCoordinatorMeta;
-import top.spray.engine.remoting.SprayRemoteStepExecutor;
+import top.spray.engine.remoting.SprayRemoteStepExecutorDefinition;
 import top.spray.engine.step.meta.SprayProcessStepMeta;
 
 import java.util.Map;
 
 public interface SprayRemoteStepExecutorGenerator {
-    static SprayRemoteStepExecutor generate(
+    static SprayRemoteStepExecutorDefinition generate(
             SprayProcessCoordinatorMeta coordinatorMeta, SprayProcessStepMeta executorMeta, SprayClassLoader sprayClassLoader) {
         Map<String, SprayRemoteStepExecutorGenerator> generatorMap = SprayServiceUtil.loadServiceClassNameMapCache(SprayRemoteStepExecutorGenerator.class);
         for (SprayRemoteStepExecutorGenerator generator : generatorMap.values()) {
@@ -22,6 +22,6 @@ public interface SprayRemoteStepExecutorGenerator {
 
     boolean support(
             SprayProcessCoordinatorMeta coordinatorMeta, SprayProcessStepMeta executorMeta, SprayClassLoader sprayClassLoader);
-    SprayRemoteStepExecutor generateExecutor(
+    SprayRemoteStepExecutorDefinition generateExecutor(
             SprayProcessCoordinatorMeta coordinatorMeta, SprayProcessStepMeta executorMeta, SprayClassLoader sprayClassLoader);
 }

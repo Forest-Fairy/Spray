@@ -16,7 +16,7 @@ import top.spray.engine.plugins.remote.dubbo.constants.SprayDubboProtocolConst;
 import top.spray.engine.plugins.remote.dubbo.consumer.target.SprayDubboSrcExecutorFacade;
 import top.spray.engine.plugins.remote.dubbo.provider.target.SprayDubboExecutorTargetReference;
 import top.spray.engine.plugins.remote.dubbo.util.SprayDubboConfigurations;
-import top.spray.engine.step.executor.SprayProcessStepExecutor;
+import top.spray.engine.step.executor.SprayExecutorDefinition;
 import top.spray.engine.step.meta.SprayProcessStepMeta;
 
 public interface SprayDubboExecutorReference {
@@ -51,7 +51,7 @@ public interface SprayDubboExecutorReference {
         return referenceConfig.get();
     }
 
-    static void createTargetProvider(String executorNameKey, SprayDubboCoordinator coordinator, SprayProcessStepExecutor realExecutor) {
+    static void createTargetProvider(String executorNameKey, SprayDubboCoordinator coordinator, SprayExecutorDefinition realExecutor) {
         SprayDubboExecutorTargetReference referenceImpl = new SprayDubboExecutorTargetReference(coordinator, realExecutor);
         ServiceConfig<SprayDubboExecutorReference> serviceConfig = new ServiceConfig<>();
         serviceConfig.setId(executorNameKey);
@@ -70,7 +70,7 @@ public interface SprayDubboExecutorReference {
                 .start();
     }
 
-    static void createSrcProvider(String executorNameKey, SprayProcessCoordinator coordinator, SprayProcessStepExecutor realExecutor) {
+    static void createSrcProvider(String executorNameKey, SprayProcessCoordinator coordinator, SprayExecutorDefinition realExecutor) {
         SprayDubboExecutorTargetReference referenceImpl = new SprayDubboSrcExecutorFacade(coordinator, realExecutor);
         ServiceConfig<SprayDubboExecutorReference> serviceConfig = new ServiceConfig<>();
         serviceConfig.setId(executorNameKey);

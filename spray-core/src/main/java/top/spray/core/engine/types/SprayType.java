@@ -12,7 +12,7 @@ public interface SprayType {
     static SprayTypeHolder holder(SprayType sprayStatusType) {
         return SprayTypeHolder.create(sprayStatusType);
     }
-    static boolean equal(Object t1, Object t2) {
+    static boolean isEqual(Object t1, Object t2) {
         if (t1 == null && t2 == null) {
             return true;
         }
@@ -23,7 +23,10 @@ public interface SprayType {
             return holder.equals(t1);
         }
         if (t1 instanceof SprayType type1 && t2 instanceof SprayType type2) {
-            return type1.getCode() == type2.getCode();
+            if (t1.getClass().isAssignableFrom(t2.getClass()) || t2.getClass().isAssignableFrom(t1.getClass())) {
+                // 同一个类或是父子类才可以
+                return type1.getCode() == type2.getCode();
+            }
         }
         return false;
     }

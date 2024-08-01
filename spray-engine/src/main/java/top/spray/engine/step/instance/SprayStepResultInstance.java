@@ -92,6 +92,11 @@ public class SprayStepResultInstance {
     public void setStatus(SprayStepStatus status) {
         this.stepStatus.set(status);
     }
+    public void endStep(SprayStepStatus status) {
+        this.setStatus(status);
+        this.endTime = System.currentTimeMillis();
+
+    }
 
 //    public void addError(Throwable error) {
 //        this.errorList.add(Pair.of(System.currentTimeMillis(), error));
@@ -130,9 +135,6 @@ public class SprayStepResultInstance {
                 executorMeta, SprayExecutionRecordType.RECORD_EXECUTE_FAILED, fromExecutorMeta, data, still, error));
     }
 
-    public void endStep() {
-        this.endTime = System.currentTimeMillis();
-    }
 
 
     public SprayType getStatus() {
@@ -144,7 +146,7 @@ public class SprayStepResultInstance {
     public long getEndTime() {
         return this.endTime;
     }
-    public long duration() {
+    public long getDuration() {
         return this.endTime == 0 ?
                 System.currentTimeMillis() - this.startTime :
                 this.endTime - this.startTime;

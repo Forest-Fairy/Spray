@@ -4,7 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.rpc.RpcContext;
 import top.spray.core.engine.props.SprayData;
 import top.spray.core.engine.types.coordinate.status.SprayCoordinatorStatus;
-import top.spray.core.engine.types.data.dispatch.result.SprayDataDispatchResultStatus;
+import top.spray.core.engine.types.data.dispatch.result.SprayEventDispatchResultStatus;
 import top.spray.engine.coordinate.meta.SprayProcessCoordinatorMeta;
 import top.spray.engine.plugins.remote.dubbo.api.target.SprayDubboBaseService;
 import top.spray.engine.plugins.remote.dubbo.api.target.SprayDubboVariablesContainer;
@@ -15,7 +15,7 @@ import top.spray.engine.prop.SprayVariableContainer;
 import top.spray.engine.plugins.remote.dubbo.api.target.SprayDubboCoordinator;
 import top.spray.engine.plugins.remote.dubbo.api.source.reference.SprayDubboCoordinatorReference;
 import top.spray.engine.step.condition.SprayNextStepFilter;
-import top.spray.engine.step.executor.SprayProcessStepExecutor;
+import top.spray.engine.step.executor.SprayExecutorDefinition;
 import top.spray.engine.step.meta.SprayProcessStepMeta;
 
 import java.util.List;
@@ -30,7 +30,7 @@ public class SprayDubboCoordinatorImpl implements SprayDubboCoordinator {
     private final SprayDubboBaseService baseService;
     private final SprayProcessCoordinatorMeta coordinatorMeta;
     private final Map<String, SprayProcessStepMeta> stepMetas;
-    private final Map<String, SprayProcessStepExecutor> executors;
+    private final Map<String, SprayExecutorDefinition> executors;
     private final Map<String, SprayDubboVariablesContainer> variablesContainerMap;
     private final ClassLoader creatorThreadClassLoader;
 
@@ -106,7 +106,7 @@ public class SprayDubboCoordinatorImpl implements SprayDubboCoordinator {
     }
 
     @Override
-    public String getExecutorNameKey(SprayProcessStepExecutor executor) {
+    public String getExecutorNameKey(SprayExecutorDefinition executor) {
         return executor.getMeta().getExecutorNameKey(this.coordinatorMeta);
     }
 
@@ -142,7 +142,7 @@ public class SprayDubboCoordinatorImpl implements SprayDubboCoordinator {
     }
 
     @Override
-    public void publishData(String identityDataKey, SprayNextStepFilter stepFilter, SprayProcessStepExecutor fromExecutor, SprayData data, boolean still) {
+    public void publishData(String identityDataKey, SprayNextStepFilter stepFilter, SprayExecutorDefinition fromExecutor, SprayData data, boolean still) {
         String filteredNameKeys = stepFilter == null ? null :
                 fromExecutor.getMeta().nextNodes().stream()
                         .filter(nodeMeta ->
@@ -156,12 +156,12 @@ public class SprayDubboCoordinatorImpl implements SprayDubboCoordinator {
     }
 
     @Override
-    public List<SprayDataDispatchResultStatus> getDispatchResults(String dataKey) {
+    public List<SprayEventDispatchResultStatus> getDispatchResults(String dataKey) {
         throw new SprayDubboOperationNotSupportException();
     }
 
     @Override
-    public void sendDataPublishEvent(SprayProcessStepExecutor nextStepExecutor, SprayVariableContainer lastVariables, SprayProcessStepExecutor fromExecutor, SprayData data, boolean still) {
+    public void sendDataPublishEvent(SprayExecutorDefinition nextStepExecutor, SprayVariableContainer lastVariables, SprayExecutorDefinition fromExecutor, SprayData data, boolean still) {
         throw new SprayDubboOperationNotSupportException();
     }
 
@@ -176,13 +176,13 @@ public class SprayDubboCoordinatorImpl implements SprayDubboCoordinator {
     }
 
     @Override
-    public void registerExecutor(String executorNameKey, SprayProcessStepExecutor executor) {
+    public void registerExecutor(String executorNameKey, SprayExecutorDefinition executor) {
         this.executors.put(executorNameKey, executor);
     }
 
     @Override
-    public SprayProcessStepExecutor getStepExecutor(String executorNameKey) {
-        SprayProcessStepExecutor executor = this.executors.get(executorNameKey);
+    public SprayExecutorDefinition getStepExecutor(String executorNameKey) {
+        SprayExecutorDefinition executor = this.executors.get(executorNameKey);
         if (executor == null) {
             synchronized (this.executors) {
                 if ((executor = this.executors.get(executorNameKey)) == null) {

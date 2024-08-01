@@ -9,7 +9,7 @@ import top.spray.engine.plugins.remote.dubbo.api.source.holder.SprayDubboExecuto
 import top.spray.engine.plugins.remote.dubbo.api.target.reference.SprayDubboExecutorReference;
 import top.spray.engine.plugins.remote.dubbo.provider.source.SprayDubboExecutorSrcReference;
 import top.spray.engine.prop.SprayVariableContainer;
-import top.spray.engine.step.executor.SprayProcessStepExecutor;
+import top.spray.engine.step.executor.SprayExecutorDefinition;
 import top.spray.engine.step.instance.SprayStepResultInstance;
 import top.spray.engine.step.meta.SprayProcessStepMeta;
 
@@ -78,12 +78,12 @@ public class SprayDubboSrcExecutorFacade implements SprayDubboExecutor, SprayDub
     }
 
     @Override
-    public boolean needWait(SprayVariableContainer variables, SprayProcessStepExecutor fromExecutor, SprayData data, boolean still) {
+    public boolean needWait(SprayVariableContainer variables, SprayExecutorDefinition fromExecutor, SprayData data, boolean still) {
         return this.realExecutor.needWait(variables, fromExecutor, data, still);
     }
 
     @Override
-    public void execute(SprayVariableContainer variables, SprayProcessStepExecutor fromExecutor, SprayData data, boolean still) {
+    public void execute(SprayVariableContainer variables, SprayExecutorDefinition fromExecutor, SprayData data, boolean still) {
         this.realExecutor.execute(variables, fromExecutor, data, still);
     }
 

@@ -4,12 +4,12 @@ import cn.hutool.core.util.CharsetUtil;
 import org.apache.commons.lang3.StringUtils;
 import top.spray.core.config.util.SpraySystemConfigurations;
 import top.spray.core.engine.props.SprayData;
-import top.spray.core.engine.types.data.dispatch.result.SprayDataDispatchResultStatus;
+import top.spray.core.engine.types.data.dispatch.result.SprayEventDispatchResultStatus;
 import top.spray.core.util.SprayUtf8s;
 import top.spray.engine.coordinate.meta.SprayProcessCoordinatorMeta;
 import top.spray.engine.exception.SprayDispatchResultHandleException;
 import top.spray.engine.prop.SprayVariableContainer;
-import top.spray.engine.step.executor.SprayProcessStepExecutor;
+import top.spray.engine.step.executor.SprayExecutorDefinition;
 import top.spray.engine.step.meta.SprayProcessStepMeta;
 
 import java.io.*;
@@ -37,7 +37,7 @@ public class SprayDataDispatchResultHandler_PropertiesFile implements SprayDataD
     @Override
     public String computeDataKey(
             SprayProcessCoordinatorMeta coordinatorMeta, SprayVariableContainer variables,
-            SprayProcessStepExecutor fromExecutor, SprayData data, boolean still,
+            SprayExecutorDefinition fromExecutor, SprayData data, boolean still,
             SprayProcessStepMeta nextMeta) {
         return (coordinatorMeta.transactionId() + SEP_FOR_COMPUTE +
                 fromExecutor.getExecutorNameKey() + SEP_FOR_COMPUTE +
@@ -47,8 +47,8 @@ public class SprayDataDispatchResultHandler_PropertiesFile implements SprayDataD
 
     @Override
     public void setDispatchResult(SprayProcessCoordinatorMeta coordinatorMeta, SprayVariableContainer variables,
-                                  SprayProcessStepExecutor fromExecutor, SprayData data, boolean still,
-                                  SprayProcessStepMeta nextMeta, String dataKey, SprayDataDispatchResultStatus dataDispatchStatus) {
+                                  SprayExecutorDefinition fromExecutor, SprayData data, boolean still,
+                                  SprayProcessStepMeta nextMeta, String dataKey, SprayEventDispatchResultStatus dataDispatchStatus) {
         try {
             File propertiesFile = this.getResultFile(coordinatorMeta);
             getFileStream(propertiesFile)
@@ -61,9 +61,9 @@ public class SprayDataDispatchResultHandler_PropertiesFile implements SprayDataD
     }
 
     @Override
-    public List<SprayDataDispatchResultStatus> getDispatchResult(SprayProcessCoordinatorMeta coordinatorMeta, String dataKey) {
+    public List<SprayEventDispatchResultStatus> getDispatchResult(SprayProcessCoordinatorMeta coordinatorMeta, String dataKey) {
         try {
-            List<SprayDataDispatchResultStatus> resultStatusList = new ArrayList<>();
+            List<SprayEventDispatchResultStatus> resultStatusList = new ArrayList<>();
             String prefix = dataKey + SEP_FOR_STATUS;
             File resultFile = this.getResultFile(coordinatorMeta);
             if (resultFile.exists()) {
@@ -72,7 +72,7 @@ public class SprayDataDispatchResultHandler_PropertiesFile implements SprayDataD
                     while (StringUtils.isNotBlank(line = file.readLine())) {
                         line = CharsetUtil.convert(line, CharsetUtil.CHARSET_ISO_8859_1, SprayUtf8s.Charset);
                         if (line.startsWith(prefix)) {
-                            resultStatusList.add(SprayDataDispatchResultStatus
+                            resultStatusList.add(SprayEventDispatchResultStatus
                                     .get(Integer.parseInt(line.substring(prefix.length()).trim())));
                         }
                     }

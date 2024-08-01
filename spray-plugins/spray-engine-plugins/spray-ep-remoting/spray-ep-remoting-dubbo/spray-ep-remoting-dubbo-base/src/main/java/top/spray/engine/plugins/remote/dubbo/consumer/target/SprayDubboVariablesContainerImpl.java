@@ -1,10 +1,7 @@
 package top.spray.engine.plugins.remote.dubbo.consumer.target;
 
-import top.spray.core.engine.props.SprayData;
 import top.spray.engine.plugins.remote.dubbo.api.target.SprayDubboVariablesContainer;
-import top.spray.engine.prop.SprayVariableContainer;
 import top.spray.engine.plugins.remote.dubbo.api.source.reference.SprayDubboVariablesReference;
-import top.spray.engine.step.executor.SprayProcessStepExecutor;
 
 public class SprayDubboVariablesContainerImpl implements SprayDubboVariablesContainer {
     private final String transactionId;

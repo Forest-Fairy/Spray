@@ -61,6 +61,6 @@ public class SprayStepStatus implements SprayType {
 
     @Override
     public boolean equals(Object obj) {
-        return SprayType.equal(this, obj);
+        return SprayType.isEqual(this, obj);
     }
 }

@@ -5,13 +5,13 @@ import top.spray.core.engine.execute.SprayListenable;
 import top.spray.core.engine.execute.SprayMetaDrive;
 import top.spray.core.engine.props.SprayData;
 import top.spray.core.engine.types.coordinate.status.SprayCoordinatorStatus;
-import top.spray.core.engine.types.data.dispatch.result.SprayDataDispatchResultStatus;
+import top.spray.core.engine.types.data.dispatch.result.SprayEventDispatchResultStatus;
 import top.spray.engine.coordinate.meta.SprayProcessCoordinatorMeta;
 import top.spray.engine.event.handler.SprayCoordinatorEventHandler;
 import top.spray.engine.event.model.SprayEvent;
-import top.spray.engine.event.model.SprayEventReceiver;
+import top.spray.engine.event.handler.SprayEventReceiver;
 import top.spray.engine.prop.SprayVariableContainer;
-import top.spray.engine.step.executor.SprayProcessStepExecutor;
+import top.spray.engine.step.executor.SprayExecutorDefinition;
 
 import java.util.List;
 import java.util.Set;
@@ -69,7 +69,7 @@ public interface SprayProcessCoordinator extends
     SprayVariableContainer getVariablesContainer(String identityDataKey);
 
     /** the only way to get the executor */
-    SprayProcessStepExecutor getStepExecutor(String executorNameKey);
+    SprayExecutorDefinition getStepExecutor(String executorNameKey);
 
     /** all the recorded input data of the executor in coordinator */
     Set<String> getInputDataKeys(String executorNameKey);
@@ -78,5 +78,5 @@ public interface SprayProcessCoordinator extends
     Set<String> getOutputDataKeys(String executorNameKey);
 
     /** data dispatch results track */
-    List<SprayDataDispatchResultStatus> getDispatchResults(String dataKey);
+    List<SprayEventDispatchResultStatus> getDispatchResults(String dataKey);
 }
