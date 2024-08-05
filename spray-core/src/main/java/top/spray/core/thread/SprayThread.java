@@ -11,17 +11,17 @@ public class SprayThread extends Thread {
 
     public SprayThread() {
         super();
-        this.setName("Spray" + this.getName());
+        this.setName("spray-" + this.getName());
     }
 
     public SprayThread(Runnable target) {
         super(target);
-        this.setName("Spray" + this.getName());
+        this.setName("spray-" + this.getName());
     }
 
     public SprayThread(ThreadGroup group, Runnable target) {
         super(group, target);
-        this.setName("Spray" + this.getName());
+        this.setName("spray-" + this.getName());
     }
 
     public SprayThread(String name) {
