@@ -2,6 +2,10 @@ package top.spray.db.connection.connection.jdbc;
 
 import cn.hutool.db.StatementUtil;
 import cn.hutool.db.sql.NamedSql;
+import top.spray.db.connection.action.SprayActionHandler;
+import top.spray.db.connection.action.SprayDataAction;
+import top.spray.db.connection.action.SprayDataActionResult;
+import top.spray.db.connection.connection.SprayConnection;
 import top.spray.db.connection.exception.SpraySqlException;
 import top.spray.db.connection.support.SprayTransactionSupportConnection;
 
@@ -11,10 +15,14 @@ import java.sql.SQLException;
 import java.util.Map;
 
 public class SprayJDBCConnection extends SprayTransactionSupportConnection<Connection> {
-    private boolean readOnly;
 
     public SprayJDBCConnection(Connection connection) {
         super(connection);
+    }
+
+    @Override
+    protected <Action extends SprayDataAction<Result, ?>, Result extends SprayDataActionResult<Action>> SprayActionHandler<SprayConnection<?>, Action, Result> getActionHandler(Action action) {
+        return null;
     }
 
     @Override
@@ -22,11 +30,6 @@ public class SprayJDBCConnection extends SprayTransactionSupportConnection<Conne
         if (! this.getConnection().isClosed()) {
             this.getConnection().close();
         }
-    }
-
-    @Override
-    public void setReadOnly(boolean readOnly) {
-        this.readOnly = readOnly;
     }
 
     public PreparedStatement getPreparedStatement(String parameterizedSql, Map<String, Object> params) {

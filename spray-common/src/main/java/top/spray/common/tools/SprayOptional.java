@@ -1,4 +1,4 @@
-package top.spray.core.global.stream;
+package top.spray.common.tools;
 
 import java.util.NoSuchElementException;
 import java.util.Objects;
@@ -10,6 +10,7 @@ import java.util.stream.Stream;
 
 public class SprayOptional<T> {
     private static final SprayOptional<?> EMPTY = new SprayOptional<>(null);
+    private static final Supplier<?> NullSupplier = () -> null;
     public static<T> SprayOptional<T> empty() {
         // noinspection unchecked
         return (SprayOptional<T>) EMPTY;
@@ -25,13 +26,9 @@ public class SprayOptional<T> {
         this.value = value;
     }
 
-
-    public T get() {
-        if (value == null) {
-            throw new NoSuchElementException("No value present");
-        }
+    private Supplier<T> nullSupplier() {
         // noinspection unchecked
-        return (T) value;
+        return (Supplier<T>) NullSupplier;
     }
 
     public boolean isPresent() {
@@ -44,13 +41,13 @@ public class SprayOptional<T> {
 
     public void ifPresent(Consumer<? super T> action) {
         if (value != null) {
-            action.accept(this.get());
+            action.accept(this.orElseGet(nullSupplier()));
         }
     }
 
     public void ifPresentOrElse(Consumer<? super T> action, Runnable emptyAction) {
         if (value != null) {
-            action.accept(this.get());
+            action.accept(this.orElseGet(nullSupplier()));
         } else {
             emptyAction.run();
         }
@@ -59,7 +56,7 @@ public class SprayOptional<T> {
     public SprayOptional<T> filter(Predicate<? super T> predicate) {
         Objects.requireNonNull(predicate);
         if (this.isPresent()) {
-            if (! predicate.test(this.get())) {
+            if (! predicate.test(this.orElseGet(nullSupplier()))) {
                 return empty();
             }
         }
@@ -69,7 +66,7 @@ public class SprayOptional<T> {
     public <U> SprayOptional<U> map(Function<? super T, ? extends U> mapper) {
         Objects.requireNonNull(mapper);
         if (this.isPresent()) {
-            U u = mapper.apply(this.get());
+            U u = mapper.apply(this.orElseGet(nullSupplier()));
             if (u != null) {
                 return SprayOptional.of(u);
             }
@@ -81,7 +78,7 @@ public class SprayOptional<T> {
         Objects.requireNonNull(mapper);
         if (isPresent()) {
             @SuppressWarnings("unchecked")
-            SprayOptional<U> r = (SprayOptional<U>) mapper.apply(this.get());
+            SprayOptional<U> r = (SprayOptional<U>) mapper.apply(this.orElseGet(nullSupplier()));
             return Objects.requireNonNull(r);
         }
         return empty();
@@ -102,28 +99,28 @@ public class SprayOptional<T> {
         if (!isPresent()) {
             return Stream.empty();
         } else {
-            return Stream.of(this.get());
+            return Stream.of(this.orElseGet(nullSupplier()));
         }
     }
 
     public T orElse(T other) {
-        return this.isPresent() ? this.get() : other;
+        return this.isPresent() ? this.orElseGet(nullSupplier()) : other;
     }
 
     public T orElseGet(Supplier<? extends T> supplier) {
-        return this.isPresent() ? this.get() : supplier.get();
+        return this.isPresent() ? this.orElseGet(nullSupplier()) : supplier.get();
     }
 
     public T orElseThrow() {
         if (this.isNotPresent()) {
             throw new NoSuchElementException("No value present");
         }
-        return this.get();
+        return this.orElseGet(nullSupplier());
     }
 
     public <X extends Throwable> T orElseThrow(Supplier<? extends X> exceptionSupplier) throws X {
         if (this.isPresent()) {
-            return this.get();
+            return this.orElseGet(nullSupplier());
         } else {
             throw exceptionSupplier.get();
         }

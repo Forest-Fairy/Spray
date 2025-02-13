@@ -2,7 +2,7 @@ package top.spray.processor.process.data.event.impl;
 
 import top.spray.common.tools.Sprays;
 import top.spray.core.global.prop.SprayUnsupportedOperation;
-import top.spray.core.global.stream.SprayOptional;
+import top.spray.common.tools.SprayOptional;
 import top.spray.processor.process.data.event.SprayDataEvent;
 import top.spray.processor.process.dispatch.coordinate.coordinator.SprayProcessCoordinator;
 import top.spray.processor.process.dispatch.event.SprayDispatchEvent;

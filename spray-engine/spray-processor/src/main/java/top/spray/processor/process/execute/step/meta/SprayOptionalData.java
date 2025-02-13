@@ -2,7 +2,7 @@ package top.spray.processor.process.execute.step.meta;
 
 import top.spray.core.global.prop.SprayData;
 import top.spray.common.tools.SprayTuple;
-import top.spray.core.global.stream.SprayOptional;
+import top.spray.common.tools.SprayOptional;
 
 public class SprayOptionalData extends SprayOptional<SprayTuple._3<String, SprayData, Boolean>> {
     private final String dataKey;

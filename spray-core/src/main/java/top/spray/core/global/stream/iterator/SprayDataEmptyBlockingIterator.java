@@ -2,7 +2,7 @@ package top.spray.core.global.stream.iterator;
 
 import top.spray.core.global.prop.SprayData;
 import top.spray.core.global.stream.SprayDataIterator;
-import top.spray.core.global.stream.SprayOptional;
+import top.spray.common.tools.SprayOptional;
 
 public class SprayDataEmptyBlockingIterator extends SprayDataIterator {
 

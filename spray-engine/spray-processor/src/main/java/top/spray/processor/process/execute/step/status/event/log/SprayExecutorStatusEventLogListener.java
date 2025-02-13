@@ -27,10 +27,10 @@ public class SprayExecutorStatusEventLogListener extends SprayExecutor_i18n impl
         }
 //        event.getEventSource()
         SprayStepStatusInstance statusInstance = logEvent.getStatusInstance();
-        Object source = logEvent.getEventSource().get();
+        Object source = logEvent.getEventSource().orElse(null);
         if (source instanceof SprayStepStatus oldStatus) {
             LOGGER.info("step.status.change",
-                    statusInstance.getCoordinator().getMeta().getProcessName(),
+                    statusInstance.getCoordinator().name(),
                     statusInstance.getExecutorFacade().executorNameKey(),
                     oldStatus.typeName(), statusInstance.getStatus().typeName());
             return SprayListenEventReceiveResult.Success(eventId, receiveTime, "step.status.change");

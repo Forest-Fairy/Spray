@@ -1,6 +1,8 @@
 package top.spray.db.connection.action;
 
 import top.spray.core.system.type.SprayTypeI18nType;
+import top.spray.db.connection.exception.SprayDatabaseException;
+import top.spray.db.connection.exception.SpraySqlException;
 import top.spray.db.sql.objects.db.SprayDatabaseType;
 
 import java.util.Map;
@@ -22,7 +24,10 @@ public interface SprayDataAction<Result extends SprayDataActionResult<?>, TYPE e
 
     Map<String, Object> params();
 
-    default void callBack(Result result, Throwable throwable) {}
+    default void callBackHandled(Result result) {}
+    default void callBackError(Throwable throwable) {
+        throw new SprayDatabaseException(throwable);
+    }
 
     interface Type extends SprayTypeI18nType {
     }

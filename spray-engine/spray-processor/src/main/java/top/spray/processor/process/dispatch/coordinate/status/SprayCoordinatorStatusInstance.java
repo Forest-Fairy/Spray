@@ -1,7 +1,7 @@
 package top.spray.processor.process.dispatch.coordinate.status;
 
 import top.spray.core.global.prop.SprayUnsupportedOperation;
-import top.spray.core.global.stream.SprayOptional;
+import top.spray.common.tools.SprayOptional;
 import top.spray.processor.infrustructure.analyse.SprayAnalysable;
 import top.spray.core.system.type.SprayType;
 import top.spray.core.system.type.SprayTypeHolder;

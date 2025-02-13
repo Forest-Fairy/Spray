@@ -1,7 +1,7 @@
 package top.spray.processor.process.dispatch.coordinate.status.event.log;
 
 import top.spray.core.system.logger.SprayLogger;
-import top.spray.core.global.stream.SprayOptional;
+import top.spray.common.tools.SprayOptional;
 import top.spray.processor.infrustructure.listen.SprayListenEventReceiveResult;
 import top.spray.processor.infrustructure.listen.SprayListenable;
 import top.spray.processor.infrustructure.listen.SprayListenEvent;
@@ -35,7 +35,7 @@ public class SprayCoordinatorStatusEventLogListener extends SprayCoordinator_i18
 //        event.getEventSource()
         SprayCoordinatorStatusInstance statusInstance = logEvent.getStatusInstance();
         SprayOptional<?> source = logEvent.getEventSource();
-        if (source.get() instanceof SprayCoordinatorStatus oldStatus) {
+        if (source.orElse(null) instanceof SprayCoordinatorStatus oldStatus) {
             LOGGER.info("coordinator.status.change",
                     logEvent.getStatusInstance().coordinator().name(),
                     oldStatus.typeName(), logEvent.getStatusInstance().getStatus().getDescription());

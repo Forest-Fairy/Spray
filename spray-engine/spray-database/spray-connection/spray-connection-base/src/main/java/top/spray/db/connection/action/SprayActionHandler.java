@@ -40,10 +40,10 @@ public abstract class SprayActionHandler<
             String parameterizedSql = action.toParameterizedSql().trim();
             validateAction(parameterizedSql, connection, action);
             Result result = doHandle(parameterizedSql, connection, action);
-            action.callBack(result, null);
+            action.callBackHandled(result);
             return result;
         } catch (Throwable throwable) {
-            action.callBack(null, throwable);
+            action.callBackError(throwable);
             return null;
         }
     }

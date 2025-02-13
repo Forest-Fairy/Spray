@@ -3,7 +3,7 @@ package top.spray.processor.process.execute.step.executor.type;
 import top.spray.core.global.prop.SprayData;
 import top.spray.core.global.stream.SprayDataIterator;
 import top.spray.core.global.stream.SprayDataStream;
-import top.spray.core.global.stream.SprayOptional;
+import top.spray.common.tools.SprayOptional;
 import top.spray.processor.process.dispatch.coordinate.coordinator.SprayProcessCoordinator;
 import top.spray.processor.process.execute.step.executor.SprayStepExecutor;
 import top.spray.processor.process.execute.step.executor.facade.SprayStepFacade;
@@ -30,7 +30,7 @@ public abstract class SpraySourceExecutor extends SprayStepExecutor {
             SprayOptional<SprayData> next = iterator.next();
             if (next.isPresent()) {
                 this.publishData(variableContainerIdentityDataKey,
-                        new SprayOptionalData(this.executorNameKey, next.get(), ! iterator.isDone()));
+                        new SprayOptionalData(this.executorNameKey, next.orElse(null), ! iterator.isDone()));
             }
         }
     }

@@ -1,6 +1,6 @@
 package top.spray.processor.infrustructure.listen;
 
-import top.spray.core.global.stream.SprayOptional;
+import top.spray.common.tools.SprayOptional;
 
 public interface SprayListenEvent<Source> {
     String getEventId();

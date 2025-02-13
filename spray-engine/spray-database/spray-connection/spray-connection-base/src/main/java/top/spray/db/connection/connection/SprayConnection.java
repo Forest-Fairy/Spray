@@ -25,17 +25,19 @@ public abstract class SprayConnection<Connection> implements AutoCloseable {
         this.readOnly = readOnly;
     }
 
-    public final <Conn extends SprayConnection<?>, Action extends SprayDataAction<Result, ?>, Result extends SprayDataActionResult<Action>> Result accept(Action action) throws Exception {
+    public final <Action extends SprayDataAction<Result, ?>, Result extends SprayDataActionResult<Action>> Result accept(Action action) throws Exception {
         if (readOnly) {
             if (! (action instanceof SprayDataQueryAction)) {
                 throw new SprayDatabaseException("connection.readonly.error");
             }
         }
-        SprayActionHandler<Conn, Action, Result> handler =
-                SprayActionHandler.getInstance(this.getClass(), action);
+        SprayActionHandler<SprayConnection<?>, Action, Result> handler = this.getActionHandler(action);
         return handler == null
                 ? SprayUnsupportedOperation.unsupported()
-                : handler.handle((Conn) this, action);
+                : handler.handle(this, action);
     }
+
+    protected abstract <Action extends SprayDataAction<Result, ?>, Result extends SprayDataActionResult<Action>>
+        SprayActionHandler<SprayConnection<?>, Action, Result> getActionHandler(Action action);
 
 }

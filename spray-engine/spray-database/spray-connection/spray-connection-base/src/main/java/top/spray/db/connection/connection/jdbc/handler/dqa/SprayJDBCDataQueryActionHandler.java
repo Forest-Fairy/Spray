@@ -3,7 +3,7 @@ package top.spray.db.connection.connection.jdbc.handler.dqa;
 import top.spray.core.global.prop.SprayData;
 import top.spray.core.global.stream.SprayDataProvider;
 import top.spray.core.global.stream.SprayDataStream;
-import top.spray.core.global.stream.SprayOptional;
+import top.spray.common.tools.SprayOptional;
 import top.spray.db.connection.action.SprayAutoRegisterActionHandler;
 import top.spray.db.connection.action.dqa.SprayDataQueryAction;
 import top.spray.db.connection.action.dqa.SprayDataQueryResult;
