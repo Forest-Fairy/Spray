@@ -1,0 +1,21 @@
+[
+  {
+    "type": "spray-process",
+    "design": {
+      "id": "processId(s)",
+      "name": "processName(s)",
+      "host": "processRunningHost(s)",
+      "transactionId": "transactionId(s)",
+      "minThreadCount": "minThreadCountForExecutor(n)",
+      "asyncSupport": "enableAsyncProcess(b)"
+
+
+    }
+  },
+  {
+    "type": "spray-step",
+    "design": {
+
+    }
+  }
+]

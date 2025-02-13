@@ -1,0 +1,362 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.springframework.cloud</groupId>
+        <artifactId>spring-cloud-dependencies-parent</artifactId>
+        <version>4.1.0</version>
+        <relativePath></relativePath>
+    </parent>
+    <groupId>top.spray</groupId>
+    <artifactId>spray-dependencies</artifactId>
+    <version>${spray.dependencies.version}</version>
+    <name>spray-dependencies</name>
+    <description></description>
+    <packaging>pom</packaging>
+
+    <properties>
+        <spray.dependencies.version>spray_24.0.1.0</spray.dependencies.version>
+
+        <!-- Spring Cloud Alibaba -->
+        <spring-cloud-alibaba.version>2023.0.1.0</spring-cloud-alibaba.version>
+        <!-- Spring Boot -->
+        <spring-boot.version>3.2.3</spring-boot.version>
+        <!-- Dubbo -->
+        <dubbo.version>3.2.13</dubbo.version>
+        <bcprov.version>1.78.1</bcprov.version>
+
+        <!-- Jupiter -->
+        <junit_jupiter_version>5.9.3</junit_jupiter_version>
+
+
+        <hutool.version>5.8.25</hutool.version>
+        <fastjson2.version>2.0.51</fastjson2.version>
+        <brotli4j.version>1.15.0</brotli4j.version>
+        <activemq.version>5.18.3</activemq.version>
+        <angus-mail.version>2.0.2</angus-mail.version>
+        <artemis.version>2.31.2</artemis.version>
+        <aspectj.version>1.9.21</aspectj.version>
+        <assertj.version>3.24.2</assertj.version>
+        <awaitility.version>4.2.0</awaitility.version>
+        <brave.version>5.16.0</brave.version>
+        <build-helper-maven-plugin.version>3.4.0</build-helper-maven-plugin.version>
+        <byte-buddy.version>1.14.12</byte-buddy.version>
+        <cache2k.version>2.6.1.Final</cache2k.version>
+        <caffeine.version>3.1.8</caffeine.version>
+        <cassandra-driver.version>4.17.0</cassandra-driver.version>
+        <classmate.version>1.6.0</classmate.version>
+        <commons-codec.version>1.16.1</commons-codec.version>
+        <commons-dbcp2.version>2.10.0</commons-dbcp2.version>
+        <commons-lang3.version>3.13.0</commons-lang3.version>
+        <google.guava.version>33.3.1-jre</google.guava.version>
+        <commons-pool.version>1.6</commons-pool.version>
+        <commons-pool2.version>2.12.0</commons-pool2.version>
+        <couchbase-client.version>3.4.11</couchbase-client.version>
+        <crac.version>1.4.0</crac.version>
+        <db2-jdbc.version>11.5.9.0</db2-jdbc.version>
+        <dependency-management-plugin.version>1.1.4</dependency-management-plugin.version>
+        <derby.version>10.16.1.1</derby.version>
+        <dropwizard-metrics.version>4.2.25</dropwizard-metrics.version>
+        <ehcache3.version>3.10.8</ehcache3.version>
+        <elasticsearch-client.version>8.10.4</elasticsearch-client.version>
+        <flyway.version>9.22.3</flyway.version>
+        <freemarker.version>2.3.32</freemarker.version>
+        <git-commit-id-maven-plugin.version>6.0.0</git-commit-id-maven-plugin.version>
+        <glassfish-jaxb.version>4.0.4</glassfish-jaxb.version>
+        <glassfish-jstl.version>3.0.1</glassfish-jstl.version>
+        <graphql-java.version>21.3</graphql-java.version>
+        <groovy.version>4.0.18</groovy.version>
+        <gson.version>2.10.1</gson.version>
+        <h2.version>2.2.224</h2.version>
+        <hamcrest.version>2.2</hamcrest.version>
+        <hazelcast.version>5.3.6</hazelcast.version>
+        <hibernate.version>6.4.4.Final</hibernate.version>
+        <hibernate-validator.version>8.0.1.Final</hibernate-validator.version>
+        <hikaricp.version>5.0.1</hikaricp.version>
+        <hsqldb.version>2.7.2</hsqldb.version>
+        <htmlunit.version>2.70.0</htmlunit.version>
+        <httpasyncclient.version>4.1.5</httpasyncclient.version>
+        <httpclient5.version>5.2.3</httpclient5.version>
+        <httpcore.version>4.4.16</httpcore.version>
+        <httpcore5.version>5.2.4</httpcore5.version>
+        <infinispan.version>14.0.24.Final</infinispan.version>
+        <influxdb-java.version>2.23</influxdb-java.version>
+        <jackson-bom.version>2.15.4</jackson-bom.version>
+        <jakarta-activation.version>2.1.2</jakarta-activation.version>
+        <jakarta-annotation.version>2.1.1</jakarta-annotation.version>
+        <jakarta-jms.version>3.1.0</jakarta-jms.version>
+        <jakarta-json.version>2.1.3</jakarta-json.version>
+        <jakarta-json-bind.version>3.0.0</jakarta-json-bind.version>
+        <jakarta-mail.version>2.1.2</jakarta-mail.version>
+        <jakarta-management.version>1.1.4</jakarta-management.version>
+        <jakarta-persistence.version>3.1.0</jakarta-persistence.version>
+        <jakarta-servlet.version>6.0.0</jakarta-servlet.version>
+        <jakarta-servlet-jsp-jstl.version>3.0.0</jakarta-servlet-jsp-jstl.version>
+        <jakarta-transaction.version>2.0.1</jakarta-transaction.version>
+        <jakarta-validation.version>3.0.2</jakarta-validation.version>
+        <jakarta-websocket.version>2.1.1</jakarta-websocket.version>
+        <jakarta-ws-rs.version>3.1.0</jakarta-ws-rs.version>
+        <jakarta-xml-bind.version>4.0.1</jakarta-xml-bind.version>
+        <jakarta-xml-soap.version>3.0.1</jakarta-xml-soap.version>
+        <jakarta-xml-ws.version>4.0.1</jakarta-xml-ws.version>
+        <janino.version>3.1.12</janino.version>
+        <javax-cache.version>1.1.1</javax-cache.version>
+        <javax-money.version>1.1</javax-money.version>
+        <jaxen.version>2.0.0</jaxen.version>
+        <jaybird.version>5.0.3.java11</jaybird.version>
+        <jboss-logging.version>3.5.3.Final</jboss-logging.version>
+        <jdom2.version>2.0.6.1</jdom2.version>
+        <jedis.version>5.0.2</jedis.version>
+        <jersey.version>3.1.5</jersey.version>
+        <jetty-reactive-httpclient.version>4.0.3</jetty-reactive-httpclient.version>
+        <jetty.version>12.0.6</jetty.version>
+        <jmustache.version>1.15</jmustache.version>
+        <jooq.version>3.18.11</jooq.version>
+        <json-path.version>2.9.0</json-path.version>
+        <json-smart.version>2.5.0</json-smart.version>
+        <jsonassert.version>1.5.1</jsonassert.version>
+        <jtds.version>1.3.1</jtds.version>
+        <junit.version>4.13.2</junit.version>
+        <junit-jupiter.version>5.10.2</junit-jupiter.version>
+        <kafka.version>3.6.1</kafka.version>
+        <kotlin.version>1.9.22</kotlin.version>
+        <kotlin-coroutines.version>1.7.3</kotlin-coroutines.version>
+        <kotlin-serialization.version>1.6.3</kotlin-serialization.version>
+        <lettuce.version>6.3.1.RELEASE</lettuce.version>
+        <liquibase.version>4.24.0</liquibase.version>
+        <log4j2.version>2.21.1</log4j2.version>
+        <logback.version>1.4.14</logback.version>
+        <lombok.version>1.18.30</lombok.version>
+        <mariadb.version>3.3.3</mariadb.version>
+        <maven-antrun-plugin.version>3.1.0</maven-antrun-plugin.version>
+        <maven-assembly-plugin.version>3.6.0</maven-assembly-plugin.version>
+        <maven-clean-plugin.version>3.3.2</maven-clean-plugin.version>
+        <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
+        <maven-dependency-plugin.version>3.6.1</maven-dependency-plugin.version>
+        <maven-deploy-plugin.version>3.1.1</maven-deploy-plugin.version>
+        <maven-enforcer-plugin.version>3.4.1</maven-enforcer-plugin.version>
+        <maven-failsafe-plugin.version>3.1.2</maven-failsafe-plugin.version>
+        <maven-help-plugin.version>3.4.0</maven-help-plugin.version>
+        <maven-install-plugin.version>3.1.1</maven-install-plugin.version>
+        <maven-invoker-plugin.version>3.6.0</maven-invoker-plugin.version>
+        <maven-jar-plugin.version>3.3.0</maven-jar-plugin.version>
+        <maven-javadoc-plugin.version>3.6.3</maven-javadoc-plugin.version>
+        <maven-resources-plugin.version>3.3.1</maven-resources-plugin.version>
+        <maven-shade-plugin.version>3.5.2</maven-shade-plugin.version>
+        <maven-source-plugin.version>3.3.0</maven-source-plugin.version>
+        <maven-surefire-plugin.version>3.1.2</maven-surefire-plugin.version>
+        <maven-war-plugin.version>3.4.0</maven-war-plugin.version>
+        <micrometer.version>1.12.3</micrometer.version>
+        <micrometer-tracing.version>1.2.3</micrometer-tracing.version>
+        <mockito.version>5.7.0</mockito.version>
+        <mongodb.version>4.11.1</mongodb.version>
+        <mssql-jdbc.version>12.4.2.jre11</mssql-jdbc.version>
+        <mysql.version>8.3.0</mysql.version>
+        <native-build-tools-plugin.version>0.9.28</native-build-tools-plugin.version>
+        <nekohtml.version>1.9.22</nekohtml.version>
+        <neo4j-java-driver.version>5.17.0</neo4j-java-driver.version>
+        <netty.version>4.1.107.Final</netty.version>
+        <okhttp.version>4.12.0</okhttp.version>
+        <opentelemetry.version>1.31.0</opentelemetry.version>
+        <oracle-database.version>21.9.0.0</oracle-database.version>
+        <oracle-r2dbc.version>1.1.1</oracle-r2dbc.version>
+        <pooled-jms.version>3.1.5</pooled-jms.version>
+        <postgresql.version>42.6.1</postgresql.version>
+        <prometheus-client.version>0.16.0</prometheus-client.version>
+        <pulsar.version>3.1.2</pulsar.version>
+        <pulsar-reactive.version>0.5.3</pulsar-reactive.version>
+        <quartz.version>2.3.2</quartz.version>
+        <querydsl.version>5.0.0</querydsl.version>
+        <r2dbc-h2.version>1.0.0.RELEASE</r2dbc-h2.version>
+        <r2dbc-mariadb.version>1.1.4</r2dbc-mariadb.version>
+        <r2dbc-mssql.version>1.0.2.RELEASE</r2dbc-mssql.version>
+        <r2dbc-mysql.version>1.0.6</r2dbc-mysql.version>
+        <r2dbc-pool.version>1.0.1.RELEASE</r2dbc-pool.version>
+        <r2dbc-postgresql.version>1.0.4.RELEASE</r2dbc-postgresql.version>
+        <r2dbc-proxy.version>1.1.4.RELEASE</r2dbc-proxy.version>
+        <r2dbc-spi.version>1.0.0.RELEASE</r2dbc-spi.version>
+        <rabbit-amqp-client.version>5.19.0</rabbit-amqp-client.version>
+        <rabbit-stream-client.version>0.14.0</rabbit-stream-client.version>
+        <reactive-streams.version>1.0.4</reactive-streams.version>
+        <reactor-bom.version>2023.0.3</reactor-bom.version>
+        <rest-assured.version>5.3.2</rest-assured.version>
+        <rsocket.version>1.1.3</rsocket.version>
+        <rxjava3.version>3.1.8</rxjava3.version>
+        <saaj-impl.version>3.0.3</saaj-impl.version>
+        <selenium.version>4.14.1</selenium.version>
+        <selenium-htmlunit.version>4.13.0</selenium-htmlunit.version>
+        <sendgrid.version>4.9.3</sendgrid.version>
+        <slf4j.version>2.0.12</slf4j.version>
+        <snakeyaml.version>2.2</snakeyaml.version>
+        <spring-amqp.version>3.1.2</spring-amqp.version>
+        <spring-authorization-server.version>1.2.2</spring-authorization-server.version>
+        <spring-batch.version>5.1.1</spring-batch.version>
+        <spring-data-bom.version>2023.1.3</spring-data-bom.version>
+        <spring-framework.version>6.1.4</spring-framework.version>
+        <spring-graphql.version>1.2.5</spring-graphql.version>
+        <spring-hateoas.version>2.2.0</spring-hateoas.version>
+        <spring-integration.version>6.2.2</spring-integration.version>
+        <spring-kafka.version>3.1.2</spring-kafka.version>
+        <spring-ldap.version>3.2.2</spring-ldap.version>
+        <spring-pulsar.version>1.0.3</spring-pulsar.version>
+        <spring-restdocs.version>3.0.1</spring-restdocs.version>
+        <spring-retry.version>2.0.5</spring-retry.version>
+        <spring-security.version>6.2.2</spring-security.version>
+        <spring-session.version>3.2.1</spring-session.version>
+        <spring-ws.version>4.0.10</spring-ws.version>
+        <sqlite-jdbc.version>3.43.2.0</sqlite-jdbc.version>
+        <testcontainers.version>1.19.5</testcontainers.version>
+        <thymeleaf.version>3.1.2.RELEASE</thymeleaf.version>
+        <thymeleaf-extras-data-attribute.version>2.0.1</thymeleaf-extras-data-attribute.version>
+        <thymeleaf-extras-springsecurity.version>3.1.2.RELEASE</thymeleaf-extras-springsecurity.version>
+        <thymeleaf-layout-dialect.version>3.3.0</thymeleaf-layout-dialect.version>
+        <tomcat.version>10.1.19</tomcat.version>
+        <unboundid-ldapsdk.version>6.0.11</unboundid-ldapsdk.version>
+        <undertow.version>2.3.12.Final</undertow.version>
+        <versions-maven-plugin.version>2.16.2</versions-maven-plugin.version>
+        <webjars-locator-core.version>0.55</webjars-locator-core.version>
+        <wsdl4j.version>1.6.3</wsdl4j.version>
+        <xml-maven-plugin.version>1.1.0</xml-maven-plugin.version>
+        <xmlunit2.version>2.9.1</xmlunit2.version>
+        <yasson.version>3.0.3</yasson.version>
+
+
+
+        <!-- graalvm build tools version -->
+        <native-build-tools-plugin.version>0.9.28</native-build-tools-plugin.version>
+
+
+
+    </properties>
+    <dependencyManagement>
+        <dependencies>
+            <!--           Base 		  -->
+            <!-- Spring Dependencies -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring-boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.alibaba.cloud</groupId>
+                <artifactId>spring-cloud-alibaba-dependencies</artifactId>
+                <version>${spring-cloud-alibaba.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.dubbo</groupId>
+                <artifactId>dubbo</artifactId>
+                <version>${dubbo.version}</version>
+            </dependency>
+
+
+            <!--           Utilities 		  -->
+            <!-- Logging -->
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+            </dependency>
+            <!-- Crypto -->
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcprov-debug-jdk15to18</artifactId>
+                <version>${bcprov.version}</version>
+            </dependency>
+
+            <!-- Lang3 -->
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>${comm}</version>
+            </dependency>
+            <!-- Lombok -->
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>${lombok.version}</version>
+            </dependency>
+            <!-- Hutool -->
+            <dependency>
+                <groupId>cn.hutool</groupId>
+                <artifactId>hutool-all</artifactId>
+                <version>${hutool.version}</version>
+            </dependency>
+            <!-- fastjson2 -->
+            <dependency>
+                <groupId>com.alibaba.fastjson2</groupId>
+                <artifactId>fastjson2</artifactId>
+                <version>${fastjson2.version}</version>
+            </dependency>
+            <!-- brotli4j -->
+            <dependency>
+                <groupId>com.aayushatharva.brotli4j</groupId>
+                <artifactId>brotli4j</artifactId>
+                <version>${brotli4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>${commons-lang3.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>${google.guava.version}</version>
+            </dependency>
+
+            <!--            Buildings		  	 -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-devtools</artifactId>
+                <scope>runtime</scope>
+                <optional>true</optional>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-test</artifactId>
+                <scope>test</scope>
+            </dependency>
+            <!--JUnit Jupiter Engine to depend on the JUnit5 engine and JUnit 5 API -->
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter-engine</artifactId>
+                <version>${junit_jupiter_version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter-api</artifactId>
+                <version>${junit_jupiter_version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter-params</artifactId>
+                <version>${junit_jupiter_version}</version>
+                <scope>test</scope>
+            </dependency>
+
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.graalvm.buildtools</groupId>
+                <artifactId>native-maven-plugin</artifactId>
+                <version>${native-build-tools-plugin.version}</version>
+            </plugin>
+<!--            <plugin>-->
+<!--                <groupId>org.springframework.boot</groupId>-->
+<!--                <artifactId>spring-boot-maven-plugin</artifactId>-->
+<!--                <version>${spring-boot.version}</version>-->
+<!--            </plugin>-->
+        </plugins>
+    </build>
+</project>

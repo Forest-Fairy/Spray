@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>top.spray</groupId>
+    <artifactId>Spray</artifactId>
+    <name>spray-parent</name>
+    <version>${revision}</version>
+    <packaging>pom</packaging>
+    <description>spray</description>
+    <modules>
+        <module>spray-docs</module>
+        <module>spray-dependencies</module>
+        <module>spray-boot</module>
+        <module>spray-engine</module>
+        <module>spray-core</module>
+        <module>spray-common</module>
+        <module>spray-ui</module>
+    </modules>
+
+    <properties>
+        <java.version>17</java.version>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <spray.version>1.0.1</spray.version>
+        <spray.dependencies.version>spray_24.0.1.0</spray.dependencies.version>
+        <revision>${spray.version}</revision>
+    </properties>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>top.spray</groupId>
+                <artifactId>spray-dependencies</artifactId>
+                <version>${spray.dependencies.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>top.spray</groupId>
+                <artifactId>spray-core</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>top.spray</groupId>
+                <artifactId>spray-common</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>top.spray</groupId>
+                <artifactId>spray-engine</artifactId>
+                <version>${revision}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+        </dependency>
+    </dependencies>
+
+</project>

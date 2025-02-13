@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>top.spray</groupId>
+        <artifactId>Spray</artifactId>
+        <version>${revision}</version>
+    </parent>
+
+    <artifactId>spray-engine</artifactId>
+    <packaging>pom</packaging>
+    <name>spray-engine</name>
+    <description></description>
+    <modules>
+        <module>spray-processor</module>
+        <module>spray-database</module>
+    </modules>
+
+    <properties>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>top.spray</groupId>
+            <artifactId>spray-core</artifactId>
+        </dependency>
+    </dependencies>
+
+</project>
