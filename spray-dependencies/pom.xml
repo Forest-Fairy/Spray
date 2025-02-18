@@ -17,6 +17,7 @@
 
     <properties>
         <spray.dependencies.version>spray_24.0.1.0</spray.dependencies.version>
+
         <!-- Dubbo -->
         <dubbo.version>3.2.13</dubbo.version>
 

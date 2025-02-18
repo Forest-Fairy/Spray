@@ -7,9 +7,9 @@ import java.util.*;
  */
 public class SprayLooper {
     private SprayLooper() {}
-
+    private static final SprayLoopExceptionCatcher IGNORE_EXCEPTION_CATCHER = ignored -> {};
     public static <T> void loopAndIgnoredException(Iterable<T> collection, SprayLoopHandler<T> handler) {
-        loop(collection, handler, ignored -> {});
+        loop(collection, handler, IGNORE_EXCEPTION_CATCHER);
     }
 
     public static <T> void loop(Iterable<T> collection, SprayLoopHandler<T> handler, SprayLoopExceptionCatcher catcher) {

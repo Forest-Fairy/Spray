@@ -41,19 +41,16 @@
             <dependency>
                 <groupId>top.spray</groupId>
                 <artifactId>spray-core</artifactId>
-                <scope>runtime</scope>
                 <version>${revision}</version>
             </dependency>
             <dependency>
                 <groupId>top.spray</groupId>
                 <artifactId>spray-common</artifactId>
-                <scope>runtime</scope>
                 <version>${revision}</version>
             </dependency>
             <dependency>
                 <groupId>top.spray</groupId>
                 <artifactId>spray-engine</artifactId>
-                <scope>runtime</scope>
                 <version>${revision}</version>
             </dependency>
         </dependencies>
