@@ -22,10 +22,6 @@
     </properties>
 
     <dependencies>
-        <dependency>
-            <groupId>top.spray</groupId>
-            <artifactId>spray-core</artifactId>
-        </dependency>
     </dependencies>
 
 </project>

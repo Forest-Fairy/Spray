@@ -29,12 +29,12 @@
     <dependencies>
         <dependency>
             <groupId>top.spray</groupId>
-            <artifactId>spray-core-i18n</artifactId>
-            <version>${revision}</version>
+            <artifactId>spray-common</artifactId>
         </dependency>
         <dependency>
             <groupId>top.spray</groupId>
-            <artifactId>spray-common</artifactId>
+            <artifactId>spray-core-base</artifactId>
+            <version>${revision}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
