@@ -1,6 +1,6 @@
 package top.spray.db.connection.action.dqa.impl;
 
-import top.spray.common.tools.SprayTuple;
+import top.spray.common.tools.tuple.SprayTuples;
 import top.spray.db.connection.action.dqa.SprayDataQueryAction;
 import top.spray.db.connection.action.dqa.SprayDataQueryType;
 import top.spray.db.sql.objects.db.SprayDatabaseType;
@@ -18,7 +18,7 @@ public class SprayTableQueryAction implements SprayDataQueryAction {
     private final String database;
     private final String targetTableName;
     private final String extraWhere;
-    private final List<SprayTuple._2<String, Long>> orderBy;
+    private final List<SprayTuples._2<String, Long>> orderBy;
     private final String extraOrderByAndGroupBy;
     private final Map<String, Object> params;
 
@@ -28,7 +28,7 @@ public class SprayTableQueryAction implements SprayDataQueryAction {
                                   String database,
                                   String targetTableName,
                                   String extraWhere,
-                                  List<SprayTuple._2<String, Long>> orderBy,
+                                  List<SprayTuples._2<String, Long>> orderBy,
                                   String extraOrderByAndGroupBy,
                                   Map<String, Object> params) {
         this.dbType = dbType;

@@ -1,6 +1,6 @@
 package top.spray.core.validate;
 
+@FunctionalInterface
 public interface SprayValidator {
-    String validatorName();
-    boolean validate(String field, Object value);
+    String validate(String field, Object value);
 }

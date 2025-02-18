@@ -2,7 +2,7 @@ package top.spray.processor.process.dispatch.variables;
 
 import top.spray.core.global.prop.SprayData;
 import top.spray.core.global.prop.SprayDataUtil;
-import top.spray.common.tools.SprayTuple;
+import top.spray.common.tools.tuple.SprayTuples;
 import top.spray.processor.process.dispatch.coordinate.coordinator.SprayProcessCoordinator;
 import top.spray.processor.infrustructure.prop.SprayVariableContainer;
 import top.spray.processor.process.execute.step.executor.facade.SprayStepFacade;
@@ -98,13 +98,13 @@ public class SprayCoordinatorVariableContainer implements SprayVariableContainer
     }
 
     @Override
-    public <T> T computeIfAbsent(String key, boolean ignoreBanned, Supplier<SprayTuple._2<T, Boolean>> valueAndSetBanned) {
+    public <T> T computeIfAbsent(String key, boolean ignoreBanned, Supplier<SprayTuples._2<T, Boolean>> valueAndSetBanned) {
         if (valueAndSetBanned == null) {
             throw new IllegalArgumentException("can not compute with null cause null value is not allowed to exist in spray data");
         }
         T t = (T) this._get(key);
         if (t == null) {
-            SprayTuple._2<T, Boolean> _2 = valueAndSetBanned.get();
+            SprayTuples._2<T, Boolean> _2 = valueAndSetBanned.get();
             this.set(key, t = _2.t0(), _2.t1());
         }
         return t;

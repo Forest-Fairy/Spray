@@ -1,6 +1,6 @@
 package top.spray.core.validate;
 
-import top.spray.core.global.exception.SprayException;
+import top.spray.core.exception.SprayException;
 
 public class SprayValidateException extends SprayException {
 

@@ -1,13 +1,14 @@
 package top.spray.core.validate;
 
 import top.spray.common.bean.SprayServiceUtil;
-import top.spray.core.global.exception.SprayCoreException;
+import top.spray.common.tools.tuple.SprayTuples;
+import top.spray.core.exception.SprayCoreException;
 
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 public class SprayValidators {
     public static final SprayValidators INSTANCE = new SprayValidators();
@@ -40,7 +41,7 @@ public class SprayValidators {
      * @param fieldValidatorMap field's validator map
      * @param failed failed handler  key: {fieldName}@validator:{validatorName} value: {fieldValue}
      */
-    public static void validate(Map<String, Object> bean, Map<String, List<SprayValidator>> fieldValidatorMap, BiConsumer<String, Object> failed) {
+    public static void validate(Map<String, Object> bean, Map<String, List<SprayValidator>> fieldValidatorMap, Consumer<SprayTuples._3<String, Object, String>> failed) {
         for (Map.Entry<String, Object> entry : bean.entrySet()) {
             SprayValidator curValidator = null;
             List<SprayValidator> validators = fieldValidatorMap.get(entry.getKey());
@@ -50,15 +51,16 @@ public class SprayValidators {
             try {
                 for (SprayValidator validator : validators) {
                     curValidator = validator;
-                    if (! validator.validate(entry.getKey(), entry.getValue())) {
-                        failed.accept(entry.getKey() + "@validator:" + validator.validatorName(), entry.getValue());
+                    String validRs = validator.validate(entry.getKey(), entry.getValue());
+                    if (validRs != null && !validRs.isBlank()) {
+                        failed.accept(new SprayTuples._3<>(entry.getKey(), entry.getValue(), validRs));
                     }
                 }
             } catch (Exception error) {
                 if (curValidator == null) {
                     throw new SprayCoreException(error);
                 }
-                throw new SprayValidateException(curValidator.validatorName(), entry.getKey(), String.valueOf(entry.getValue()), error);
+                throw new SprayValidateException(curValidator.getClass().getName(), entry.getKey(), String.valueOf(entry.getValue()), error);
             }
         }
     }

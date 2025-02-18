@@ -1,18 +1,18 @@
 package top.spray.processor.process.execute.step.meta;
 
 import top.spray.core.global.prop.SprayData;
-import top.spray.common.tools.SprayTuple;
+import top.spray.common.tools.tuple.SprayTuples;
 import top.spray.common.tools.SprayOptional;
 
-public class SprayOptionalData extends SprayOptional<SprayTuple._3<String, SprayData, Boolean>> {
+public class SprayOptionalData extends SprayOptional<SprayTuples._3<String, SprayData, Boolean>> {
     private final String dataKey;
     public SprayOptionalData() {
         this(null);
     }
     public SprayOptionalData(String generatorExecutorNameKey, SprayData data, boolean still) {
-        this(new SprayTuple._3<>(generatorExecutorNameKey, data, still));
+        this(new SprayTuples._3<>(generatorExecutorNameKey, data, still));
     }
-    private SprayOptionalData(SprayTuple._3<String, SprayData, Boolean> value) {
+    private SprayOptionalData(SprayTuples._3<String, SprayData, Boolean> value) {
         super(value);
         this.dataKey = this.isNotPresent() ? "" :
                 String.format("%s@%s(%s)", this.isStill() ? "one" : "last",

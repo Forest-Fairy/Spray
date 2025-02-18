@@ -1,7 +1,7 @@
 package top.spray.processor.infrustructure.prop;
 
 import top.spray.core.global.prop.SprayData;
-import top.spray.common.tools.SprayTuple;
+import top.spray.common.tools.tuple.SprayTuples;
 import top.spray.processor.process.execute.step.executor.facade.SprayStepFacade;
 
 import java.util.function.Supplier;
@@ -31,7 +31,7 @@ public interface SprayVariableContainer {
     <T> Object getOrElse(String key, T def) ;
     <T> Object suGetOrElse(String key, T def) ;
 
-    <T> T computeIfAbsent(String key, boolean ignoreBanned, Supplier<SprayTuple._2<T, Boolean>> valueAndSetBanned) ;
+    <T> T computeIfAbsent(String key, boolean ignoreBanned, Supplier<SprayTuples._2<T, Boolean>> valueAndSetBanned) ;
 
     /**
      * set
