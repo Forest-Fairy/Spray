@@ -1,4 +1,4 @@
-package top.spray.core.system.intelligence.processor;
+package top.spray.core.intelligence.processor;
 
 import com.sun.tools.javac.api.JavacTrees;
 import com.sun.tools.javac.processing.JavacProcessingEnvironment;
@@ -12,7 +12,7 @@ import javax.annotation.processing.*;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.tools.Diagnostic;
-import java.util.*;
+import java.util.Set;
 
 /**
  * TODO learn something about compiling annotation processor
