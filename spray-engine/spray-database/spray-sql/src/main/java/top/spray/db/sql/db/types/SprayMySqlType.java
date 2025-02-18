@@ -1,4 +1,4 @@
-package top.spray.db.sql.objects.db;
+package top.spray.db.sql.db.types;
 
 public class SprayMySqlType extends SprayDatabaseType {
     public static final SprayMySqlType INSTANCE = new SprayMySqlType();
@@ -8,10 +8,14 @@ public class SprayMySqlType extends SprayDatabaseType {
 
     private static final char[] ESCAPE = {'`'};
     @Override
-    protected char[] escape() {
+    public char[] escape() {
         return ESCAPE;
     }
 
+    @Override
+    public String escapeTableName(boolean doOrRemoveEscape, String catalog, String schema, String tableName) {
+        return super.escapeTableName(doOrRemoveEscape, catalog, null, tableName);
+    }
 
     @Override
     public String castToTypeToken(Class<?> c) {

@@ -1,4 +1,4 @@
-package top.spray.db.sql.objects.db;
+package top.spray.db.sql.db.types;
 
 public class SprayOracleType extends SprayDatabaseType {
     public static final SprayOracleType INSTANCE = new SprayOracleType();
@@ -8,8 +8,13 @@ public class SprayOracleType extends SprayDatabaseType {
 
     private static final char[] ESCAPE = {'"'};
     @Override
-    protected char[] escape() {
+    public char[] escape() {
         return ESCAPE;
+    }
+
+    @Override
+    public String escapeTableName(boolean doOrRemoveEscape, String catalog, String schema, String tableName) {
+        return super.escapeTableName(doOrRemoveEscape, null, schema, tableName);
     }
 
     @Override

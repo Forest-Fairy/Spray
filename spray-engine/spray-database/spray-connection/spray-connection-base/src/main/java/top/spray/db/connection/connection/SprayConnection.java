@@ -1,18 +1,21 @@
 package top.spray.db.connection.connection;
 
-import top.spray.core.global.prop.SprayUnsupportedOperation;
+import top.spray.common.tools.SprayUnsupportedOperation;
 import top.spray.db.connection.action.SprayActionHandler;
 import top.spray.db.connection.action.SprayDataAction;
 import top.spray.db.connection.action.SprayDataActionResult;
 import top.spray.db.connection.action.dqa.SprayDataQueryAction;
 import top.spray.db.connection.exception.SprayDatabaseException;
+import top.spray.db.sql.db.types.SprayDatabaseType;
 
 public abstract class SprayConnection<Connection> implements AutoCloseable {
 
+    private final SprayDatabaseType databaseType;
     private final Connection connection;
     private boolean readOnly;
 
-    protected SprayConnection(Connection connection) {
+    protected SprayConnection(SprayDatabaseType databaseType, Connection connection) {
+        this.databaseType = databaseType;
         this.connection = connection;
     }
     /**
@@ -24,6 +27,12 @@ public abstract class SprayConnection<Connection> implements AutoCloseable {
     public void setReadOnly(boolean readOnly) {
         this.readOnly = readOnly;
     }
+    public SprayDatabaseType getDatabaseType() {
+        return databaseType;
+    }
+
+    public abstract String getCatalog();
+    public abstract String getSchema();
 
     public final <Action extends SprayDataAction<Result, ?>, Result extends SprayDataActionResult<Action>> Result accept(Action action) throws Exception {
         if (readOnly) {

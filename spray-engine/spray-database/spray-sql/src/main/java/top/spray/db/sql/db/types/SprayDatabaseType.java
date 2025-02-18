@@ -1,4 +1,4 @@
-package top.spray.db.sql.objects.db;
+package top.spray.db.sql.db.types;
 
 import top.spray.db.sql.objects.SprayJdbcTypeMapping;
 
@@ -28,7 +28,34 @@ public abstract class SprayDatabaseType {
         return product;
     }
 
-    public String doEscape(String name) {
+    public String escapeTableName(boolean doOrRemoveEscape, String catalog, String schema, String tableName) {
+        return escapeAndAppend(doOrRemoveEscape, tableName, schema, catalog);
+    }
+
+    public String handleColumnEscape(boolean doOrRemoveEscape, String tableName, String colName) {
+        return escapeAndAppend(doOrRemoveEscape, colName, tableName);
+    }
+
+    protected String escapeAndAppend(boolean doOrRemoveEscape, String name, String... names) {
+        if (name == null || name.isBlank()) {
+            return "";
+        }
+        name = handleEscape(doOrRemoveEscape, name);
+        if (names != null && names.length > 0) {
+            StringBuilder nameBuilder = new StringBuilder(name);
+            for (String n : names) {
+                if (n != null && !n.isBlank()) {
+                    n = handleEscape(doOrRemoveEscape, n) + ".";
+                    if (!nameBuilder.toString().contains(n)) {
+                        nameBuilder.insert(0, n);
+                    }
+                }
+            }
+            name = nameBuilder.toString();
+        }
+        return name;
+    }
+    private String handleEscape(boolean doOrRemoveEscape, String name) {
         if (name == null || name.trim().isEmpty()) {
             return "";
         }
@@ -37,20 +64,30 @@ public abstract class SprayDatabaseType {
         String right = String.valueOf(escape.length > 1 ? escape[1] : escape[0]);
         StringBuilder sb = new StringBuilder();
         for (String n : name.split(",")) {
-            if (n.startsWith(left) && n.endsWith(right)) {
-                sb.append(n);
+            boolean escaped = n.startsWith(left) && n.endsWith(right);
+            if (doOrRemoveEscape) {
+                if (escaped) {
+                    sb.append(n);
+                } else {
+                    sb.append(left).append(n).append(right);
+                }
             } else {
-                sb.append(left).append(n).append(right);
+                // remove escape
+                if (escaped) {
+                    sb.append(n, 1, n.length() - 1);
+                } else {
+                    sb.append(n);
+                }
             }
             sb.append(",");
         }
-        return sb.toString().substring(0, sb.length() - 1);
+        return sb.substring(0, sb.length() - 1);
     }
 
     /**
      * escape char array, length is only 1 or 2, it means left and right while the length is 2
      */
-    protected abstract char[] escape();
+    public abstract char[] escape();
 
     /**
      * cast java type to current db type

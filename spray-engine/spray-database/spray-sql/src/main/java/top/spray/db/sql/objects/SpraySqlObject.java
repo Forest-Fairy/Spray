@@ -1,12 +1,15 @@
 package top.spray.db.sql.objects;
 
-import top.spray.db.sql.objects.db.SprayDatabaseType;
+import top.spray.db.sql.db.types.SprayDatabaseType;
 
 import java.io.IOException;
 
 public interface SpraySqlObject {
     /** if object has alias then use its alias else use its name */
     SprayDatabaseType databaseType();
+
+    boolean doEscape();
+
     String refName();
 
     /**

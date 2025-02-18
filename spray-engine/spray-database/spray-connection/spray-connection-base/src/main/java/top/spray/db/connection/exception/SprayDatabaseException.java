@@ -1,6 +1,6 @@
 package top.spray.db.connection.exception;
 
-import top.spray.core.global.exception.SprayException;
+import top.spray.core.exception.SprayException;
 
 /**
  * define resource bundle with

@@ -4,6 +4,7 @@ import top.spray.common.tools.Sprays;
 import top.spray.db.connection.action.SprayDataAction;
 import top.spray.db.connection.action.dma.SprayDataModificationAction;
 import top.spray.db.connection.action.dma.SprayDataModificationType;
+import top.spray.db.connection.action.dma.impl.SprayTruncateTableAction;
 import top.spray.db.connection.connection.jdbc.SprayJDBCConnection;
 
 import java.sql.PreparedStatement;
@@ -20,6 +21,10 @@ public class SprayJDBCTruncateTableActionHandler extends SprayJDBCDataModificati
 
     @Override
     protected PreparedStatement getPreparedStatement(String parameterizedSql, SprayJDBCConnection connection, SprayDataModificationAction action) throws Exception {
+        if (action instanceof SprayTruncateTableAction) {
+            return connection.getPreparedStatement(
+                    parameterizedSql, action.params());
+        }
         return null;
     }
 

@@ -8,12 +8,14 @@ import java.util.List;
 import java.util.Map;
 
 public class SprayTruncateTableAction implements SprayDataModificationAction {
-    private final String database;
+    private final String catalog;
+    private final String schema;
     private final SprayDatabaseType databaseType;
     private final String tableName;
 
-    public SprayTruncateTableAction(String database, SprayDatabaseType databaseType, String tableName) {
-        this.database = database;
+    public SprayTruncateTableAction(String catalog, String schema, SprayDatabaseType databaseType, String tableName) {
+        this.catalog = catalog;
+        this.schema = schema;
         this.databaseType = databaseType;
         this.tableName = tableName;
     }
@@ -24,8 +26,13 @@ public class SprayTruncateTableAction implements SprayDataModificationAction {
     }
 
     @Override
-    public String database() {
-        return database;
+    public String catalog() {
+        return catalog;
+    }
+
+    @Override
+    public String schema() {
+        return schema;
     }
 
     @Override

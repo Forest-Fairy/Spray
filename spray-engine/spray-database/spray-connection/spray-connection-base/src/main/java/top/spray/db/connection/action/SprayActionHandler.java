@@ -2,8 +2,8 @@ package top.spray.db.connection.action;
 
 import top.spray.common.bean.SprayClassUtil;
 import top.spray.common.tools.SpraySynchronizeUtils;
-import top.spray.core.global.exception.SprayCoreException;
-import top.spray.core.global.prop.SprayUnsupportedOperation;
+import top.spray.common.tools.SprayUnsupportedOperation;
+import top.spray.core.exception.SprayCoreException;
 import top.spray.db.connection.connection.SprayConnection;
 import top.spray.db.connection.exception.SpraySqlException;
 

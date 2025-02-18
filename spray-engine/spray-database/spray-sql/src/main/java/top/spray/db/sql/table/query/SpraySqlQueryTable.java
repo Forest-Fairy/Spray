@@ -7,6 +7,7 @@ import top.spray.db.sql.table.SpraySqlTable;
 import java.util.List;
 
 public interface SpraySqlQueryTable extends SpraySqlTable {
+    String alias();
 
     SpraySqlSelectColumn selections();
 

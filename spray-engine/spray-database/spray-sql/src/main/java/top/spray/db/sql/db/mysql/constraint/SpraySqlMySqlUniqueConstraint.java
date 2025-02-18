@@ -4,22 +4,25 @@ import top.spray.db.sql.constraint.SpraySqlUniqueConstraint;
 import top.spray.db.sql.db.mysql.SpraySqlObjectMysql;
 import top.spray.db.sql.objects.SpraySqlAction;
 import top.spray.db.sql.objects.SpraySqlOption;
-import top.spray.db.sql.objects.db.SprayDatabaseType;
-import top.spray.db.sql.objects.db.SprayMySqlType;
+import top.spray.db.sql.db.types.SprayDatabaseType;
+import top.spray.db.sql.db.types.SprayMySqlType;
 
 import java.io.IOException;
 
 public class SpraySqlMySqlUniqueConstraint implements SpraySqlObjectMysql, SpraySqlUniqueConstraint {
-    private final String name;
+    private final boolean doEscape;
+    private final String constraintName;
     private final String column;
-    public SpraySqlMySqlUniqueConstraint(String name, String column) {
-        this.name = name;
+
+    public SpraySqlMySqlUniqueConstraint(boolean doEscape, String constraintName, String column) {
+        this.doEscape = doEscape;
+        this.constraintName = constraintName;
         this.column = column;
     }
 
     @Override
     public String constraintName() {
-        return name;
+        return constraintName;
     }
 
     @Override
@@ -38,16 +41,21 @@ public class SpraySqlMySqlUniqueConstraint implements SpraySqlObjectMysql, Spray
     }
 
     @Override
+    public boolean doEscape() {
+        return doEscape;
+    }
+
+    @Override
     public String refName() {
-        return name;
+        return constraintName;
     }
 
     @Override
     public void writeSql(Appendable appender, Appendable extraAppender, SpraySqlOption option, SpraySqlAction action) throws IOException {
         if (action.isAction(SpraySqlAction.TableAction.CREATE_TABLE)) {
             // CONSTRAINT constraint_name UNIQUE (column_name)
-            if (name != null && !name.isEmpty()) {
-                extraAppender.append("CONSTRAINT ").append(doEscape(name)).append(" ");
+            if (constraintName != null && !constraintName.isEmpty()) {
+                extraAppender.append("CONSTRAINT ").append(doEscape(constraintName)).append(" ");
             }
             extraAppender.append("UNIQUE (").append(doEscape(column)).append(")");
         } else if (action.isAction(SpraySqlAction.TableAction.ALTER_TABLE)) {
@@ -55,14 +63,14 @@ public class SpraySqlMySqlUniqueConstraint implements SpraySqlObjectMysql, Spray
                 // ALTER TABLE table_name ADD CONSTRAINT constraint_name UNIQUE (column_name);
                 this.optionAppend(appender, option);
                 appender.append("ADD ");
-                if (name != null && !name.isEmpty()) {
-                    appender.append("CONSTRAINT ").append(doEscape(name)).append(" ");
+                if (constraintName != null && !constraintName.isEmpty()) {
+                    appender.append("CONSTRAINT ").append(doEscape(constraintName)).append(" ");
                 }
                 appender.append("UNIQUE (").append(doEscape(column)).append(")");
             } else if (action.isAction(SpraySqlAction.ConstraintAction.DROP_CONSTRAINT)) {
                 // ALTER TABLE table_name DROP INDEX constraint_name;
                 this.optionAppend(appender, option);
-                appender.append("DROP INDEX ").append(doEscape(name));
+                appender.append("DROP INDEX ").append(doEscape(constraintName));
             }
         }
     }

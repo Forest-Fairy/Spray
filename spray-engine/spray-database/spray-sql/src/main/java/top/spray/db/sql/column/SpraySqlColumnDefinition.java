@@ -9,10 +9,11 @@ public interface SpraySqlColumnDefinition extends SpraySqlColumn {
 
     String lastColName();
 
+    String comment();
+
     /**
      * key means the constraint type, it helps reduce the time cost
      */
     Map<String, SpraySqlConstraint> constraints();
 
-    String comment();
 }

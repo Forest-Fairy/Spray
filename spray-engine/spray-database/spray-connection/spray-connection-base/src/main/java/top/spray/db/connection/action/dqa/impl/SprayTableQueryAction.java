@@ -15,9 +15,11 @@ public class SprayTableQueryAction implements SprayDataQueryAction {
     private final SprayDatabaseType dbType;
     private final List<String> selectFields;
     private final Map<String, Function<Object, Object>> castors;
-    private final String database;
-    private final String targetTableName;
+    private final String catalog;
+    private final String schema;
+    private final String queryTable;
     private final String extraWhere;
+    // less than zero means DESC
     private final List<SprayTuples._2<String, Long>> orderBy;
     private final String extraOrderByAndGroupBy;
     private final Map<String, Object> params;
@@ -25,8 +27,9 @@ public class SprayTableQueryAction implements SprayDataQueryAction {
     private SprayTableQueryAction(SprayDatabaseType dbType,
                                   String[] selectFields,
                                   Map<String, Function<Object, Object>> castors,
-                                  String database,
-                                  String targetTableName,
+                                  String catalog,
+                                  String schema,
+                                  String queryTable,
                                   String extraWhere,
                                   List<SprayTuples._2<String, Long>> orderBy,
                                   String extraOrderByAndGroupBy,
@@ -34,8 +37,9 @@ public class SprayTableQueryAction implements SprayDataQueryAction {
         this.dbType = dbType;
         this.selectFields = List.of(selectFields);
         this.castors = castors;
-        this.database = database;
-        this.targetTableName = targetTableName;
+        this.catalog = catalog;
+        this.schema = schema;
+        this.queryTable = queryTable;
         this.extraWhere = extraWhere;
         this.orderBy = orderBy;
         this.extraOrderByAndGroupBy = extraOrderByAndGroupBy;
@@ -54,8 +58,13 @@ public class SprayTableQueryAction implements SprayDataQueryAction {
     }
 
     @Override
-    public String database() {
-        return database;
+    public String catalog() {
+        return catalog;
+    }
+
+    @Override
+    public String schema() {
+        return schema;
     }
 
     @Override

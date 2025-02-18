@@ -1,6 +1,6 @@
 package top.spray.db.connection.action.dma;
 
-import top.spray.core.global.prop.SprayUnsupportedOperation;
+import top.spray.common.tools.SprayUnsupportedOperation;
 import top.spray.db.connection.action.SprayDataAction;
 import top.spray.db.connection.exception.SprayDatabaseException;
 
