@@ -1,43 +1,45 @@
 package top.spray.common.tools;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Consumer;
+import java.util.*;
 
 /**
  * a loop util for looping, enhance only if the exceptions will be not too many
  */
 public class SprayLooper {
-    public static final SprayLooper INSTANCE = new SprayLooper();
+    private SprayLooper() {}
 
-    public <T> void loop(Collection<T> collection, Consumer<T> handler) {
-        this.loop(collection, handler, null);
+
+    public static <T> void loop(Iterable<T> collection, Handler<T> handler) {
+        loop(collection, handler, ignoredEx -> {});
     }
 
-    public <T> void loop(Collection<T> collection, Consumer<T> handler, Consumer<Throwable> catcher) {
-        AtomicInteger counter = new AtomicInteger();
-        int size = collection.size();
-        while (counter.get() < size) {
+    public static <T> void loop(Iterable<T> collection, Handler<T> handler, Catcher catcher) {
+        Iterator<T> it = collection.iterator();
+        while (true) {
+            if (!it.hasNext()) {
+                return;
+            }
             try {
-                doLoop(counter, collection, handler);
+                while (it.hasNext()) {
+                    handler.accept(it.next());
+                }
             } catch (Throwable throwable) {
                 if (catcher != null) {
                     catcher.accept(throwable);
+                } else {
+                    throw new RuntimeException(throwable);
                 }
             }
         }
     }
 
-    private static <T> void doLoop(AtomicInteger start, Iterable<T> collection, Consumer<T> handler) {
-        List<T> c = collection instanceof List<T> list ? list : new ArrayList<>();
-        if (c.isEmpty()) {
-            collection.iterator().forEachRemaining(c::add);
-        }
-        for (int i = start.get(); i < c.size(); i++) {
-            start.incrementAndGet();
-            handler.accept(c.get(i));
-        }
+    @FunctionalInterface
+    interface Handler<T> {
+        void accept(T t) throws Exception;
+    }
+
+    @FunctionalInterface
+    interface Catcher {
+        void accept(Throwable t);
     }
 }
