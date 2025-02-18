@@ -2,7 +2,7 @@ package top.spray.processor.process.data.event.impl;
 
 import top.spray.core.system.type.SprayType;
 import top.spray.core.system.type.SprayTypeI18nType;
-import top.spray.core.i18n.Spray_i18nBundleDef;
+import top.spray.core.i18n.SprayResourceBundleDef;
 import top.spray.processor.process.execute.i18n.SprayExecuteDescription;
 import top.spray.processor.process.execute.i18n.SprayExecuteTypeName;
 
@@ -50,7 +50,7 @@ public class SprayDataExecuteEventType implements SprayTypeI18nType {
     }
 
     @Override
-    public Class<? extends Spray_i18nBundleDef> i18nClass(TargetType target) {
+    public Class<? extends SprayResourceBundleDef> i18nClass(TargetType target) {
         return switch (target) {
             case NAME -> SprayExecuteTypeName.class;
             case DESCRIPTION -> SprayExecuteDescription.class;

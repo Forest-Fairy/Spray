@@ -1,6 +1,6 @@
 package top.spray.processor.process.execute.step.status;
 
-import top.spray.core.i18n.Spray_i18nBundleDef;
+import top.spray.core.i18n.SprayResourceBundleDef;
 import top.spray.core.system.type.SprayType;
 import top.spray.core.system.type.SprayTypeI18nType;
 import top.spray.processor.process.execute.i18n.SprayExecuteDescription;
@@ -74,7 +74,7 @@ public class SprayStepStatus implements SprayTypeI18nType {
     }
 
     @Override
-    public Class<? extends Spray_i18nBundleDef> i18nClass(TargetType target) {
+    public Class<? extends SprayResourceBundleDef> i18nClass(TargetType target) {
         if (target == TargetType.NAME) {
             return SprayExecuteTypeName.class;
         } else if (target == TargetType.DESCRIPTION) {
