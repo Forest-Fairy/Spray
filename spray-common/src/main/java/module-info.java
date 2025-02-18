@@ -13,4 +13,5 @@ module top.spray.common {
     exports top.spray.common.data;
     exports top.spray.common.tools;
     exports top.spray.common.cache;
+    exports top.spray.common.tools.loop;
 }

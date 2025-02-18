@@ -12,16 +12,6 @@
     <artifactId>spray-core</artifactId>
     <name>spray-core</name>
     <description>a spray dependency for the models and apis</description>
-    <packaging>pom</packaging>
-    <modules>
-        <module>spray-core-config</module>
-        <module>spray-core-dynamic</module>
-        <module>spray-core-factory</module>
-        <module>spray-core-logger</module>
-        <module>spray-core-types</module>
-        <module>spray-core-base</module>
-        <module>spray-core-intelligence</module>
-    </modules>
 
     <properties>
     </properties>
@@ -30,11 +20,6 @@
         <dependency>
             <groupId>top.spray</groupId>
             <artifactId>spray-common</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>top.spray</groupId>
-            <artifactId>spray-core-base</artifactId>
-            <version>${revision}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>

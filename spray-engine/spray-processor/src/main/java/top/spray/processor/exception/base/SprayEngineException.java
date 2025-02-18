@@ -1,6 +1,6 @@
 package top.spray.processor.exception.base;
 
-import top.spray.core.global.exception.SprayException;
+import top.spray.core.exception.SprayException;
 
 /**
  * spray.i18n.exception.engine.suffix
