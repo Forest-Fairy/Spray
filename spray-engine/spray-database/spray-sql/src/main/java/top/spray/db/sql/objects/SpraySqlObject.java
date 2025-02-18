@@ -8,7 +8,11 @@ public interface SpraySqlObject {
     /** if object has alias then use its alias else use its name */
     SprayDatabaseType databaseType();
 
-    boolean doEscape();
+    boolean doOrRemoveEscape();
+
+    default String handleEscape(boolean doOrRemoveEscape, String name) {
+        return databaseType().handleEscape(doOrRemoveEscape, name);
+    }
 
     String refName();
 

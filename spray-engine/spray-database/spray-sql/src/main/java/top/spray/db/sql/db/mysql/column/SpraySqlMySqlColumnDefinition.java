@@ -66,7 +66,7 @@ public class SpraySqlMySqlColumnDefinition implements SpraySqlObjectMysql, Spray
     public void writeSql(Appendable appender, Appendable extraAppender, SpraySqlOption option, SpraySqlAction action) throws IOException {
          if (action.isAction(SpraySqlAction.TableAction.CREATE_TABLE)) {
             this.optionAppend(appender, option);
-            appender.append(" ").append(doEscape(colName)).append(" ")
+            appender.append(" ").append(doOrRemoveEscape(colName)).append(" ")
                 .append(typeToken).append(" ");
 
             List<String> extraLines = new LinkedList<>();
@@ -98,23 +98,23 @@ public class SpraySqlMySqlColumnDefinition implements SpraySqlObjectMysql, Spray
         } else if (action.isAction(SpraySqlAction.ColumnAction.ADD_COLUMN)) {
              // ALTER TABLE tableName ADD colName colType (AFTER colName0);
              this.optionAppend(appender, option);
-             appender.append("ADD ").append(doEscape(colName)).append(" ")
+             appender.append("ADD ").append(doOrRemoveEscape(colName)).append(" ")
                  .append(typeToken).append(" ");
              if (lastColName != null && !lastColName.isEmpty()) {
-                 appender.append("AFTER ").append(doEscape(lastColName));
+                 appender.append("AFTER ").append(doOrRemoveEscape(lastColName));
              }
         } else if (action.isAction(SpraySqlAction.ColumnAction.DROP_COLUMN)) {
              // ALTER TABLE tableName DROP colName;
              this.optionAppend(appender, option);
-             appender.append("DROP ").append(doEscape(colName));
+             appender.append("DROP ").append(doOrRemoveEscape(colName));
         } else if (action.isAction(SpraySqlAction.ColumnAction.ALTER_COLUMN_STRUCT)) {
              // ALTER TABLE tableName CHANGE colName newColName newColType;
              // ALTER TABLE tableName MODIFY colName colType;
              if (lastColName != null && !lastColName.isEmpty()) {
-                 appender.append("CHANGE ").append(doEscape(lastColName)).append(" ")
-                         .append(doEscape(colName)).append(" ").append(typeToken);
+                 appender.append("CHANGE ").append(doOrRemoveEscape(lastColName)).append(" ")
+                         .append(doOrRemoveEscape(colName)).append(" ").append(typeToken);
              } else {
-                 appender.append("MODIFY ").append(doEscape(colName)).append(" ").append(typeToken);
+                 appender.append("MODIFY ").append(doOrRemoveEscape(colName)).append(" ").append(typeToken);
              }
         }
     }

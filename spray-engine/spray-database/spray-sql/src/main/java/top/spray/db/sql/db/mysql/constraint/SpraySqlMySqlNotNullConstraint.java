@@ -8,10 +8,12 @@ import top.spray.db.sql.objects.SpraySqlOption;
 import java.io.IOException;
 
 public class SpraySqlMySqlNotNullConstraint implements SpraySqlObjectMysql, SpraySqlNotNullConstraint {
+    private final boolean doOrRemoveEscape;
     private final String name;
     private final String column;
     private final String typeToken;
-    public SpraySqlMySqlNotNullConstraint(String name, String column, String typeToken) {
+    public SpraySqlMySqlNotNullConstraint(boolean doOrRemoveEscape, String name, String column, String typeToken) {
+        this.doOrRemoveEscape = doOrRemoveEscape;
         this.name = name;
         this.column = column;
         this.typeToken = typeToken;
@@ -33,6 +35,11 @@ public class SpraySqlMySqlNotNullConstraint implements SpraySqlObjectMysql, Spra
     }
 
     @Override
+    public boolean doOrRemoveEscape() {
+        return doOrRemoveEscape;
+    }
+
+    @Override
     public String refName() {
         return name;
     }
@@ -51,11 +58,11 @@ public class SpraySqlMySqlNotNullConstraint implements SpraySqlObjectMysql, Spra
             if (action.isAction(SpraySqlAction.ConstraintAction.ADD_CONSTRAINT)) {
                 // ALTER TABLE table_name MODIFY column_name datatype NOT NULL;
                 this.optionAppend(appender, option);
-                appender.append("MODIFY ").append(doEscape(column)).append(typeToken).append(" NOT NULL");
+                appender.append("MODIFY ").append(handleEscape(doOrRemoveEscape, column)).append(typeToken).append(" NOT NULL");
             } else if (action.isAction(SpraySqlAction.ConstraintAction.DROP_CONSTRAINT)) {
                 // ALTER TABLE table_name MODIFY column_name datatype;
                 this.optionAppend(appender, option);
-                appender.append("MODIFY ").append(doEscape(column)).append(typeToken);
+                appender.append("MODIFY ").append(handleEscape(doOrRemoveEscape, column)).append(typeToken);
             }
         }
     }

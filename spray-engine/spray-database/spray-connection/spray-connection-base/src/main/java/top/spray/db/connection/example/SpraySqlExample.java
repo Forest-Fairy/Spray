@@ -1,7 +1,6 @@
 package top.spray.db.connection.example;
 
 import top.spray.db.connection.connection.jdbc.SprayJDBCConnection;
-import top.spray.db.connection.support.SprayTransactionSupportConnection;
 import top.spray.db.sql.column.SpraySqlColumnDefinition;
 import top.spray.db.sql.db.oracle.SpraySqlObjectOracle;
 import top.spray.db.sql.objects.SpraySqlOption;
@@ -75,7 +74,7 @@ public class SpraySqlExample {
 
         @Override
         public void writeSql(Appendable appender, Appendable extraAppender, SpraySqlOption option, SpraySqlAction action) throws IOException {
-            appender.append(doEscape(tableName));
+            appender.append(doOrRemoveEscape(tableName));
         }
     }
 }

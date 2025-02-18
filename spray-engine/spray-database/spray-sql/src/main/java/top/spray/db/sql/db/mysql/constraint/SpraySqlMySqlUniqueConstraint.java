@@ -10,12 +10,12 @@ import top.spray.db.sql.db.types.SprayMySqlType;
 import java.io.IOException;
 
 public class SpraySqlMySqlUniqueConstraint implements SpraySqlObjectMysql, SpraySqlUniqueConstraint {
-    private final boolean doEscape;
+    private final boolean doOrRemoveEscape;
     private final String constraintName;
     private final String column;
 
-    public SpraySqlMySqlUniqueConstraint(boolean doEscape, String constraintName, String column) {
-        this.doEscape = doEscape;
+    public SpraySqlMySqlUniqueConstraint(boolean doOrRemoveEscape, String constraintName, String column) {
+        this.doOrRemoveEscape = doOrRemoveEscape;
         this.constraintName = constraintName;
         this.column = column;
     }
@@ -41,8 +41,8 @@ public class SpraySqlMySqlUniqueConstraint implements SpraySqlObjectMysql, Spray
     }
 
     @Override
-    public boolean doEscape() {
-        return doEscape;
+    public boolean doOrRemoveEscape() {
+        return doOrRemoveEscape;
     }
 
     @Override
@@ -55,22 +55,22 @@ public class SpraySqlMySqlUniqueConstraint implements SpraySqlObjectMysql, Spray
         if (action.isAction(SpraySqlAction.TableAction.CREATE_TABLE)) {
             // CONSTRAINT constraint_name UNIQUE (column_name)
             if (constraintName != null && !constraintName.isEmpty()) {
-                extraAppender.append("CONSTRAINT ").append(doEscape(constraintName)).append(" ");
+                extraAppender.append("CONSTRAINT ").append(handleEscape(doOrRemoveEscape, constraintName)).append(" ");
             }
-            extraAppender.append("UNIQUE (").append(doEscape(column)).append(")");
+            extraAppender.append("UNIQUE (").append(handleEscape(doOrRemoveEscape, column)).append(")");
         } else if (action.isAction(SpraySqlAction.TableAction.ALTER_TABLE)) {
             if (action.isAction(SpraySqlAction.ConstraintAction.ADD_CONSTRAINT)) {
                 // ALTER TABLE table_name ADD CONSTRAINT constraint_name UNIQUE (column_name);
                 this.optionAppend(appender, option);
                 appender.append("ADD ");
                 if (constraintName != null && !constraintName.isEmpty()) {
-                    appender.append("CONSTRAINT ").append(doEscape(constraintName)).append(" ");
+                    appender.append("CONSTRAINT ").append(handleEscape(doOrRemoveEscape, constraintName)).append(" ");
                 }
-                appender.append("UNIQUE (").append(doEscape(column)).append(")");
+                appender.append("UNIQUE (").append(handleEscape(doOrRemoveEscape, column)).append(")");
             } else if (action.isAction(SpraySqlAction.ConstraintAction.DROP_CONSTRAINT)) {
                 // ALTER TABLE table_name DROP INDEX constraint_name;
                 this.optionAppend(appender, option);
-                appender.append("DROP INDEX ").append(doEscape(constraintName));
+                appender.append("DROP INDEX ").append(handleEscape(doOrRemoveEscape, constraintName));
             }
         }
     }

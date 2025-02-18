@@ -8,12 +8,14 @@ import top.spray.db.sql.objects.SpraySqlOption;
 import java.io.IOException;
 
 public class SpraySqlMySqlDefaultValueConstraint implements SpraySqlObjectMysql, SpraySqlDefaultValueConstraint {
+    private final boolean doOrRemoveEscape;
     private final String name;
     private final String column;
     private final String defaultValue;
     private final String typeToken;
 
-    public SpraySqlMySqlDefaultValueConstraint(String name, String column, String defaultValue, String typeToken) {
+    public SpraySqlMySqlDefaultValueConstraint(boolean doOrRemoveEscape, String name, String column, String defaultValue, String typeToken) {
+        this.doOrRemoveEscape = doOrRemoveEscape;
         this.name = name;
         this.column = column;
         this.defaultValue = defaultValue;
@@ -46,6 +48,11 @@ public class SpraySqlMySqlDefaultValueConstraint implements SpraySqlObjectMysql,
     }
 
     @Override
+    public boolean doOrRemoveEscape() {
+        return doOrRemoveEscape;
+    }
+
+    @Override
     public String refName() {
         return name;
     }
@@ -58,12 +65,12 @@ public class SpraySqlMySqlDefaultValueConstraint implements SpraySqlObjectMysql,
             if (action.isAction(SpraySqlAction.ConstraintAction.ADD_CONSTRAINT)) {
                 // ALTER TABLE table_name ALTER column_name SET DEFAULT xxx;
                 this.optionAppend(appender, option);
-                appender.append("ALTER ").append(doEscape(column));
+                appender.append("ALTER ").append(handleEscape(doOrRemoveEscape, column));
                 appender.append(" SET DEFAULT ").append(databaseType().formatValue(defaultValue, typeToken));
             } else if (action.isAction(SpraySqlAction.ConstraintAction.DROP_CONSTRAINT)) {
                 // ALTER TABLE table_name ALTER column_name DROP DEFAULT;
                 this.optionAppend(appender, option);
-                appender.append("ALTER ").append(doEscape(column));
+                appender.append("ALTER ").append(handleEscape(doOrRemoveEscape, column));
                 appender.append(" DROP DEFAULT");
             }
         }

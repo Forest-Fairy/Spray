@@ -8,10 +8,12 @@ import top.spray.db.sql.objects.SpraySqlOption;
 import java.io.IOException;
 
 public class SpraySqlMySqlPrimaryKeyConstraint implements SpraySqlObjectMysql, SpraySqlPrimaryKeyConstraint {
+    private final boolean doOrRemoveEscape;
     private final String name;
     private final String column;
 
-    public SpraySqlMySqlPrimaryKeyConstraint(String name, String column) {
+    public SpraySqlMySqlPrimaryKeyConstraint(boolean doOrRemoveEscape, String name, String column) {
+        this.doOrRemoveEscape = doOrRemoveEscape;
         this.name = name;
         this.column = column;
     }
@@ -32,6 +34,11 @@ public class SpraySqlMySqlPrimaryKeyConstraint implements SpraySqlObjectMysql, S
     }
 
     @Override
+    public boolean doOrRemoveEscape() {
+        return doOrRemoveEscape;
+    }
+
+    @Override
     public String refName() {
         return name;
     }
@@ -41,18 +48,18 @@ public class SpraySqlMySqlPrimaryKeyConstraint implements SpraySqlObjectMysql, S
         if (action.isAction(SpraySqlAction.TableAction.CREATE_TABLE)) {
             // CONSTRAINT constraint_name PRIMARY KEY (column_name)
             if (name != null && !name.isEmpty()) {
-                extraAppender.append("CONSTRAINT ").append(doEscape(name)).append(" ");
+                extraAppender.append("CONSTRAINT ").append(handleEscape(doOrRemoveEscape, name)).append(" ");
             }
-            extraAppender.append("PRIMARY KEY (").append(doEscape(column)).append(")");
+            extraAppender.append("PRIMARY KEY (").append(handleEscape(doOrRemoveEscape, column)).append(")");
         } else if (action.isAction(SpraySqlAction.TableAction.ALTER_TABLE)) {
             if (action.isAction(SpraySqlAction.ConstraintAction.ADD_CONSTRAINT)) {
                 // ALTER TABLE table_name ADD CONSTRAINT constraint_name PRIMARY KEY (column_name);
                 this.optionAppend(appender, option);
                 appender.append("ADD ");
                 if (name != null && !name.isEmpty()) {
-                    appender.append("CONSTRAINT ").append(doEscape(name)).append(" ");
+                    appender.append("CONSTRAINT ").append(handleEscape(doOrRemoveEscape, name)).append(" ");
                 }
-                appender.append("PRIMARY KEY (").append(doEscape(column)).append(")");
+                appender.append("PRIMARY KEY (").append(handleEscape(doOrRemoveEscape, column)).append(")");
             } else if (action.isAction(SpraySqlAction.ConstraintAction.DROP_CONSTRAINT)) {
                 // ALTER TABLE table_name DROP PRIMARY KEY;
                 this.optionAppend(appender, option);

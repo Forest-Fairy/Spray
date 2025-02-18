@@ -55,7 +55,8 @@ public abstract class SprayDatabaseType {
         }
         return name;
     }
-    private String handleEscape(boolean doOrRemoveEscape, String name) {
+
+    public String handleEscape(boolean doOrRemoveEscape, String name) {
         if (name == null || name.trim().isEmpty()) {
             return "";
         }
