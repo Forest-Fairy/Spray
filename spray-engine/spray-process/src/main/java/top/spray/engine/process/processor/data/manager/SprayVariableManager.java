@@ -18,6 +18,9 @@ public interface SprayVariableManager {
     /** method for getting executor's variableContainer */
     SprayVariableContainer getVariableContainer(String identityDataKey);
 
+    /** method for getting executor's parent variableContainer */
+    SprayVariableContainer getParentVariableContainer(String identityDataKey);
+
     SprayVariableContainer easyCopyVariable(String toExecutorNameKey,
                                             String variableContainerIdentityDataKey,
                                             String fromExecutorNameKey);
@@ -35,7 +38,7 @@ public interface SprayVariableManager {
                                  String fromExecutorNameKey,
                                  SprayOptionalData optionalData,
                                  SprayProcessExecuteStepMeta nextMeta,
-                                 SprayDataDispatchResultType dataDispatchStatus);
+                                 SprayDataDispatchResultType dataDispatchStatus, Object... params);
 
     Iterable<String> getInputDataKeys(String executorNameKey);
 

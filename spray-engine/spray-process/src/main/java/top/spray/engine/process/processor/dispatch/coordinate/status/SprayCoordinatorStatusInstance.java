@@ -30,7 +30,7 @@ public class SprayCoordinatorStatusInstance implements SprayAnalysable, SprayLis
     }
 
     private void init() {
-        this.coordinatorStatus = SprayType.holder(SprayCoordinatorStatus.RUNNING);
+        this.coordinatorStatus = SprayType.holder(SprayCoordinatorStatus.INITIALIZING);
         this.runningCounter = new LongAdder();
         this.startTime = System.currentTimeMillis();
         this.listeners = new LinkedList<>(this.coordinator.listListeners().stream().filter(listener -> listener.isForListenable(this)).toList());

@@ -34,7 +34,7 @@ public class SprayStepStatusInstance implements SprayListenable {
         init();
     }
     private void init() {
-        this.stepStatus = SprayType.holder(SprayStepStatus.RUNNING);
+        this.stepStatus = SprayType.holder(SprayStepStatus.WAITING);
         this.startTime = System.currentTimeMillis();
         this.inputInfos = new ConcurrentHashMap<>(0);
         this.outputInfos = new ConcurrentHashMap<>(0);

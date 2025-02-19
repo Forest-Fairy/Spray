@@ -4,7 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 import top.spray.core.system.dynamic.SprayClassLoader;
 import top.spray.engine.process.processor.dispatch.coordinate.coordinator.SprayProcessCoordinator;
 import top.spray.engine.process.processor.dispatch.coordinate.meta.SprayProcessCoordinatorMeta;
-import top.spray.engine.process.exception.coordinate.SprayFailedInitExecutorException;
+import top.spray.engine.process.processor.dispatch.exception.SprayFailedInitExecutorException;
 import top.spray.engine.process.processor.execute.step.executor.facade.SprayDefaultStepExecutorFacade;
 import top.spray.engine.process.processor.execute.step.executor.facade.SprayStepFacade;
 import top.spray.processor.process.step.generator.SprayExecutorGenerator;

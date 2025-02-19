@@ -26,7 +26,7 @@ public class SprayDataDispatchResultType implements SprayCoordinatorType {
     public static final SprayDataDispatchResultType SUCCESS = new SprayDataDispatchResultType(
             1, "dispatch.result.status.success");
 
-    /** the data is abandoned because there is no next step for executing */
+    /** the data is abandoned because of no next step or next step does not want to execute */
     public static final SprayDataDispatchResultType ABANDONED = new SprayDataDispatchResultType(
             0, "dispatch.result.status.abandoned");
 

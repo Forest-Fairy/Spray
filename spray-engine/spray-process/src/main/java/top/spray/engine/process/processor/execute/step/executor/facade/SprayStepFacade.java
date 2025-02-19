@@ -11,6 +11,9 @@ import top.spray.engine.process.processor.execute.step.meta.SprayOptionalData;
 import top.spray.engine.process.processor.execute.step.meta.SprayProcessExecuteStepMeta;
 import top.spray.engine.process.processor.execute.step.status.SprayStepStatusInstance;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 /**
  * Define the executor of a process node
  */
@@ -33,10 +36,12 @@ public interface SprayStepFacade extends
 
     SprayProcessCoordinator getCoordinator();
 
-    SprayStepStatusInstance getStepStatus();
+    SprayStepStatusInstance runningStatus();
 
     SprayExecutorType getExecutorType();
 
-    void receive(String variableContainerIdentityDataKey, String fromExecutorNameKey, SprayOptionalData optionalData);
+    void receive(@Nonnull String variableContainerIdentityDataKey,
+                 @Nullable String fromExecutorNameKey,
+                 @Nullable SprayOptionalData optionalData);
 
 }

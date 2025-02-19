@@ -7,24 +7,29 @@ import java.util.*;
  */
 public class SprayLooper {
     private SprayLooper() {}
-    private static final SprayLoopExceptionCatcher IGNORE_EXCEPTION_CATCHER = ignored -> {};
+
+    @SuppressWarnings("rawtypes")
+    private static final SprayLoopExceptionCatcher IGNORE_EXCEPTION_CATCHER = (t, ignored) -> {};
     public static <T> void loopAndIgnoredException(Iterable<T> collection, SprayLoopHandler<T> handler) {
+        // noinspection unchecked
         loop(collection, handler, IGNORE_EXCEPTION_CATCHER);
     }
 
-    public static <T> void loop(Iterable<T> collection, SprayLoopHandler<T> handler, SprayLoopExceptionCatcher catcher) {
+    public static <T> void loop(Iterable<T> collection, SprayLoopHandler<T> handler, SprayLoopExceptionCatcher<T> catcher) {
         Iterator<T> it = collection.iterator();
         while (true) {
             if (!it.hasNext()) {
                 return;
             }
+            T next = null;
             try {
                 while (it.hasNext()) {
-                    handler.accept(it.next());
+                    next = it.next();
+                    handler.accept(it.hasNext(), next);
                 }
             } catch (Throwable throwable) {
                 if (catcher != null) {
-                    catcher.accept(throwable);
+                    catcher.accept(next, throwable);
                 } else {
                     throw new RuntimeException(throwable);
                 }

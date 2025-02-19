@@ -7,5 +7,6 @@ public interface SprayClosable extends AutoCloseable {
     }
 
     void shutdown();
+
     void forceShutdown();
 }

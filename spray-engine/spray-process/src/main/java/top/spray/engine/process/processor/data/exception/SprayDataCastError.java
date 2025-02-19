@@ -1,6 +1,4 @@
-package top.spray.engine.process.exception.data;
-
-import top.spray.engine.process.exception.base.SprayDataException;
+package top.spray.engine.process.processor.data.exception;
 
 public class SprayDataCastError extends SprayDataException {
     public SprayDataCastError(Class<?> fromType, Class<?> toType, Throwable cause) {

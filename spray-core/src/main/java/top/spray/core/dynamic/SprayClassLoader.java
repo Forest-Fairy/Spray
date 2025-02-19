@@ -106,7 +106,7 @@ public class SprayClassLoader extends ClassLoader implements AutoCloseable {
                 throw new IllegalStateException("unable to load class " + fileObject);
             }
             SprayLooper.loopAndIgnoredException(this.loaderListeners,
-                    listener -> listener.newClassDefined(this, loadedClass));
+                    (hasNext, listener) -> listener.newClassDefined(this, loadedClass));
             fileObject.defineClass(loadedClass);
         }
         this.classes.put(fileObject.fullClassName(), fileObject);
@@ -148,7 +148,7 @@ public class SprayClassLoader extends ClassLoader implements AutoCloseable {
     @Override
     public void close() {
         SprayLooper.loopAndIgnoredException(this.loaderListeners,
-                listener -> listener.onClassLoaderClose(this));
+                (hasNext, listener) -> listener.onClassLoaderClose(this));
     }
 
 }

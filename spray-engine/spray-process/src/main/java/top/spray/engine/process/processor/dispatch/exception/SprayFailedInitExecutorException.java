@@ -1,5 +1,5 @@
 
-package top.spray.engine.process.exception.coordinate;
+package top.spray.engine.process.processor.dispatch.exception;
 
 import cn.hutool.core.util.StrUtil;
 import top.spray.core.i18n.SprayResourceBundleDef;

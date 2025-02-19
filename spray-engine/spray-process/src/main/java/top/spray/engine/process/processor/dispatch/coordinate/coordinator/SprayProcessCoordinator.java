@@ -64,10 +64,25 @@ public interface SprayProcessCoordinator extends
     SprayCoordinatorStatusInstance runningStatus();
 
     @Override
-    void startOrContinue();
+    boolean canDoStart();
+
+    @Override
+    void start();
+
+    @Override
+    boolean canDoResume();
+
+    @Override
+    void resume();
+
+    @Override
+    boolean canDoPause();
 
     @Override
     void pause();
+
+    @Override
+    boolean canDoCancel();
 
     @Override
     void cancel();

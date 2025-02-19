@@ -4,7 +4,7 @@ import top.spray.common.tools.SprayExceptionUtil;
 import top.spray.common.tools.SprayOptional;
 import top.spray.core.dynamic.SprayClassLoader;
 import top.spray.core.thread.SprayPoolExecutor;
-import top.spray.engine.process.exception.execute.SprayStepExecuteError;
+import top.spray.engine.process.processor.execute.exception.SprayStepExecuteError;
 import top.spray.engine.process.infrastructure.analyse.SprayAnalyseResult;
 import top.spray.engine.process.infrastructure.analyse.SprayAnalyser;
 import top.spray.engine.process.infrastructure.listen.SprayListener;
@@ -16,6 +16,8 @@ import top.spray.engine.process.thread.SprayPoolExecutorBuilder;
 import top.spray.engine.process.processor.dispatch.coordinate.coordinator.SprayProcessCoordinator;
 import top.spray.engine.process.processor.execute.step.status.SprayStepStatusInstance;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -73,7 +75,8 @@ public class SprayDefaultStepExecutorFacade implements SprayStepFacade {
         return this.classLoader;
     }
 
-    public final SprayStepStatusInstance getStepStatus() {
+    @Override
+    public final SprayStepStatusInstance runningStatus() {
         return this.stepResult;
     }
 
@@ -84,7 +87,10 @@ public class SprayDefaultStepExecutorFacade implements SprayStepFacade {
 
 
     @Override
-    public final void receive(String variableContainerIdentityDataKey, String fromExecutorNameKey, SprayOptionalData optionalData) {
+    public final void receive(
+            @Nonnull String variableContainerIdentityDataKey,
+            @Nullable String fromExecutorNameKey,
+            @Nullable SprayOptionalData optionalData) {
         if (executable(variableContainerIdentityDataKey, fromExecutorNameKey, optionalData)) {
             doExecute(variableContainerIdentityDataKey, fromExecutorNameKey, optionalData);
         }

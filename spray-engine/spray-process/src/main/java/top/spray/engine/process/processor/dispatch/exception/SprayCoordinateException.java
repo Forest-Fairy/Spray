@@ -1,9 +1,11 @@
-package top.spray.engine.process.exception.base;
+package top.spray.engine.process.processor.dispatch.exception;
+
+import top.spray.engine.exception.SprayEngineException;
 
 /**
  * spray.i18n.exception.engine.coordinate
  */
-public class SprayCoordinateException extends SprayEngineException {
+public abstract class SprayCoordinateException extends SprayEngineException {
 
     protected SprayCoordinateException(String messageKey, Object... params) {
         super(messageKey, params);

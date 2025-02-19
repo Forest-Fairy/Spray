@@ -1,17 +1,25 @@
 package top.spray.engine.process.processor.dispatch.coordinate.coordinator;
 
 import top.spray.common.data.SprayData;
+import top.spray.common.tools.loop.SprayLooper;
+import top.spray.core.dynamic.SprayClassLoader;
+import top.spray.engine.process.infrastructure.listen.SprayListener;
 import top.spray.engine.process.processor.dispatch.coordinate.status.SprayCoordinatorStatusInstance;
 import top.spray.engine.process.processor.data.manager.SprayVariableManager;
+import top.spray.engine.process.processor.dispatch.exception.SprayCoordinatorDispatchErrorException;
+import top.spray.engine.process.processor.dispatch.exception.SprayCoordinatorUnsupportedException;
+import top.spray.engine.process.processor.dispatch.variables.SprayCoordinatorVariableManager;
+import top.spray.engine.process.processor.execute.step.executor.SprayStepExecutor;
 import top.spray.engine.process.processor.execute.step.meta.SprayOptionalData;
 import top.spray.engine.process.processor.execute.step.meta.SprayProcessExecuteStepMeta;
 import top.spray.engine.process.processor.execute.step.meta.SprayStepActiveType;
 import top.spray.engine.process.processor.dispatch.coordinate.meta.SprayProcessCoordinatorMeta;
 import top.spray.engine.process.processor.data.event.impl.SprayDataDispatchResultType;
 import top.spray.engine.process.processor.dispatch.coordinate.status.SprayCoordinatorStatus;
-import top.spray.engine.process.exception.coordinate.SprayExecutorGenerateError;
+import top.spray.engine.process.processor.dispatch.exception.SprayExecutorGenerateError;
 import top.spray.engine.process.processor.dispatch.filters.SprayStepExecuteConditionFilter;
 import top.spray.engine.process.processor.execute.step.executor.facade.SprayStepFacade;
+import top.spray.engine.process.processor.execute.step.status.SprayStepStatus;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -20,9 +28,10 @@ public class SprayDefaultProcessCoordinator implements SprayProcessCoordinator {
     private final String transactionId;
     private final SprayProcessCoordinatorMeta coordinatorMeta;
     private final ClassLoader creatorThreadClassLoader;
-    private final List<SprayCoordinatorListener<? extends SprayCoordinatorListener<?>>> listeners;
+    private final List<SprayListener> listeners;
     private final Map<String, SprayStepFacade> cachedExecutorMap;
     private final SprayCoordinatorStatusInstance coordinatorStatusInstance;
+    private final SprayVariableManager variableManager;
 
     public SprayDefaultProcessCoordinator(String transactionId, SprayProcessCoordinatorMeta coordinatorMeta) {
         this.coordinatorMeta = coordinatorMeta;
@@ -30,7 +39,8 @@ public class SprayDefaultProcessCoordinator implements SprayProcessCoordinator {
         this.cachedExecutorMap = new ConcurrentHashMap<>();
         this.listeners = new LinkedList<>();
         this.creatorThreadClassLoader = Thread.currentThread().getContextClassLoader();
-        this.coordinatorStatusInstance = new SprayCoordinatorStatusInstance(this.coordinatorMeta);
+        this.coordinatorStatusInstance = new SprayCoordinatorStatusInstance(this);
+        this.variableManager = new SprayCoordinatorVariableManager(this);
         initExecutors();
     }
 
@@ -61,75 +71,126 @@ public class SprayDefaultProcessCoordinator implements SprayProcessCoordinator {
     }
 
     @Override
+    public String transactionId() {
+        return this.transactionId;
+    }
+
+    @Override
     public final SprayProcessCoordinatorMeta getMeta() {
         return coordinatorMeta;
     }
 
     @Override
-    public final ClassLoader getClassloader() {
-        return this.creatorThreadClassLoader;
+    public boolean listenerRegister(SprayListener listener) {
+        if (listener.isForListenable(this) && !listeners.contains(listener)) {
+            this.listeners.add(listener);
+            return true;
+        }
+        return false;
     }
 
     @Override
-    public final List<SprayCoordinatorListener<? extends SprayCoordinatorListener<?>>> getListeners() {
-        return this.listeners;
+    public SprayClassLoader getClassloader(String executorNameKey) {
+        return getExecutorFacade(executorNameKey).getClassLoader();
     }
 
     @Override
-    public final SprayCoordinatorStatusInstance getCoordinatorStatusInstance() {
+    public List<SprayListener> listListeners() {
+        return listeners;
+    }
+
+    @Override
+    public SprayCoordinatorStatusInstance runningStatus() {
         return this.coordinatorStatusInstance;
     }
 
-
     @Override
-    public void start() {
-        // TODO start receiving
+    public boolean canDoStart() {
+        return SprayCoordinatorStatus.INITIALIZING.equals(this.coordinatorStatusInstance.getStatus());
     }
 
+    @Override
+    public synchronized void start() {
+        if (! this.canDoStart()) {
+            throw new IllegalStateException(this.coordinatorStatusInstance.getStatus().typeName());
+        }
+        // TODO start
+        this.coordinatorStatusInstance.setStatus(SprayCoordinatorStatus.RUNNING);
+        List<SprayProcessExecuteStepMeta> startNodes = this.getMeta().listStartNodes();
+        String processVariableContainerIdentityDataKey = this.variableManager.getProcessVariableContainer().identityDataKey();
+        List<SprayData> defaultStartData = this.getMeta().getDefaultDataList();
+        if (defaultStartData == null || defaultStartData.isEmpty()) {
+            dispatchDataToNodes(startNodes, processVariableContainerIdentityDataKey, null, null);
+        } else {
+            Iterator<SprayData> it = defaultStartData.iterator();
+            while (it.hasNext()) {
+                SprayData data = it.next();
+                dispatchDataToNodes(startNodes, processVariableContainerIdentityDataKey,
+                        null, new SprayOptionalData(this.transactionId, data, it.hasNext()));
+            }
+        }
+    }
+
+    @Override
+    public boolean canDoResume() {
+        return false;
+    }
+
+    @Override
+    public synchronized void resume() {
+        throw new SprayCoordinatorUnsupportedException(this);
+    }
+
+    @Override
+    public boolean canDoPause() {
+        return false;
+    }
+
+    @Override
+    public void pause() {
+        throw new SprayCoordinatorUnsupportedException(this);
+    }
+
+    @Override
+    public boolean canDoCancel() {
+        return ! this.coordinatorStatusInstance.getStatus().isEnd();
+    }
+
+    @Override
+    public void cancel() {
+        this.shutdown();
+    }
 
     protected void setDispatchResult(String variableContainerIdentityDataKey, String fromExecutorNameKey,
                                      SprayOptionalData optionalData, SprayProcessExecuteStepMeta nextMeta,
-                                     SprayDataDispatchResultType dataDispatchStatus) {
-        this.getVariableManager().setDataDispatchResult(variableContainerIdentityDataKey, fromExecutorNameKey, optionalData, nextMeta, dataDispatchStatus);
+                                     SprayDataDispatchResultType dataDispatchStatus, Object... params) {
+        this.getVariableManager().setDataDispatchResult(variableContainerIdentityDataKey, fromExecutorNameKey, optionalData, nextMeta, dataDispatchStatus, params);
     }
 
 
     @Override
-    public void dispatchData(String toExecutorNameKeys, String variableContainerIdentityDataKey,
-                             String fromExecutorNameKey, SprayData data, boolean still) {
-        if (toExecutorNameKeys.trim().isEmpty() && !toExecutorNameKeys.isEmpty()) {
-            // not run
+    public void dispatchData(String variableContainerIdentityDataKey, SprayStepExecutor fromExecutor, SprayOptionalData optionalData, String toExecutorNameKeys) {
+        String fromExecutorNameKey = fromExecutor.executorNameKey();
+        if (toExecutorNameKeys == null) {
+            setDispatchResult(variableContainerIdentityDataKey, fromExecutorNameKey,
+                    optionalData, null, SprayDataDispatchResultType.FAILED,
+                    "param is invalid, please contact the technician");
             return;
         }
         List<SprayProcessExecuteStepMeta> nextNodes = this.listNextSteps(fromExecutorNameKey);
-        if (!nextNodes.isEmpty() && toExecutorNameKeys != null && ! toExecutorNameKeys.isBlank()) {
+        if (!nextNodes.isEmpty() && ! toExecutorNameKeys.isBlank()) {
             nextNodes = nextNodes.stream()
-                    .filter(nextNodeMeta -> toExecutorNameKeys.contains(this.getExecutorNameKey(nextNodeMeta)))
+                    .filter(nextNodeMeta -> {
+                        if (! toExecutorNameKeys.contains(this.getExecutorNameKey(nextNodeMeta))) {
+                            this.setDispatchResult(variableContainerIdentityDataKey, fromExecutorNameKey,
+                                    optionalData, nextNodeMeta, SprayDataDispatchResultType.FILTERED);
+                            return false;
+                        }
+                        return true;
+                    })
                     .toList();
         }
-        this.dispatchDataToNodes(nextNodes, variableContainerIdentityDataKey, fromExecutorNameKey, data, still);
-    }
-
-    private boolean validateExecutorBeforeCreate(String variableContainerIdentityDataKey, SprayOptionalData optionalData, SprayProcessExecuteStepMeta nodeMeta) {
-        boolean create = true;
-        if (! SprayStepActiveType.ACTIVE.equals(nodeMeta.stepActiveType())) {
-            if (SprayStepActiveType.SKIP.equals(nodeMeta.stepActiveType())) {
-                this.dispatchDataToNodes(nodeMeta.nextNodes(), variableContainerIdentityDataKey, fromExecutorNameKey, data, still);
-            }
-            this.setDispatchResult(variableContainerIdentityDataKey, fromExecutorNameKey, data, still, nodeMeta, SprayDataDispatchResultType.SKIPPED);
-            create = false;
-        } else {
-            if (!nodeMeta.getExecuteConditionFilter().isEmpty()) {
-                for (SprayStepExecuteConditionFilter filter : nodeMeta.getExecuteConditionFilter()) {
-                    if (!filter.filterBeforeExecute(this, variableContainerIdentityDataKey, optionalData, nodeMeta)) {
-                        create = false;
-                        this.setDispatchResult(variableContainerIdentityDataKey, fromExecutorNameKey, data, still, nodeMeta, SprayDataDispatchResultType.ABANDONED);
-                        break;
-                    }
-                }
-            }
-        }
-        return create;
+        this.dispatchDataToNodes(nextNodes, variableContainerIdentityDataKey, fromExecutorNameKey, optionalData);
     }
 
     protected final void dispatchDataToNodes(List<SprayProcessExecuteStepMeta> nodes, String variableContainerIdentityDataKey, String fromExecutorNameKey, SprayOptionalData optionalData) {
@@ -138,38 +199,56 @@ public class SprayDefaultProcessCoordinator implements SprayProcessCoordinator {
             return;
         }
         for (SprayProcessExecuteStepMeta nodeMeta : nodes) {
-            if (! validCoordinatorStatus()) {
+            if (this.runningStatus().getStatus().isEnd()) {
                 continue;
             }
-            if (! validateExecutorBeforeCreate(variableContainerIdentityDataKey, fromExecutorNameKey, data, still, nodeMeta)) {
+            if (! validateExecutorBeforeCreateOrExecute(variableContainerIdentityDataKey, fromExecutorNameKey, optionalData, nodeMeta)) {
                 continue;
             }
             // run it
             this.doNodeDataDispatch(this.getExecutorFacade(this.getExecutorNameKey(nodeMeta)),
-                    variableContainerIdentityDataKey, fromExecutorNameKey, data, still);
+                    variableContainerIdentityDataKey, fromExecutorNameKey, optionalData);
         }
+    }
+
+    private boolean validateExecutorBeforeCreateOrExecute(String variableContainerIdentityDataKey, String fromExecutorNameKey, SprayOptionalData optionalData, SprayProcessExecuteStepMeta nodeMeta) {
+        boolean create = true;
+        if (! SprayStepActiveType.ACTIVE.equals(nodeMeta.stepActiveType())) {
+            if (SprayStepActiveType.SKIP.equals(nodeMeta.stepActiveType())) {
+                this.dispatchDataToNodes(nodeMeta.nextNodes(), variableContainerIdentityDataKey, fromExecutorNameKey, optionalData);
+            }
+            this.setDispatchResult(variableContainerIdentityDataKey, fromExecutorNameKey, optionalData, nodeMeta, SprayDataDispatchResultType.SKIPPED);
+            create = false;
+        } else {
+            if (!nodeMeta.getExecuteConditionFilter().isEmpty()) {
+                for (SprayStepExecuteConditionFilter filter : nodeMeta.getExecuteConditionFilter()) {
+                    if (!filter.filterBeforeExecute(this, variableContainerIdentityDataKey, optionalData, nodeMeta)) {
+                        create = false;
+                        this.setDispatchResult(variableContainerIdentityDataKey, fromExecutorNameKey, optionalData, nodeMeta, SprayDataDispatchResultType.ABANDONED);
+                        break;
+                    }
+                }
+            }
+        }
+        return create;
     }
 
     protected final void doNodeDataDispatch(SprayStepFacade toExecutor, String variableContainerIdentityDataKey,
-                                            String fromExecutorNameKey, SprayData data, boolean still) {
+                                            String fromExecutorNameKey, SprayOptionalData optionalData) {
         try {
             int copyMode = toExecutor.getMeta().varCopyMode();
-            if (copyMode != 0) {
-                toExecutor.receive(variableContainerIdentityDataKey, fromExecutorNameKey, data, still);
+            if (copyMode == 0) {
+                toExecutor.receive(variableContainerIdentityDataKey, fromExecutorNameKey, optionalData);
             } else {
-                toExecutor.receive(copyMode == 1 ?
-                        this.getVariableManager().easyCopyVariable(toExecutor.executorNameKey(), variableContainerIdentityDataKey, fromExecutorNameKey).identityDataKey() :
-                        this.getVariableManager().deepCopyVariable(toExecutor.executorNameKey(), variableContainerIdentityDataKey, fromExecutorNameKey).identityDataKey(),
-                        fromExecutorNameKey, data, still);
+                variableContainerIdentityDataKey = copyMode == 1
+                        ? this.getVariableManager().easyCopyVariable(toExecutor.executorNameKey(), variableContainerIdentityDataKey, fromExecutorNameKey).identityDataKey()
+                        : this.getVariableManager().deepCopyVariable(toExecutor.executorNameKey(), variableContainerIdentityDataKey, fromExecutorNameKey).identityDataKey();
+                toExecutor.receive(variableContainerIdentityDataKey, fromExecutorNameKey, optionalData);
             }
-            this.setDispatchResult(variableContainerIdentityDataKey, fromExecutorNameKey, data, still, toExecutor.getMeta(), SprayDataDispatchResultType.SUCCESS);
+            this.setDispatchResult(variableContainerIdentityDataKey, fromExecutorNameKey, optionalData, toExecutor.getMeta(), SprayDataDispatchResultType.SUCCESS);
         } catch (Exception e) {
-            this.setDispatchResult(variableContainerIdentityDataKey, fromExecutorNameKey, data, still, toExecutor.getMeta(), SprayDataDispatchResultType.FAILED);
+            this.setDispatchResult(variableContainerIdentityDataKey, fromExecutorNameKey, optionalData, toExecutor.getMeta(), SprayDataDispatchResultType.FAILED, e);
         }
-    }
-
-    private boolean validCoordinatorStatus() {
-        return SprayCoordinatorStatus.RUNNING.equals(this.getCoordinatorStatusInstance().getStatus());
     }
 
 
@@ -189,25 +268,26 @@ public class SprayDefaultProcessCoordinator implements SprayProcessCoordinator {
 
     @Override
     public SprayVariableManager getVariableManager() {
-
+        return this.variableManager;
     }
+
     @Override
     public void shutdown() {
-        if (this.getClassloader() instanceof SprayClassLoader scl) {
-            scl.closeInRuntime();
-        }
-        for (Map.Entry<String, SprayStepFacade> executorEntry : this.cachedExecutorMap.entrySet()) {
-            try {
-                executorEntry.getValue().close();
-            } catch (Exception e) {
-                // TODO handle exception with its handler
-                throw new RuntimeException(e);
-            }
-        }
+        forceShutdown();
     }
 
     @Override
     public void forceShutdown() {
-
+        SprayLooper.loop(this.cachedExecutorMap.entrySet(), (hasNext, entry) -> {
+            entry.getValue().close();
+        }, (entry, error) -> {
+            SprayLooper.loopAndIgnoredException(entry.getValue().listListeners(), (still, listener) -> {
+                // TODO handle exception with its handler
+                throw new RuntimeException(error);
+            });
+        });
+        if (this.creatorThreadClassLoader instanceof SprayClassLoader scl) {
+            scl.close();
+        }
     }
 }

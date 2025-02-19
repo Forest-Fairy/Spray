@@ -7,7 +7,7 @@ import java.util.List;
 
 public class SprayStepStatus implements SprayStepExecuteType {
     private static final List<SprayStepStatus> values = List.of(
-            SprayStepStatus.RUNNING,
+            SprayStepStatus.WAITING,
             SprayStepStatus.SUSPENDING,
             SprayStepStatus.STOP,
             SprayStepStatus.DONE,
@@ -22,8 +22,12 @@ public class SprayStepStatus implements SprayStepExecuteType {
     }
 
     /** running by default */
-    public static final SprayStepStatus RUNNING = new SprayStepStatus(
-            0, "step_status.execution_running");
+    public static final SprayStepStatus WAITING = new SprayStepStatus(
+            0, "step_status.execution_waiting");
+
+    /** running by default */
+    public static final SprayStepStatus PROCESSING = new SprayStepStatus(
+            0, "step_status.execution_processing");
 
     /** suspended by config (debugged or collecting data) */
     public static final SprayStepStatus SUSPENDING = new SprayStepStatus(

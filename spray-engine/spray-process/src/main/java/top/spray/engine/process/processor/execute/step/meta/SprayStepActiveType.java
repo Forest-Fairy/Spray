@@ -31,7 +31,7 @@ public enum SprayStepActiveType implements SprayStepExecuteType {
     }
 
     @Override
-    public boolean isSameClass(Class<? extends SprayType> clazz) {
+    public boolean validInstance(Class<? extends SprayType> clazz) {
         return SprayStepActiveType.class.equals(clazz);
     }
 

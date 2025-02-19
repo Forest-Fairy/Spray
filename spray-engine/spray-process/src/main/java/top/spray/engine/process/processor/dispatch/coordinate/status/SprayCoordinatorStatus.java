@@ -9,7 +9,7 @@ import java.util.List;
 public class SprayCoordinatorStatus implements SprayCoordinatorType {
     private static final List<SprayCoordinatorStatus> values = List.of(
             SprayCoordinatorStatus.RUNNING,
-            SprayCoordinatorStatus.STOP,
+            SprayCoordinatorStatus.ABORTED,
             SprayCoordinatorStatus.FINISH,
             SprayCoordinatorStatus.FAILED,
             SprayCoordinatorStatus.ERROR
@@ -24,6 +24,7 @@ public class SprayCoordinatorStatus implements SprayCoordinatorType {
     /** initializing, set by default */
     public static final SprayCoordinatorStatus INITIALIZING = new SprayCoordinatorStatus(
             0, "coordinator.status.initializing", false);
+
     /** running, witch can start data coordinator */
     public static final SprayCoordinatorStatus RUNNING = new SprayCoordinatorStatus(
             0, "coordinator.status.running", false);
@@ -33,7 +34,7 @@ public class SprayCoordinatorStatus implements SprayCoordinatorType {
             1, "coordinator.status.finish", true);
 
     /** stop by human. need stop reason */
-    public static final SprayCoordinatorStatus STOP = new SprayCoordinatorStatus(
+    public static final SprayCoordinatorStatus ABORTED = new SprayCoordinatorStatus(
             2, "coordinator.status.aborted", true);
 
     /** stop with exception. need fail message */

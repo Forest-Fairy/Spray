@@ -3,7 +3,7 @@ package top.spray.engine.process.processor.factory.generator;
 import top.spray.common.bean.SprayServiceUtil;
 import top.spray.engine.process.processor.dispatch.coordinate.coordinator.SprayProcessCoordinator;
 import top.spray.engine.process.processor.dispatch.coordinate.meta.SprayProcessCoordinatorMeta;
-import top.spray.engine.process.exception.coordinate.SprayCoordinatorGenerateError;
+import top.spray.engine.process.processor.dispatch.exception.SprayCoordinatorGenerateError;
 
 import java.util.Map;
 

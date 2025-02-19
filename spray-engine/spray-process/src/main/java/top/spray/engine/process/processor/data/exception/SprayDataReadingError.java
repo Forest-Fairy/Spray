@@ -1,7 +1,5 @@
-package top.spray.engine.process.exception.data;
+package top.spray.engine.process.processor.data.exception;
 
-
-import top.spray.engine.process.exception.base.SprayDataException;
 
 public class SprayDataReadingError extends SprayDataException {
     public SprayDataReadingError(Throwable cause) {
