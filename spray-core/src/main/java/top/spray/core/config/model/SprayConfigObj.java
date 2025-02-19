@@ -10,16 +10,15 @@ import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 
-@SprayResourceBundle("system.configuration")
+@SprayResourceBundle(SprayResourceBundle.CONFIGURATION)
 public class SprayConfigObj<T> {
-    static final Map<String, SprayConfigObj<?>> CONFIG_MAP = new HashMap<>();
-    private final String i18n;
-    private final boolean visitable;
-    private final String key;
-    private T value;
-    private final T defValue;
-
-    private final Type type;
+    protected static final Map<String, SprayConfigObj<?>> CONFIG_MAP = new HashMap<>();
+    protected final String i18n;
+    protected final boolean visitable;
+    protected final String key;
+    protected T value;
+    protected final T defValue;
+    protected final Class<?> type;
 
     SprayConfigObj(String i18n, boolean visitable, String key, T value, T defValue) {
         this.i18n = i18n;
@@ -27,7 +26,7 @@ public class SprayConfigObj<T> {
         this.key = key;
         this.value = value;
         this.defValue = defValue;
-        this.type = TypeUtil.getGenerics(this.getClass())[0].getActualTypeArguments()[0];
+        this.type = value == null ? defValue.getClass() : value.getClass();
         CONFIG_MAP.put(key, this);
     }
 
@@ -36,12 +35,13 @@ public class SprayConfigObj<T> {
     }
 
     public String getName() {
-        return SprayResourceBundleDef.get("name", this.getClass(), i18n);
+        return SprayResourceBundleDef.get(
+                "name", this.getClass(), i18n);
     }
 
     public String getComment() {
-        return StrUtil.format(
-                SprayResourceBundleDef.get("comment", this.getClass(), i18n),
+        return StrUtil.format(SprayResourceBundleDef.get(
+                "comment", this.getClass(), i18n),
                 this.getValue(), this.defValue);
     }
 
@@ -61,15 +61,4 @@ public class SprayConfigObj<T> {
         return defValue;
     }
 
-    public static void fromMap(Map<String, Object> map) {
-        map.forEach((k, v) -> {
-            SprayConfigObj<?> config = CONFIG_MAP.get(k);
-            if (config != null) {
-                config.value = v == null ? null : SprayDataUtil.convertValue(v, (Class<?>) config.type);
-            } else {
-                // register by new one
-                new SprayConfigObj<>(k, false, k, v, null);
-            }
-        });
-    }
 }

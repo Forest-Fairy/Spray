@@ -23,7 +23,7 @@ public interface SprayResourceBundleDef {
      */
     String getBundleName();
 
-    String BUNDLE_PREFIX = "spray.i18n.";
+//    String BUNDLE_PREFIX = "spray.i18n.";
     static String get(String type, Class<?> clazz, String key, Object... args) {
         Objects.requireNonNull(key, "key should not be null");
         if (key.contains(" ")) {
@@ -51,8 +51,8 @@ public interface SprayResourceBundleDef {
         }
         if (i18n != null) {
             String bundleName = i18n.getBundleName();
-            if (! bundleName.startsWith(BUNDLE_PREFIX)) {
-                bundleName = BUNDLE_PREFIX + bundleName;
+            if (! bundleName.startsWith("spray.i18n.")) {
+                bundleName = "spray.i18n." + bundleName;
             }
             if (type != null && !type.isBlank()) {
                 bundleName = bundleName + "." + type;

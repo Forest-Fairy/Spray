@@ -1,8 +1,8 @@
 package top.spray.db.connection.action;
 
-import top.spray.core.type.SprayTypeI18nType;
+import top.spray.core.type.SprayType;
 import top.spray.db.connection.exception.SprayDatabaseException;
-import top.spray.db.sql.objects.db.SprayDatabaseType;
+import top.spray.db.sql.db.types.SprayDatabaseType;
 
 import java.util.Map;
 
@@ -25,6 +25,6 @@ public interface SprayDataAction<Result extends SprayDataActionResult<?>, TYPE e
         throw new SprayDatabaseException(throwable);
     }
 
-    interface Type extends SprayTypeI18nType {
+    interface Type extends SprayType {
     }
 }

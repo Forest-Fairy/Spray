@@ -1,12 +1,22 @@
 package top.spray.core.type;
 
 
+import top.spray.core.i18n.SprayResourceBundle;
+import top.spray.core.i18n.SprayResourceBundleDef;
+
 import java.util.List;
 
+@SprayResourceBundle(SprayResourceBundle.TYPE)
 public interface SprayType {
     int getCode();
-    String typeName();
-    String getDescription();
+    String i18nKey();
+    default String typeName() {
+        return SprayResourceBundleDef.get("name", this.getClass(), this.i18nKey());
+    }
+    default String getDescription() {
+        return SprayResourceBundleDef.get("description", this.getClass(), this.i18nKey());
+    }
+
     default boolean validInstance(Class<? extends SprayType> clazz) {
         return this.getClass().isAssignableFrom(clazz);
     }
@@ -18,10 +28,10 @@ public interface SprayType {
         if (t1 == null && t2 == null) {
             return true;
         }
-        if (t1 instanceof SprayTypeHolder holder) {
+        if (t1 instanceof SprayTypeHolder<?> holder) {
             return holder.equals(t2);
         }
-        if (t2 instanceof SprayTypeHolder holder) {
+        if (t2 instanceof SprayTypeHolder<?> holder) {
             return holder.equals(t1);
         }
         if (t1 instanceof SprayType type1 && t2 instanceof SprayType type2) {

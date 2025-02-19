@@ -14,17 +14,41 @@
     <name>spray-engine</name>
     <description></description>
     <modules>
-        <module>spray-processor</module>
+        <module>spray-process</module>
         <module>spray-database</module>
+        <module>spray-engine-base</module>
     </modules>
 
     <properties>
     </properties>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>top.spray</groupId>
+                <artifactId>spray-engine-base</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>top.spray</groupId>
+                <artifactId>spray-database</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>top.spray</groupId>
+                <artifactId>spray-process</artifactId>
+                <version>${revision}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
         <dependency>
             <groupId>top.spray</groupId>
             <artifactId>spray-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>top.spray</groupId>
+            <artifactId>spray-engine-base</artifactId>
         </dependency>
     </dependencies>
 

@@ -8,7 +8,7 @@ import top.spray.core.i18n.SprayResourceBundleDef;
  * enhanced logger with spray i18n support
  */
 public interface SprayLogger extends Logger {
-    static SprayLogger create(Class<? extends SprayResourceBundleDef> c) {
+    static SprayLogger create(Class<?> c) {
         return new SprayLoggerImpl(c);
     }
 

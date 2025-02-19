@@ -1,8 +1,8 @@
 package top.spray.core.stream;
 
-import top.spray.core.type.SprayTypeI18nType;
+import top.spray.core.type.SprayType;
 
-public enum SprayDataStreamStatus implements SprayTypeI18nType {
+public enum SprayDataStreamStatus implements SprayType {
     OPEN(0, "stream.open"),
     CLOSE(0, "stream.close"),
     SUSPEND(0, "stream.suspend"),
