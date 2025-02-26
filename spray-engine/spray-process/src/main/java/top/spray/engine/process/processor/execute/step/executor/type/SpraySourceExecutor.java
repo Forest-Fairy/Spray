@@ -6,6 +6,7 @@ import top.spray.core.stream.SprayDataIterator;
 import top.spray.core.stream.SprayDataStream;
 import top.spray.engine.process.processor.dispatch.coordinate.coordinator.SprayProcessCoordinator;
 import top.spray.engine.process.processor.execute.step.executor.SprayStepExecutor;
+import top.spray.engine.process.processor.execute.step.executor.facade.SprayStepExecutorOwner;
 import top.spray.engine.process.processor.execute.step.executor.facade.SprayStepFacade;
 import top.spray.engine.process.processor.execute.step.meta.SprayExecutorType;
 import top.spray.engine.process.processor.execute.step.meta.SprayOptionalData;
@@ -13,8 +14,8 @@ import top.spray.engine.process.processor.execute.step.meta.SprayProcessExecuteS
 
 public abstract class SpraySourceExecutor extends SprayStepExecutor {
 
-    public SpraySourceExecutor(SprayProcessCoordinator coordinator, SprayStepFacade executorFacade) {
-        super(coordinator, executorFacade);
+    public SpraySourceExecutor(SprayStepExecutorOwner executorOwner, String transactionId) {
+        super(executorOwner, transactionId);
     }
 
     @Override

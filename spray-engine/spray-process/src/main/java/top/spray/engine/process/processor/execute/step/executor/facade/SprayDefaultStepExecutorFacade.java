@@ -4,6 +4,7 @@ import top.spray.common.tools.SprayExceptionUtil;
 import top.spray.common.tools.SprayOptional;
 import top.spray.core.dynamic.SprayClassLoader;
 import top.spray.core.thread.SprayPoolExecutor;
+import top.spray.engine.process.infrastructure.prop.SprayVariableContainer;
 import top.spray.engine.process.processor.execute.exception.SprayStepExecuteError;
 import top.spray.engine.process.infrastructure.analyse.SprayAnalyseResult;
 import top.spray.engine.process.infrastructure.analyse.SprayAnalyser;
@@ -24,7 +25,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Define the executor of a process node
  */
-public class SprayDefaultStepExecutorFacade implements SprayStepFacade {
+public class SprayDefaultStepExecutorFacade implements SprayStepFacade, SprayStepExecutorOwner {
     private SprayProcessExecuteStepMeta stepMeta;
     private SprayProcessCoordinator coordinator;
     private SprayClassLoader classLoader;
@@ -36,8 +37,8 @@ public class SprayDefaultStepExecutorFacade implements SprayStepFacade {
     private Map<String, Object> executeInfo;
 
     public SprayDefaultStepExecutorFacade(SprayProcessExecuteStepMeta stepMeta, SprayProcessCoordinator coordinator, SprayClassLoader classLoader) {
-        this.stepMeta = stepMeta;
         this.coordinator = coordinator;
+        this.stepMeta = stepMeta;
         this.classLoader = classLoader;
         this.executor = ;
     }
@@ -182,5 +183,40 @@ public class SprayDefaultStepExecutorFacade implements SprayStepFacade {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public String getExecutorNameKey() {
+        return this.executorNameKey();
+    }
+
+    @Override
+    public SprayProcessExecuteStepMeta getStepMeta() {
+        return this.getMeta();
+    }
+
+    @Override
+    public List<SprayProcessExecuteStepMeta> listNextSteps(String executorNameKey) {
+        return this.getCoordinator().listNextSteps(executorNameKey);
+    }
+
+    @Override
+    public String getExecutorNameKey(SprayProcessExecuteStepMeta nextStepMeta) {
+        return this.coordinator.getExecutorNameKey(nextStepMeta);
+    }
+
+    @Override
+    public void dispatchData(String variableContainerIdentityDataKey, SprayStepExecutor sprayStepExecutor, SprayOptionalData optionalData, String toExecutorNameKeys) {
+        this.coordinator.dispatchData(variableContainerIdentityDataKey, sprayStepExecutor, optionalData, toExecutorNameKeys);
+    }
+
+    @Override
+    public SprayStepFacade getExecutorFacade(String executorNameKey) {
+        return this.coordinator.getExecutorFacade(executorNameKey);
+    }
+
+    @Override
+    public SprayVariableContainer getVariableContainer(String variableContainerIdentityDataKey) {
+        return this.coordinator.getVariableManager().getVariableContainer(variableContainerIdentityDataKey);
     }
 }

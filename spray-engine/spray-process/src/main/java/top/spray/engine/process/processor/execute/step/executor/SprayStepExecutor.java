@@ -6,6 +6,7 @@ import top.spray.engine.process.infrastructure.meta.SprayMetaDrive;
 import top.spray.engine.process.infrastructure.prop.SprayVariableContainer;
 import top.spray.engine.process.processor.dispatch.coordinate.coordinator.SprayProcessCoordinator;
 import top.spray.engine.process.processor.execute.filters.SprayNextStepFilter;
+import top.spray.engine.process.processor.execute.step.executor.facade.SprayStepExecutorOwner;
 import top.spray.engine.process.processor.execute.step.executor.facade.SprayStepFacade;
 import top.spray.engine.process.processor.execute.step.meta.SprayExecutorType;
 import top.spray.engine.process.processor.execute.step.meta.SprayOptionalData;
@@ -16,22 +17,16 @@ import java.util.Map;
 import java.util.Objects;
 
 public abstract class SprayStepExecutor implements SprayAnalysable, SprayMetaDrive<SprayProcessExecuteStepMeta> {
-    protected final SprayProcessCoordinator coordinator;
-    protected final SprayStepFacade executorFacade;
+    protected final SprayStepExecutorOwner executorOwner;
     protected final SprayProcessExecuteStepMeta stepMeta;
     protected final String transactionId;
     protected final String executorNameKey;
 
-    public SprayStepExecutor(SprayProcessCoordinator coordinator, SprayStepFacade executorFacade) {
-        this.coordinator = coordinator;
-        this.executorFacade = executorFacade;
-        this.transactionId = coordinator.transactionId();
-        this.stepMeta = executorFacade.getMeta();
-        this.executorNameKey = executorFacade.executorNameKey();
-    }
-
-    public SprayProcessCoordinator coordinator() {
-        return this.coordinator;
+    public SprayStepExecutor(SprayStepExecutorOwner executorOwner, String transactionId) {
+        this.executorOwner = executorOwner;
+        this.transactionId = transactionId;
+        this.stepMeta = executorOwner.getStepMeta();
+        this.executorNameKey = executorOwner.getExecutorNameKey();
     }
 
     @Override
@@ -92,11 +87,11 @@ public abstract class SprayStepExecutor implements SprayAnalysable, SprayMetaDri
         String not_publish = " ";
         String toExecutorNameKeys = "";
         if (filter != null) {
-            List<SprayProcessExecuteStepMeta> nextStepMetas = this.coordinator.listNextSteps(this.executorNameKey);
+            List<SprayProcessExecuteStepMeta> nextStepMetas = this.executorOwner.listNextSteps(this.executorNameKey);
             if (nextStepMetas != null) {
                 for (SprayProcessExecuteStepMeta nextStepMeta : nextStepMetas) {
                     if (filter.filterBeforeDispatch(this, variableContainerIdentityDataKey, optionalData, nextStepMeta)) {
-                        toExecutorNameKeys += "," + this.coordinator.getExecutorNameKey(nextStepMeta);
+                        toExecutorNameKeys += "," + this.executorOwner.getExecutorNameKey(nextStepMeta);
                     }
                 }
             }
@@ -109,15 +104,15 @@ public abstract class SprayStepExecutor implements SprayAnalysable, SprayMetaDri
         if (toExecutorNameKeys.equals(not_publish)) {
             return;
         }
-        this.coordinator.dispatchData(variableContainerIdentityDataKey, this, optionalData, toExecutorNameKeys);
+        this.executorOwner.dispatchData(variableContainerIdentityDataKey, this, optionalData, toExecutorNameKeys);
     }
 
     protected SprayVariableContainer getVariableContainer(String variableContainerIdentityDataKey) {
-        return this.coordinator.getVariableManager().getVariableContainer(variableContainerIdentityDataKey);
+        return this.executorOwner.getVariableContainer(variableContainerIdentityDataKey);
     }
     protected SprayStepFacade getExecutorFacade(String executorNameKey) {
         Objects.requireNonNull(executorNameKey, "executorNameKey can not be null");
-        return this.coordinator.getExecutorFacade(executorNameKey);
+        return this.executorOwner.getExecutorFacade(executorNameKey);
     }
     protected SprayStepFacade getMyFacade() {
         return this.getExecutorFacade(this.executorNameKey);
