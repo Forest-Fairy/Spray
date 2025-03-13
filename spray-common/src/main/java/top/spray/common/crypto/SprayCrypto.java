@@ -2,7 +2,7 @@ package top.spray.common.crypto;
 
 public interface SprayCrypto {
     static void register(SprayCrypto crypto) {
-        SprayCryptos.register(crypto);
+        SprayCryptos.SprayCryptoFactory.register(crypto);
     }
     boolean match(String name);
     byte[] encrypt(byte[] content, String key);

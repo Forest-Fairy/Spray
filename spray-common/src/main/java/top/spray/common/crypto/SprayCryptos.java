@@ -16,16 +16,9 @@ public class SprayCryptos {
     public static SprayCrypto RSA() {
         return SprayCryptoFactory.getCrypto("RSA");
     }
-    public static SprayCrypto getCrypto(String name) {
-        return SprayCryptoFactory.getCrypto(name);
-    }
-    public static void register(SprayCrypto crypto) {
-        SprayCryptoFactory.register(crypto);
-    }
 
 
-
-    private static class SprayCryptoFactory {
+    public static class SprayCryptoFactory {
         private static final Set<SprayCrypto> CRYPTO_LIST = new LinkedHashSet<>();
 
         public static void register(SprayCrypto crypto) {
