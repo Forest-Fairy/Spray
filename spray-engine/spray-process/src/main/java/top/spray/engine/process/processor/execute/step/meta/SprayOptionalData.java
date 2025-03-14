@@ -22,16 +22,16 @@ public class SprayOptionalData extends SprayOptional<SprayTuples._3<String, Spra
         return dataKey;
     }
     public String getGeneratorNameKey() {
-        return this.isNotPresent() ? "" : this.map(SprayTuples._3::t0).orElse(null);
+        return this.isNotPresent() ? "" : this.map(SprayTuples._3::t1).orElse(null);
     }
     public SprayData getData() {
-        return this.isNotPresent() ? SprayData.EMPTY : this.map(SprayTuples._3::t1).orElse(null);
+        return this.isNotPresent() ? SprayData.EMPTY : this.map(SprayTuples._3::t2).orElse(null);
     }
     public boolean isStill() {
-        return this.isPresent() && this.map(SprayTuples._3::t2).orElse(null);
+        return this.isPresent() && this.map(SprayTuples._3::t3).orElse(null);
     }
 
     public SprayOptionalData copyIfPresent() {
-        return this.isNotPresent() ? this : new SprayOptionalData(this.map(SprayTuples._3::t0).orElse(null), SprayData.deepCopy(this.map(SprayTuples._3::t1).orElse(null)), this.map(SprayTuples._3::t2).orElse(null));
+        return this.isNotPresent() ? this : new SprayOptionalData(this.map(SprayTuples._3::t1).orElse(null), SprayData.deepCopy(this.map(SprayTuples._3::t2).orElse(null)), this.map(SprayTuples._3::t3).orElse(null));
     }
 }

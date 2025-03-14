@@ -116,7 +116,7 @@ public class SprayStepVariableContainer implements SprayVariableContainer {
         T t = (T) this._get(ignoreBanned, key);
         if (t == null) {
             SprayTuples._2<T, Boolean> _2 = valueAndSetBanned.get();
-            this.set(key, t = _2.t0(), _2.t1());
+            this.set(key, t = _2.t1(), _2.t2());
         }
         return t;
     }
