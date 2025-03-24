@@ -196,8 +196,8 @@ public class SprayDefaultStepExecutorFacade implements SprayStepFacade, SpraySte
     }
 
     @Override
-    public List<SprayProcessExecuteStepMeta> listNextSteps(String executorNameKey) {
-        return this.getCoordinator().listNextSteps(executorNameKey);
+    public List<SprayProcessExecuteStepMeta> listNextSteps() {
+        return this.getCoordinator().listNextSteps(this.executor.executorNameKey());
     }
 
     @Override

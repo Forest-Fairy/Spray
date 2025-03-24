@@ -1,5 +1,7 @@
 package top.spray.engine.process.processor.execute.exception;
 
+import top.spray.engine.exception.SprayEngineException;
+
 /**
  * spray.i18n.exception.engine.execute
  */

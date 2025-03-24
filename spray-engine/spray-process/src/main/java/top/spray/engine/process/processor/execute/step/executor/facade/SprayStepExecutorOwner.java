@@ -12,7 +12,7 @@ public interface SprayStepExecutorOwner {
 
     SprayProcessExecuteStepMeta getStepMeta();
 
-    List<SprayProcessExecuteStepMeta> listNextSteps(String executorNameKey);
+    List<SprayProcessExecuteStepMeta> listNextSteps();
 
     String getExecutorNameKey(SprayProcessExecuteStepMeta nextStepMeta);
 

@@ -4,7 +4,6 @@ import org.slf4j.MDC;
 import top.spray.engine.process.infrastructure.analyse.SprayAnalysable;
 import top.spray.engine.process.infrastructure.meta.SprayMetaDrive;
 import top.spray.engine.process.infrastructure.prop.SprayVariableContainer;
-import top.spray.engine.process.processor.dispatch.coordinate.coordinator.SprayProcessCoordinator;
 import top.spray.engine.process.processor.execute.filters.SprayNextStepFilter;
 import top.spray.engine.process.processor.execute.step.executor.facade.SprayStepExecutorOwner;
 import top.spray.engine.process.processor.execute.step.executor.facade.SprayStepFacade;
@@ -87,7 +86,7 @@ public abstract class SprayStepExecutor implements SprayAnalysable, SprayMetaDri
         String not_publish = " ";
         String toExecutorNameKeys = "";
         if (filter != null) {
-            List<SprayProcessExecuteStepMeta> nextStepMetas = this.executorOwner.listNextSteps(this.executorNameKey);
+            List<SprayProcessExecuteStepMeta> nextStepMetas = this.executorOwner.listNextSteps();
             if (nextStepMetas != null) {
                 for (SprayProcessExecuteStepMeta nextStepMeta : nextStepMetas) {
                     if (filter.filterBeforeDispatch(this, variableContainerIdentityDataKey, optionalData, nextStepMeta)) {
