@@ -7,6 +7,7 @@ module top.spray.common {
     requires com.google.common;
     requires com.alibaba.fastjson2;
     requires org.apache.commons.lang3;
+    requires org.jetbrains.annotations;
     exports top.spray.common.analyse;
     exports top.spray.common.bean;
     exports top.spray.common.crypto;

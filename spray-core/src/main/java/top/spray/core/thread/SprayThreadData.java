@@ -2,8 +2,8 @@ package top.spray.core.thread;
 
 import cn.hutool.core.util.HexUtil;
 import org.slf4j.MDC;
-import top.spray.core.global.prop.SprayData;
-import top.spray.core.global.config.util.SpraySystemConfigurations;
+import top.spray.common.data.SprayData;
+import top.spray.core.config.util.SpraySystemConfigurations;
 
 public class SprayThreadData extends SprayData {
     private static final ThreadLocal<SprayThreadData> THREAD_LOCAL = new ThreadLocal<>();

@@ -1,11 +1,14 @@
 package top.spray.common.data;
 
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.lang.reflect.Array;
 import java.util.*;
 
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class SprayData implements Map<String, Object>, Serializable {
     public static final SprayData EMPTY = new SprayData().unmodifiable();
 
@@ -15,11 +18,11 @@ public class SprayData implements Map<String, Object>, Serializable {
     private final Map<String, Object> inside;
 
     public SprayData() {
-        inside = new HashMap<>();
+        inside = new LinkedHashMap<>();
     }
 
     public SprayData(Map map) {
-        inside = new HashMap<>();
+        inside = new LinkedHashMap<>(getInitialCapacity(map.size()));
         map.forEach((k, v) -> {
             if (k != null) {
                 this.put(String.valueOf(k), v);
@@ -27,12 +30,12 @@ public class SprayData implements Map<String, Object>, Serializable {
         });
     }
     public SprayData(String key0, Object value0, Object... keyValues) {
-        inside = new HashMap<>();
+        inside = new LinkedHashMap<>(getInitialCapacity(keyValues.length / 2 + 1));
         if (key0 == null) {
             throw new IllegalArgumentException("key can not be null");
         }
         this.put(key0, value0);
-        if (keyValues != null && keyValues.length > 0) {
+        if (keyValues.length > 0) {
             if (! (keyValues.length % 2 == 0)) {
                 throw new IllegalArgumentException("keyValues must be key-value pairs!");
             }
@@ -80,38 +83,68 @@ public class SprayData implements Map<String, Object>, Serializable {
         return get(key, String.class);
     }
 
-    public <T> List<T> getList(String key, Class<T> tClass, boolean replace) {
-        List<T> list = this.getList(key, tClass);
+    public <T> List<? extends T> getList(String key, Class<T> tClass, boolean replace) {
+        List<? extends T> list = this.getList(key, tClass);
         if (replace && list != null) {
             this.put(key, list);
         }
         return list;
     }
-    public <T> List<T> getList(String key, Class<T> tClass) {
+    public <T> List<? extends T> getList(String key, Class<T> tClass) {
         Object ol = this.get(key);
         if (ol == null) {
             return null;
         }
-        if (ol instanceof List) {
-            return (List<T>) ol;
-        }
-        try {
-            List<?> o = (List<?>) ol;
-            boolean useNew = false;
-            List<T> list = new ArrayList<>(o.size());
-            for (Object each : o) {
-                if (each == null) {
-                    list.add(null);
-                } else {
-                    if (!useNew) {
-                        useNew = true;
-                    }
-                    list.add(SprayDataUtil.convertValue(each, tClass));
-                }
+        if (ol instanceof List o) {
+            if (o.isEmpty()) {
+                return o;
             }
-            return useNew ? list : (List<T>) o;
-        } catch (Exception e) {
-            throw new RuntimeException("failed to cast object value to list value", e);
+            try {
+                boolean useNew = false;
+                List<T> list = new ArrayList<>(o.size());
+                for (Object each : o) {
+                    if (each == null) {
+                        list.add(null);
+                    } else {
+                        if (!useNew) {
+                            useNew = true;
+                        }
+                        list.add(SprayDataUtil.convertValue(each, tClass));
+                    }
+                }
+                return useNew ? list : (List<T>) o;
+            } catch (Exception e) {
+                throw new RuntimeException("failed to cast object value to list value", e);
+            }
+        } else if (ol instanceof Iterable iterable) {
+            Iterator it = iterable.iterator();
+            if (!it.hasNext()) {
+                return List.of();
+            }
+            try {
+                List<T> list = new LinkedList<>();
+                it.forEachRemaining(each -> SprayDataUtil.convertValue(each, tClass));
+                return list;
+            } catch (Exception e) {
+                throw new RuntimeException("failed to cast object value to list value", e);
+            }
+        } else if (ol.getClass().isArray()) {
+            try {
+                List<T> list = new ArrayList<>(Array.getLength(ol));
+                for (int i = 0; i < Array.getLength(ol); i++) {
+                    Object each = Array.get(ol, i);
+                    if (each == null) {
+                        list.add(null);
+                    } else {
+                        list.add(SprayDataUtil.convertValue(each, tClass));
+                    }
+                }
+                return list;
+            } catch (Exception e) {
+                throw new RuntimeException("failed to cast object value to list value", e);
+            }
+        } else {
+            throw new RuntimeException("failed to cast object value to list value");
         }
     }
 
@@ -143,7 +176,6 @@ public class SprayData implements Map<String, Object>, Serializable {
         inside = dataWrapper.data;
     }
 
-    @SuppressWarnings("deprecation")
     public String toJson() {
         return toJson(false);
     }
@@ -218,12 +250,12 @@ public class SprayData implements Map<String, Object>, Serializable {
     }
 
     @Override
-    public Set<String> keySet() {
+    public @NotNull Set<String> keySet() {
         return inside.keySet();
     }
 
     @Override
-    public Collection<Object> values() {
+    public @NotNull Collection<Object> values() {
         return inside.values();
     }
 
@@ -324,5 +356,8 @@ public class SprayData implements Map<String, Object>, Serializable {
                 return super.remove(key);
             }
         }
+    }
+    static int getInitialCapacity(int size) {
+        return (int) Math.min((long) size + (size >> 1), Integer.MAX_VALUE);
     }
 }

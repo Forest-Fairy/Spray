@@ -9,198 +9,73 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
- * 节点引擎
+ * Step Meta
  */
-public class SprayProcessExecuteStepMeta implements SprayBaseMeta, Cloneable {
-
-    /* executor meta container */
-    private final SprayData metaContainer;
-
-    /* base meta */
-    private String id;
-    private String name;
-    private SprayExecutorType executorType;
-    private List<SprayProcessExecuteStepMeta> nextNodes;
-    private String executorFactoryClass;
-    private String executorClass;
-    private String jarFiles;
-    private String blockHandlerClass;
-
-    /* dubbo meta */
-    private String host;
-    private int port;
-
-
-    /* execution options meta */
-
-    private SprayStepActiveType stepActiveType;
-    private boolean transactional;
-    private boolean rollbackIfError;
-    private boolean ignoreError;
-    private boolean isAsync;
-    private boolean isRemoting;
-    private String remotingJarFiles;
-    private int coreThreadCount;
-    private int maxThreadCount;
-    private int queueCapacity;
-    private int threadAliveTime;
-    private TimeUnit threadAliveTimeUnit;
-    private int maxConcurrentReceiving;
-    private int varCopy;
-    private Collection<SprayStepExecuteConditionFilter> executeConditionFilters;
-    private String blackEvents;
-    private String whiteEvents;
-
-    public SprayProcessExecuteStepMeta(SprayData metaContainer) {
-        this.metaContainer = metaContainer.unmodifiable();
-        try {
-            init();
-        } catch (Exception e) {
-            throw new SprayMetaError(this, "failed to init the step meta " + this.getName(), e);
-        }
-    }
-
-    private void init() {
-        this.id = metaContainer.getNoneNull("stepId", String.class);
-        this.name = metaContainer.getNoneNull("stepName", String.class);
-        this.executorType = SprayExecutorType.valueOf(metaContainer.getOrElse("executorType", "COMPUTE"));
-        this.nextNodes = metaContainer.getList("nextNodes", SprayProcessExecuteStepMeta.class);
-        this.executorFactoryClass = metaContainer.getOrElse("executorFactoryClass", "");
-        this.executorClass = metaContainer.getNoneNull("executorClass", String.class);
-        this.jarFiles = metaContainer.getString("jarFiles");
-        this.blockHandlerClass = metaContainer.getString("blockHandlerClass");
-        this.stepActiveType = SprayStepActiveType.valueOf(metaContainer.getOrElse("activeType", "ACTIVE").toUpperCase());
-        this.transactional = metaContainer.getOrElse("isTransactional", false);
-        this.rollbackIfError = this.transactional && metaContainer.getOrElse("rollbackIfError", false);
-        // only effect when rollbackIfError is false
-        this.ignoreError = (!this.rollbackIfError) && (metaContainer.getOrElse("ignoreError", false));
-        this.isAsync = metaContainer.getOrElse("isAsync", false);
-        this.isRemoting = metaContainer.getOrElse("isRemoting", false);
-        this.remotingJarFiles = metaContainer.getString("remotingJarFiles");
-        this.coreThreadCount = metaContainer.getOrElse("coreThreadCount", 5);
-        this.maxThreadCount = Math.max(this.coreThreadCount, metaContainer.getOrElse("maxThreadCount", 10));
-        this.queueCapacity = metaContainer.getOrElse("queueCapacity", 20);
-        this.threadAliveTime = metaContainer.getOrElse("threadAliveTime", 30);
-        this.threadAliveTimeUnit = TimeUnit.valueOf(metaContainer.getOrElse("threadAliveTimeUnit", "SECONDS"));
-        this.maxConcurrentReceiving = metaContainer.getOrElse("maxConcurrentReceiving", 5);
-        this.blackEvents = metaContainer.getString("blackEventPassBy");
-        this.whiteEvents = metaContainer.getString("whiteEventPassBy");
-        this.varCopy = metaContainer.getOrElse("varCopy", 0);
-        this.executeConditionFilters = SprayStepExecuteConditionFilter.Factory.createFilters(this);
-    }
-
+public interface SprayProcessExecuteStepMeta extends SprayBaseMeta, Cloneable {
 
     @Override
-    public String getId() {
-        return this.id;
-    }
+    String getId();
 
     @Override
-    public String getName() {
-        return this.name;
-    }
+    String getName();
 
-    public SprayExecutorType getExecutorType() {
-        return executorType;
-    }
+    SprayExecutorType getExecutorType();
 
-    public List<SprayProcessExecuteStepMeta> nextNodes() {
-        return this.nextNodes;
-    }
+    List<? extends SprayProcessExecuteStepMeta> nextNodes();
 
-    public Collection<SprayStepExecuteConditionFilter> getExecuteConditionFilter() {
-        return executeConditionFilters;
-    }
+    Collection<SprayStepExecuteConditionFilter> getExecuteConditionFilter();
 
     /**
      * the generator class must implement the interface SprayExecutorGenerator
      */
-    public String executorFactoryClass() {
-        return this.executorFactoryClass;
-    }
-    public String executorClass() {
-        return this.executorClass;
-    }
+    String executorFactoryClass();
+    String executorClass();
 
     /**
      * the jars for running
      */
-    public String jarFiles() {
-        return this.jarFiles;
-    }
+    String jarFiles();
 
     /**
      * 1    - run current node <br>
      * 0    - skip current node <br>
      * -1   - skip all from current node
      */
-    public SprayStepActiveType stepActiveType() {
-        return this.stepActiveType;
-    }
+    SprayStepActiveType stepActiveType();
 
-    public boolean transactional() {
-        return this.transactional;
-    }
+    boolean transactional();
 
-    public boolean rollbackIfError() {
-        return rollbackIfError;
-    }
+    boolean rollbackIfError();
 
-    public boolean ignoreError() {
-        return this.ignoreError;
-    }
+    boolean ignoreError();
 
-    public boolean isAsync() {
-        return this.isAsync;
-    }
+    boolean isAsync();
 
     /** enable remoting execute */
-    public boolean isRemoting() {
-        return this.isRemoting;
-    }
+    boolean isRemoting();
 
     /**
      * jarFiles for remote executor
      */
-    public String remotingJarFiles() {
-        return remotingJarFiles;
-    }
+    String remotingJarFiles();
 
-    public int coreThreadCount() {
-        return coreThreadCount;
-    }
+    int coreThreadCount();
 
-    public int maxThreadCount() {
-        return maxThreadCount;
-    }
+    int maxThreadCount();
 
-    public int queueCapacity() {
-        return queueCapacity;
-    }
+    int queueCapacity();
 
-    public int threadAliveTime() {
-        return threadAliveTime;
-    }
+    int threadAliveTime();
 
-    public TimeUnit threadAliveTimeUnit() {
-        return threadAliveTimeUnit;
-    }
+    TimeUnit threadAliveTimeUnit();
 
-    public int maxConcurrentReceiving() {
-        return maxConcurrentReceiving;
-    }
+    int maxConcurrentReceiving();
 
-    public String getBlackEvents() {
-        return this.blackEvents;
-    }
+    String getBlackEvents();
 
-    public String getWhiteEvents() {
-        return this.whiteEvents;
-    }
+    String getWhiteEvents();
 
-    public String blockHandlerClass() {
-        return blockHandlerClass;
-    }
+    String blockHandlerClass();
 
     /**
      * @return
@@ -208,51 +83,22 @@ public class SprayProcessExecuteStepMeta implements SprayBaseMeta, Cloneable {
      *  1 -> easy <br>
      *  2 -> deep
      */
-    public int varCopyMode() {
-        return this.varCopy;
-    }
+    int varCopyMode();
 
-    public <T> T get(String key, Class<T> tClass) {
-        return metaContainer.get(key, tClass);
-    }
+    <T> T get(String key, Class<T> tClass);
 
-    public String getString(String key) {
-        return metaContainer.getString(key);
-    }
+    String getString(String key);
 
-    public String getString(String key, String defVal) {
-        return metaContainer.getOrElse(key, defVal);
-    }
+    String getString(String key, String defVal);
 
-    public Integer getInteger(String key, Integer defVal) {
-        return metaContainer.getOrElse(key, defVal);
-    }
+    Integer getInteger(String key, Integer defVal);
 
-    public Long getLong(String key, Long defVal) {
-        return metaContainer.getOrElse(key, defVal);
-    }
+    Long getLong(String key, Long defVal);
 
-    public Boolean getBoolean(String key, Boolean bool) {
-        return metaContainer.getOrElse(key, bool);
-    }
+    Boolean getBoolean(String key, Boolean bool);
 
-    public SprayData getMetaContainer() {
-        return metaContainer;
-    }
+    SprayData getMetaContainer();
 
-    public String toJson() {
-        return this.metaContainer.toJson();
-    }
+    String toJson();
 
-
-    @Override
-    public SprayProcessExecuteStepMeta clone() {
-        try {
-            SprayProcessExecuteStepMeta clone = (SprayProcessExecuteStepMeta) super.clone();
-            // TODO: copy mutable state here, so the clone can't change the internals of the original
-            return clone;
-        } catch (CloneNotSupportedException e) {
-            throw new AssertionError();
-        }
-    }
 }

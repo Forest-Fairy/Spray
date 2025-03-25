@@ -86,7 +86,7 @@ public abstract class SprayStepExecutor implements SprayAnalysable, SprayMetaDri
         String not_publish = " ";
         String toExecutorNameKeys = "";
         if (filter != null) {
-            List<SprayProcessExecuteStepMeta> nextStepMetas = this.executorOwner.listNextSteps();
+            List<? extends SprayProcessExecuteStepMeta> nextStepMetas = this.executorOwner.listNextSteps();
             if (nextStepMetas != null) {
                 for (SprayProcessExecuteStepMeta nextStepMeta : nextStepMetas) {
                     if (filter.filterBeforeDispatch(this, variableContainerIdentityDataKey, optionalData, nextStepMeta)) {

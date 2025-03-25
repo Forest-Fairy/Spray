@@ -55,7 +55,7 @@ public interface SprayProcessCoordinator extends
     SprayStepFacade getExecutorFacade(String executorNameKey);
 
     /** method for listing the next steps' meta */
-    List<SprayProcessExecuteStepMeta> listNextSteps(String executorNameKey);
+    List<? extends SprayProcessExecuteStepMeta> listNextSteps(String executorNameKey);
 
     /** method for getting the variable manager */
     SprayVariableManager getVariableManager();

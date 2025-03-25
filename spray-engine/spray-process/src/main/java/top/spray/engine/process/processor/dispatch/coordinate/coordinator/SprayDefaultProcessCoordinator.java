@@ -48,7 +48,7 @@ public class SprayDefaultProcessCoordinator implements SprayProcessCoordinator {
         createExecutors(this.getMeta().listStartNodes());
     }
 
-    private void createExecutors(List<SprayProcessExecuteStepMeta> nodes) {
+    private void createExecutors(List<? extends SprayProcessExecuteStepMeta> nodes) {
         nodes.forEach(node -> {
             String executorNameKey = this.getExecutorNameKey(node);
             if (this.cachedExecutorMap.get(executorNameKey) == null) {
@@ -177,7 +177,7 @@ public class SprayDefaultProcessCoordinator implements SprayProcessCoordinator {
                     "param is invalid, please contact the technician");
             return;
         }
-        List<SprayProcessExecuteStepMeta> nextNodes = this.listNextSteps(fromExecutorNameKey);
+        List<? extends SprayProcessExecuteStepMeta> nextNodes = this.listNextSteps(fromExecutorNameKey);
         if (!nextNodes.isEmpty() && ! toExecutorNameKeys.isBlank()) {
             nextNodes = nextNodes.stream()
                     .filter(nextNodeMeta -> {
@@ -193,7 +193,7 @@ public class SprayDefaultProcessCoordinator implements SprayProcessCoordinator {
         this.dispatchDataToNodes(nextNodes, variableContainerIdentityDataKey, fromExecutorNameKey, optionalData);
     }
 
-    protected final void dispatchDataToNodes(List<SprayProcessExecuteStepMeta> nodes, String variableContainerIdentityDataKey, String fromExecutorNameKey, SprayOptionalData optionalData) {
+    protected final void dispatchDataToNodes(List<? extends SprayProcessExecuteStepMeta> nodes, String variableContainerIdentityDataKey, String fromExecutorNameKey, SprayOptionalData optionalData) {
         if (nodes == null || nodes.isEmpty()) {
             this.setDispatchResult(variableContainerIdentityDataKey, fromExecutorNameKey, optionalData, null, SprayDataDispatchResultType.ABANDONED);
             return;
@@ -259,7 +259,7 @@ public class SprayDefaultProcessCoordinator implements SprayProcessCoordinator {
     }
 
     @Override
-    public List<SprayProcessExecuteStepMeta> listNextSteps(String executorNameKey) {
+    public List<? extends SprayProcessExecuteStepMeta> listNextSteps(String executorNameKey) {
         return Optional.of(cachedExecutorMap.get(executorNameKey))
                 .map(SprayStepFacade::getMeta)
                 .map(SprayProcessExecuteStepMeta::nextNodes)
